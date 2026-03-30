@@ -20,6 +20,7 @@ import (
 	"github.com/GreengageDB/ggupgrade/cli/clistep"
 	"github.com/GreengageDB/ggupgrade/cli/commanders"
 	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/greengage/connection"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/step"
