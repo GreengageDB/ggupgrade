@@ -12,13 +12,12 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/greenplum-db/gpupgrade/cli/clistep"
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/clistep"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func execute() *cobra.Command {
@@ -69,7 +68,7 @@ func execute() *cobra.Command {
 				return err
 			}
 
-			intermediate := &greenplum.Cluster{}
+			intermediate := &greengage.Cluster{}
 			st.RunHubSubstep(func(streams step.OutStreams) error {
 				client, err := connectToHub()
 				if err != nil {
@@ -86,7 +85,7 @@ func execute() *cobra.Command {
 					return err
 				}
 
-				intermediate, err = greenplum.DecodeCluster(response.GetIntermediate())
+				intermediate, err = greengage.DecodeCluster(response.GetIntermediate())
 				if err != nil {
 					return err
 				}
@@ -95,7 +94,7 @@ func execute() *cobra.Command {
 			})
 
 			return st.Complete(fmt.Sprintf(ExecuteCompletedText,
-				filepath.Join(intermediate.GPHome, "greenplum_path.sh"),
+				filepath.Join(intermediate.GPHome, "greengage_path.sh"),
 				intermediate.CoordinatorDataDir(),
 				intermediate.CoordinatorPort()))
 		},

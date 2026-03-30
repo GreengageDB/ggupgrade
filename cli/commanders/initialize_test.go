@@ -12,8 +12,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
 )
 
 // Streams the above stdout/err constants to the corresponding standard file
@@ -171,7 +171,7 @@ func TestCreateStateDir(t *testing.T) {
 		}
 	}()
 
-	stateDir := filepath.Join(home, ".gpupgrade")
+	stateDir := filepath.Join(home, ".ggupgrade")
 	err = os.Setenv("GPUPGRADE_HOME", stateDir)
 	if err != nil {
 		t.Fatalf("failed to set GPUPGRADE_HOME %#v", err)

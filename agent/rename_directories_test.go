@@ -8,9 +8,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/agent"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/agent"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
 )
 
 func TestRenameDirectories(t *testing.T) {

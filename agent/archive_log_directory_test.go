@@ -12,12 +12,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/greenplum-db/gpupgrade/agent"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/agent"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func TestArchiveLogDirectories(t *testing.T) {
@@ -32,7 +32,7 @@ func TestArchiveLogDirectories(t *testing.T) {
 			return &user.User{HomeDir: homeDir}, nil
 		}
 
-		logDir := filepath.Join(homeDir, "gpAdminLogs", "gpupgrade")
+		logDir := filepath.Join(homeDir, "gpAdminLogs", "ggupgrade")
 		testutils.MustCreateDir(t, logDir)
 		defer testutils.MustRemoveAll(t, logDir)
 

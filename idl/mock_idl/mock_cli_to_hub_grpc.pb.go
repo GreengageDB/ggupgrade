@@ -8,8 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
+	idl "github.com/GreengageDB/ggupgrade/idl"
 	gomock "github.com/golang/mock/gomock"
-	idl "github.com/greenplum-db/gpupgrade/idl"
 	grpc "google.golang.org/grpc"
 	metadata "google.golang.org/grpc/metadata"
 )

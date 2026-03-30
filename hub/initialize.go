@@ -7,10 +7,10 @@ import (
 	"context"
 	"log"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func (s *Server) Initialize(req *idl.InitializeRequest, stream idl.CliToHub_InitializeServer) (err error) {
@@ -19,7 +19,7 @@ func (s *Server) Initialize(req *idl.InitializeRequest, stream idl.CliToHub_Init
 		return err
 	}
 
-	// Since the agents might not be up if gpupgrade is not properly installed, check it early on using ssh.
+	// Since the agents might not be up if ggupgrade is not properly installed, check it early on using ssh.
 	st.Run(idl.Substep_verify_gpupgrade_is_installed_across_all_hosts, func(streams step.OutStreams) error {
 		return upgrade.EnsureGpupgradeVersionsMatch(AgentHosts(s.Source))
 	})
@@ -45,7 +45,7 @@ func (s *Server) Initialize(req *idl.InitializeRequest, stream idl.CliToHub_Init
 	st.Run(idl.Substep_create_backupdirs, func(streams step.OutStreams) error {
 		err = CreateBackupDirectories(streams, s.agentConns, s.BackupDirs)
 		if err != nil {
-			nextAction := `1. Run "gpupgrade revert"
+			nextAction := `1. Run "ggupgrade revert"
 
 2. Consider setting the "parent_backup_dirs" parameter in gpupgrade_config.
 

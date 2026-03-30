@@ -10,7 +10,7 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 type parameter struct {
@@ -18,7 +18,7 @@ type parameter struct {
 	value string
 }
 
-// ParseConfig returns a validated map of flags from a gpupgrade config file.
+// ParseConfig returns a validated map of flags from a ggupgrade config file.
 func ParseConfig(config io.Reader) (map[string]string, error) {
 	params, err := parseParams(config)
 	if err != nil {

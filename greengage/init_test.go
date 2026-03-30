@@ -1,14 +1,14 @@
 // Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 // SPDX-License-Identifier: Apache-2.0
 
-package greenplum_test
+package greengage_test
 
 import (
 	"fmt"
 	"os"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
 )
 
 // Does nothing.

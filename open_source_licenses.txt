@@ -1,6 +1,6 @@
 open_source_licenses.txt
 
-VMware Greenplum Upgrade 1.8.0 GA
+Greengage Upgrade 1.8.0 GA
 ======================================================================
 
 The following copyright statements and licenses apply to various open
@@ -29,7 +29,7 @@ SECTION 1: Apache License, V2.0
    >>> google_renameio-v1.0.1
    >>> inconshreveable_mousetrap-v1.1.0
    >>> spf13_cobra-v1.7.0
-   >>> gpupgrade-1.7.0
+   >>> ggupgrade-1.7.0
    >>> cloudfoundry_gosigar-v1.3.6
    >>> grpc-v1.56.2
    >>> genproto_googleapis_rpc-ccb25ca9f130
@@ -618,1351 +618,1351 @@ APPENDIX. Standard License Files
        See SECTION 21 in 'LICENSE TEXT REFERENCE TABLE'
 
 
-   >>> gpupgrade-1.7.0
+   >>> ggupgrade-1.7.0
 
-       Found in: gpupgrade-main/LICENSE
+       Found in: ggupgrade-main/LICENSE
 
        Copyright 2020 VMware, Inc. or its affiliates
 
-       The Apache 2.0 license (the "License") set forth below applies to all parts of the Greenplum Database Upgrade project. You may not use this file except in compliance with the License.
+       The Apache 2.0 license (the "License") set forth below applies to all parts of the Greengage Database Upgrade project. You may not use this file except in compliance with the License.
 
        ADDITIONAL LICENSE INFORMATION
 
        > Apache2.0
 
-       gpupgrade-main/agent/add_replication_entries.go
+       ggupgrade-main/agent/add_replication_entries.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/archive_log_directory.go
+       ggupgrade-main/agent/archive_log_directory.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/check_disk_space.go
+       ggupgrade-main/agent/check_disk_space.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/create_backup_directory.go
+       ggupgrade-main/agent/create_backup_directory.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/create_recovery_conf.go
+       ggupgrade-main/agent/create_recovery_conf.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/delete_directories.go
+       ggupgrade-main/agent/delete_directories.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/rename_directories.go
+       ggupgrade-main/agent/rename_directories.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/rename_tablespaces.go
+       ggupgrade-main/agent/rename_tablespaces.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/restore_pg_control.go
+       ggupgrade-main/agent/restore_pg_control.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/rsync.go
+       ggupgrade-main/agent/rsync.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/server.go
+       ggupgrade-main/agent/server.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/update_conf.go
+       ggupgrade-main/agent/update_conf.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/agent/upgrade_primaries.go
+       ggupgrade-main/agent/upgrade_primaries.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/functional/generate.go
+       ggupgrade-main/ci/functional/generate.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/functional/pipeline/1_resources_anchors_groups.yml
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/generate.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/pipeline/1_resources_anchors_groups.yml
+       ggupgrade-main/ci/functional/pipeline/1_resources_anchors_groups.yml
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/5-to-6-workarounds.bash
+       ggupgrade-main/ci/main/generate.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/ci/main/pipeline/1_resources_anchors_groups.yml
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/6-to-7-workarounds.bash
+       ggupgrade-main/ci/main/scripts/5-to-6-workarounds.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/add-semver.bash
+       ggupgrade-main/ci/main/scripts/6-to-7-workarounds.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/build.bash
+       ggupgrade-main/ci/main/scripts/add-semver.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/ci-helpers.bash
+       ggupgrade-main/ci/main/scripts/build.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/environment.bash
+       ggupgrade-main/ci/main/scripts/ci-helpers.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/filters/double_precision.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/scripts/filters/filter/filter.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/scripts/filters/formatting.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/scripts/filters/partition_tables.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/scripts/filters/replacement.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/scripts/filters/rules5x.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/scripts/filters/rules6x.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/scripts/filters/trigger.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/scripts/filters/view_and_rule.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/main/scripts/load-dump.bash
+       ggupgrade-main/ci/main/scripts/environment.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/load-extensions.bash
+       ggupgrade-main/ci/main/scripts/filters/double_precision.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/ci/main/scripts/filters/filter/filter.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/ci/main/scripts/filters/formatting.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/ci/main/scripts/filters/partition_tables.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/ci/main/scripts/filters/replacement.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/ci/main/scripts/filters/rules5x.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/ci/main/scripts/filters/rules6x.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/ci/main/scripts/filters/trigger.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/ci/main/scripts/filters/view_and_rule.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/ci/main/scripts/load-dump.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/load-retail-data.bash
+       ggupgrade-main/ci/main/scripts/load-extensions.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/prepare-installation.bash
+       ggupgrade-main/ci/main/scripts/load-retail-data.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/upgrade-cluster.bash
+       ggupgrade-main/ci/main/scripts/prepare-installation.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/upgrade-extensions.bash
+       ggupgrade-main/ci/main/scripts/upgrade-cluster.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/main/scripts/verify-rpm.bash
+       ggupgrade-main/ci/main/scripts/upgrade-extensions.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/ci/parser/jobs.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/parser/main.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/ci/parser/version.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/bash/generate.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/clistep/step.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/clistep/step_store.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commanders/data_migration_apply.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commanders/data_migration_generate.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commanders/data_migration.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commanders/data_migration_script.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commanders/initialize.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commanders/steps.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commanders/substeps.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/agent.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/commands.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/confirmation_text.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/data_migration.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/execute.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/finalize.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/help_text.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/hub.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/initialize.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/parse_config.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/revert.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cli/commands/version.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/cmd/gpupgrade/main.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/config/backupdir/backupdir.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/config/config.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/config/generate_intermediate_cluster.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/create_find_view_dep_function.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/partitioned_tables_indexes/recreate_partition_indexes_step_1.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/partitioned_tables_indexes/recreate_partition_indexes_step_2.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/tables_using_tsquery_type/gen_change_text_to_tsquery.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/tables_using_tsquery_type/recreate_indexes_on_deprecated_built_in_types.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/tables_using_tsquery_type/recreate_views_on_deprecated_built_in_types.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.header
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.header
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/gphdfs_external_tables/gen_drop_external_tables.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/gphdfs_user_roles/gen_alter_gphdfs_roles.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/heterogeneous_partitioned_tables/fix_heterogeneous_partition_tables.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/parent_partitions_with_seg_entries/gen_drop_parent_partitions_with_seg_entries.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/partitioned_tables_indexes/gen_drop_partition_indexes.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/tables_using_tsquery_type/gen_drop_depr_built_in_type_dependent_views.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/tables_using_tsquery_type/gen_fix_tsquery_to_text.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/unique_primary_foreign_key_constraint/gen_drop_constraint_1_fk.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/unique_primary_foreign_key_constraint/gen_drop_constraint_2_primary_unique.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/gphdfs_external_tables/recreate_gphdfs_external_tables.sh
+       ggupgrade-main/ci/main/scripts/verify-rpm.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/gphdfs_user_roles/gen_alter_gphdfs_roles.sql
+       ggupgrade-main/ci/parser/jobs.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/partitioned_tables_indexes/recreate_partition_indexes_step_1.sql
+       ggupgrade-main/ci/parser/main.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/partitioned_tables_indexes/recreate_partition_indexes_step_2.sql
+       ggupgrade-main/ci/parser/version.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/tables_using_tsquery_type/gen_change_text_to_tsquery.sql
+       ggupgrade-main/cli/bash/generate.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/tables_using_tsquery_type/recreate_indexes_on_deprecated_built_in_types.sql
+       ggupgrade-main/cli/clistep/step.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/tables_using_tsquery_type/recreate_views_on_deprecated_built_in_types.sql
+       ggupgrade-main/cli/clistep/step_store.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.header
+       ggupgrade-main/cli/commanders/data_migration_apply.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.sql
+       ggupgrade-main/cli/commanders/data_migration_generate.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.header
+       ggupgrade-main/cli/commanders/data_migration.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.sql
+       ggupgrade-main/cli/commanders/data_migration_script.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/stats/cluster_and_database_stats/generate_cluster_stats.sh
+       ggupgrade-main/cli/commanders/initialize.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commanders/steps.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commanders/substeps.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/agent.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/commands.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/confirmation_text.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/data_migration.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/execute.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/finalize.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/help_text.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/hub.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/initialize.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/parse_config.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/revert.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cli/commands/version.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/cmd/ggupgrade/main.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/config/backupdir/backupdir.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/config/config.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/config/generate_intermediate_cluster.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/create_find_view_dep_function.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/partitioned_tables_indexes/recreate_partition_indexes_step_1.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/partitioned_tables_indexes/recreate_partition_indexes_step_2.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/tables_using_tsquery_type/gen_change_text_to_tsquery.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/tables_using_tsquery_type/recreate_indexes_on_deprecated_built_in_types.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/tables_using_tsquery_type/recreate_views_on_deprecated_built_in_types.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.header
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.header
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/gphdfs_external_tables/gen_drop_external_tables.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/gphdfs_user_roles/gen_alter_gphdfs_roles.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/heterogeneous_partitioned_tables/fix_heterogeneous_partition_tables.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/parent_partitions_with_seg_entries/gen_drop_parent_partitions_with_seg_entries.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/partitioned_tables_indexes/gen_drop_partition_indexes.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/tables_using_tsquery_type/gen_drop_depr_built_in_type_dependent_views.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/tables_using_tsquery_type/gen_fix_tsquery_to_text.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/unique_primary_foreign_key_constraint/gen_drop_constraint_1_fk.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/initialize/unique_primary_foreign_key_constraint/gen_drop_constraint_2_primary_unique.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/gphdfs_external_tables/recreate_gphdfs_external_tables.sh
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/5-to-6-seed-scripts/stats/cluster_and_database_stats/generate_database_stats.sh
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/gphdfs_user_roles/gen_alter_gphdfs_roles.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/partitioned_tables_indexes/recreate_partition_indexes_step_1.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/partitioned_tables_indexes/recreate_partition_indexes_step_2.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/tables_using_tsquery_type/gen_change_text_to_tsquery.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/tables_using_tsquery_type/recreate_indexes_on_deprecated_built_in_types.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/tables_using_tsquery_type/recreate_views_on_deprecated_built_in_types.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.header
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.header
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/stats/cluster_and_database_stats/generate_cluster_stats.sh
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/create_find_view_dep_function.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/partitioned_tables_indexes/recreate_partition_indexes_step_1.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/partitioned_tables_indexes/recreate_partition_indexes_step_2.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/tables_using_tsquery_type/gen_change_text_to_tsquery.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/tables_using_tsquery_type/recreate_indexes_on_deprecated_built_in_types.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/tables_using_tsquery_type/recreate_views_on_deprecated_built_in_types.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.header
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.header
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/gphdfs_external_tables/gen_drop_external_tables.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/heterogeneous_partitioned_tables/fix_heterogeneous_partition_tables.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/parent_partitions_with_seg_entries/gen_drop_parent_partitions_with_seg_entries.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/partitioned_tables_indexes/gen_drop_partition_indexes.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/tables_using_tsquery_type/gen_drop_depr_built_in_type_dependent_views.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/tables_using_tsquery_type/gen_fix_tsquery_to_text.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/unique_primary_foreign_key_constraint/gen_drop_constraint_1_fk.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/unique_primary_foreign_key_constraint/gen_drop_constraint_2_primary_unique.sql
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/gphdfs_external_tables/recreate_gphdfs_external_tables.sh
+       ggupgrade-main/data-migration-scripts/5-to-6-seed-scripts/stats/cluster_and_database_stats/generate_database_stats.sh
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/partitioned_tables_indexes/recreate_partition_indexes_step_1.sql
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/create_find_view_dep_function.sql
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/partitioned_tables_indexes/recreate_partition_indexes_step_2.sql
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/partitioned_tables_indexes/recreate_partition_indexes_step_1.sql
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/tables_using_tsquery_type/gen_change_text_to_tsquery.sql
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/partitioned_tables_indexes/recreate_partition_indexes_step_2.sql
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/tables_using_tsquery_type/recreate_indexes_on_deprecated_built_in_types.sql
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/tables_using_tsquery_type/gen_change_text_to_tsquery.sql
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/tables_using_tsquery_type/recreate_views_on_deprecated_built_in_types.sql
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/tables_using_tsquery_type/recreate_indexes_on_deprecated_built_in_types.sql
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.header
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/tables_using_tsquery_type/recreate_views_on_deprecated_built_in_types.sql
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.sql
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.header
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.header
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.sql
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.sql
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.header
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/stats/cluster_and_database_stats/generate_cluster_stats.sh
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/finalize/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/gphdfs_external_tables/gen_drop_external_tables.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/heterogeneous_partitioned_tables/fix_heterogeneous_partition_tables.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/parent_partitions_with_seg_entries/gen_drop_parent_partitions_with_seg_entries.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/partitioned_tables_indexes/gen_drop_partition_indexes.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/tables_using_tsquery_type/gen_drop_depr_built_in_type_dependent_views.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/tables_using_tsquery_type/gen_fix_tsquery_to_text.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/unique_primary_foreign_key_constraint/gen_drop_constraint_1_fk.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/initialize/unique_primary_foreign_key_constraint/gen_drop_constraint_2_primary_unique.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/gphdfs_external_tables/recreate_gphdfs_external_tables.sh
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/data-migration-scripts/6-to-7-seed-scripts/stats/cluster_and_database_stats/generate_database_stats.sh
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/partitioned_tables_indexes/recreate_partition_indexes_step_1.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/partitioned_tables_indexes/recreate_partition_indexes_step_2.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/tables_using_tsquery_type/gen_change_text_to_tsquery.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/tables_using_tsquery_type/recreate_indexes_on_deprecated_built_in_types.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/tables_using_tsquery_type/recreate_views_on_deprecated_built_in_types.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.header
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_1_primary_unique.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.header
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/revert/unique_primary_foreign_key_constraint/recreate_constraints_2_fk.sql
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/stats/cluster_and_database_stats/generate_cluster_stats.sh
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/greenplum/allowed_gpdb_versions.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/greenplum/cluster.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/greenplum/common.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/greenplum/connection/bootstrap.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/greenplum/connection.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/greenplum/query_pg_stat_activity.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/greenplum/segconfig.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/greenplum/tablespace.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/greenplum/version.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/greenplum/wait_for_segments.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/add_mirrors_to_catalog.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/add_replication_entries.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/append_dynamic_library_path.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/archive_log_directory.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/check_disk_space.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/check_environment.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/common.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/config.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/copy_coordinator.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/create_backup_directory.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/create_recovery_conf.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/create_replication_slot.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/delete_backup_directories.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/delete_data_directories.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/delete_state_directories.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/execute.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/finalize.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/initialize.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/init_target_cluster.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/rename_data_directories.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/restore_source_cluster.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/revert.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/rpc.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/server.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/update_catalog.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/update_conf_files.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/upgrade_coordinator.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/upgrade_mirrors_using_gpaddmirrors.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/upgrade_mirrors_using_rsync.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/upgrade_primaries.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/hub/upgrade_standby.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/idl/cli_to_hub.proto
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/idl/common.proto
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/idl/connection.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/idl/generate.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/idl/hub_to_agent.proto
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/idl/sender.go
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
-
-       gpupgrade-main/Makefile
+       ggupgrade-main/data-migration-scripts/6-to-7-seed-scripts/stats/cluster_and_database_stats/generate_database_stats.sh
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/multihost/generate-cluster.bash
+       ggupgrade-main/greengage/allowed_gpdb_versions.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/greengage/cluster.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/greengage/common.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/greengage/connection/bootstrap.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/greengage/connection.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/greengage/query_pg_stat_activity.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/greengage/segconfig.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/greengreengageplum/tablespace.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/greengage/version.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/greengage/wait_for_segments.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/add_mirrors_to_catalog.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/add_replication_entries.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/append_dynamic_library_path.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/archive_log_directory.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/check_disk_space.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/check_environment.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/common.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/config.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/copy_coordinator.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/create_backup_directory.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/create_recovery_conf.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/create_replication_slot.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/delete_backup_directories.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/delete_data_directories.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/delete_state_directories.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/execute.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/finalize.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/initialize.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/init_target_cluster.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/rename_data_directories.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/restore_source_cluster.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/revert.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/rpc.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/server.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/update_catalog.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/update_conf_files.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/upgrade_coordinator.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/upgrade_mirrors_using_gpaddmirrors.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/upgrade_mirrors_using_rsync.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/upgrade_primaries.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/hub/upgrade_standby.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/idl/cli_to_hub.proto
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/idl/common.proto
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/idl/connection.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/idl/generate.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/idl/hub_to_agent.proto
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/idl/sender.go
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/Makefile
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/multihost/provision.bash
+       ggupgrade-main/multihost/generate-cluster.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/multihost/provision-hub.bash
+       ggupgrade-main/multihost/provision.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/multihost/provision-segment-agent.bash
+       ggupgrade-main/multihost/provision-hub.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/multihost/provision-standby-agent.bash
+       ggupgrade-main/multihost/provision-segment-agent.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/multihost/sync-ssh-keys.bash
+       ggupgrade-main/multihost/provision-standby-agent.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/multihost/vagrant.rb
+       ggupgrade-main/multihost/sync-ssh-keys.bash
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/NOTICE
+       ggupgrade-main/multihost/vagrant.rb
+
+       Copyright (c) 2017-2023 VMware, Inc.
+
+       See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
+
+       ggupgrade-main/NOTICE
 
        Copyright 2020 VMware, Inc. or its affiliates
 
        See SECTION 43 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2009-2011 VMware, Inc.
 
        See SECTION 57 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2014 Alan Shreve
 
        See SECTION 55 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2019 Google LLC
 
        See SECTION 47 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2018 Google Inc.
 
        See SECTION 56 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2020 VMware, Inc.
 
        See SECTION 60 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2016 gRPC
 
        See SECTION 45 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/README.md
+       ggupgrade-main/README.md
 
        Copyright (c) 2017-$originalComment.match
 
        See SECTION 39 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/scripts/show_coverage.sh
+       ggupgrade-main/scripts/show_coverage.sh
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/step/step.go
+       ggupgrade-main/step/step.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/step/stream.go
+       ggupgrade-main/step/stream.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/step/substep_store.go
+       ggupgrade-main/step/substep_store.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/testutils/exectest/command.go
+       ggupgrade-main/testutils/exectest/command.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/testutils/exectest/mains.go
+       ggupgrade-main/testutils/exectest/mains.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/testutils/mock_agent/mock_agent_server.go
+       ggupgrade-main/testutils/mock_agent/mock_agent_server.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/testutils/port_listener/main.go
+       ggupgrade-main/testutils/port_listener/main.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/testutils/sql.go
+       ggupgrade-main/testutils/sql.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/testutils/stream.go
+       ggupgrade-main/testutils/stream.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/testutils/testlog/log.go
+       ggupgrade-main/testutils/testlog/log.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/tools.go
+       ggupgrade-main/tools.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/upgrade/directories.go
+       ggupgrade-main/upgrade/directories.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/upgrade/id.go
+       ggupgrade-main/upgrade/id.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/upgrade/restore_pg_control.go
+       ggupgrade-main/upgrade/restore_pg_control.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/upgrade/run.go
+       ggupgrade-main/upgrade/run.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/upgrade/tablespace_directories.go
+       ggupgrade-main/upgrade/tablespace_directories.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/upgrade/version.go
+       ggupgrade-main/upgrade/version.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/daemon/daemon.go
+       ggupgrade-main/utils/daemon/daemon.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/disk/disk.go
+       ggupgrade-main/utils/disk/disk.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/disk/space_usage_error.go
+       ggupgrade-main/utils/disk/space_usage_error.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/errorlist/errorlist.go
+       ggupgrade-main/utils/errorlist/errorlist.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/logger/log.go
+       ggupgrade-main/utils/logger/log.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/logger/panic.go
+       ggupgrade-main/utils/logger/panic.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/next_actions.go
+       ggupgrade-main/utils/next_actions.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/rsync/rsync.go
+       ggupgrade-main/utils/rsync/rsync.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/stopwatch/stopwatch.go
+       ggupgrade-main/utils/stopwatch/stopwatch.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/syncbuf/syncbuf.go
+       ggupgrade-main/utils/syncbuf/syncbuf.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/utils/sys_utils.go
+       ggupgrade-main/utils/sys_utils.go
 
        Copyright (c) 2017-2023 VMware, Inc.
 
        See SECTION 27 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/Vagrantfile
+       ggupgrade-main/Vagrantfile
 
        Copyright (c) 2017-2023 VMware, Inc.
 
@@ -1970,7 +1970,7 @@ APPENDIX. Standard License Files
 
        > BSD-2
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2014 Kevin Ballard
 
@@ -1978,79 +1978,79 @@ APPENDIX. Standard License Files
 
        > BSD-3
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2015, Dave Cheney <dave@cheney.net>
 
        See SECTION 58 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2016 The Go Authors
 
        See SECTION 64 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2018 The Go Authors
 
        See SECTION 64 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2012 The Go Authors
 
        See SECTION 48 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2014 The Go Authors
 
        See SECTION 64 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2011 The Go Authors
 
        See SECTION 64 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2019 The Go Authors
 
        See SECTION 64 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2018 The Go Authors
 
        See SECTION 52 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2009 The Go Authors
 
        See SECTION 62 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2014 Kevin Ballard
 
        See SECTION 46 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2013, Patrick Mezard
 
        See SECTION 46 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2009 The Go Authors
 
        See SECTION 59 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2013-2021 Jack Christensen
 
@@ -2058,91 +2058,91 @@ APPENDIX. Standard License Files
 
        > MIT
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2014 Kevin Ballard
 
        See SECTION 63 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2019 Oliver Kuederle
 
        See SECTION 44 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2017 Zack
 
        See SECTION 44 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2006 Kirill Simonov
 
        See SECTION 38 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2019 Jack Christensen
 
        See SECTION 44 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2019 The Go Authors
 
        See SECTION 50 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2019-2021 Jack Christensen
 
        See SECTION 65 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) Yasuhiro MATSUMOTO <mattn.jp@gmail.com>
 
        See SECTION 68 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2013-2019, DATA-DOG team
 
        See SECTION 65 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2014 Mitchell Hashimoto
 
        See SECTION 41 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright 2010 The Go Authors
 
        See SECTION 65 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2016 Yasuhiro Matsumoto
 
        See SECTION 41 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2013-2021 Jack Christensen
 
        See SECTION 65 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2013 Fatih Arslan
 
        See SECTION 41 in 'LICENSE TEXT REFERENCE TABLE'
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2014 Benedikt Lang
 
@@ -2150,7 +2150,7 @@ APPENDIX. Standard License Files
 
        > Other Permissive Licenses
 
-       gpupgrade-main/open_source_licenses.txt
+       ggupgrade-main/open_source_licenses.txt
 
        Copyright (c) 2012 Alex Ogier
 
@@ -27349,7 +27349,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 -------------------- SECTION 59 --------------------
        gosigar-1.3.3/vendor/golang.org/x/net/LICENSE
 -------------------- SECTION 60 --------------------
-       The Apache 2.0 license (the "License") set forth below applies to all parts of the Greenplum Database Upgrade project. You may not use this file except in compliance with the License.
+       The Apache 2.0 license (the "License") set forth below applies to all parts of the Greengage Database Upgrade project. You may not use this file except in compliance with the License.
 -------------------- SECTION 61 --------------------
 -------------------- SECTION 2: BSD-STYLE, MIT-STYLE, OR SIMILAR STYLE LICENSES --------------------
 -------------------- SECTION 62 --------------------
@@ -27498,4 +27498,4 @@ Source Files is valid for three years from the date you acquired this
 Software product. Alternatively, the Source Files may accompany the
 VMware product.
 
-[GREENPLUMUPGRADE180GAAD091523]
+[GREENGAGEUPGRADE180GAAD091523]

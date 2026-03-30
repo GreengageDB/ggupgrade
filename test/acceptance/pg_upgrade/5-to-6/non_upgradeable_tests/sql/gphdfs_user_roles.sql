@@ -13,8 +13,8 @@ CREATE ROLE gphdfs_role WITH CREATEEXTTABLE(protocol='gphdfs', type='readable') 
 --------------------------------------------------------------------------------
 -- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 --------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
-! cat ~/gpAdminLogs/gpupgrade/pg_upgrade/p-1/gphdfs_user_roles.txt;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+! cat ~/gpAdminLogs/ggupgrade/pg_upgrade/p-1/gphdfs_user_roles.txt;
 
 --------------------------------------------------------------------------------
 -- Workaround to unblock upgrade

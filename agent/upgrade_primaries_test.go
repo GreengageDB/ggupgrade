@@ -15,15 +15,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/agent"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/rsync"
+	"github.com/GreengageDB/ggupgrade/agent"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
 func TestUpgradePrimaries(t *testing.T) {
@@ -38,7 +38,7 @@ func TestUpgradePrimaries(t *testing.T) {
 		defer upgrade.ResetPgUpgradeCommand()
 
 		opts := []*idl.PgOptions{{
-			Role:          greenplum.PrimaryRole,
+			Role:          greengage.PrimaryRole,
 			Action:        idl.PgOptions_check,
 			TargetVersion: "6.0.0",
 		}}
@@ -71,7 +71,7 @@ func TestUpgradePrimaries(t *testing.T) {
 
 		opts := []*idl.PgOptions{
 			{
-				Role:          greenplum.PrimaryRole,
+				Role:          greengage.PrimaryRole,
 				Action:        idl.PgOptions_upgrade,
 				TargetVersion: "6.0.0",
 				OldDBID:       "1",
@@ -120,7 +120,7 @@ func TestUpgradePrimaries(t *testing.T) {
 		defer upgrade.ResetPgUpgradeCommand()
 
 		opts := []*idl.PgOptions{{
-			Role:          greenplum.PrimaryRole,
+			Role:          greengage.PrimaryRole,
 			Action:        idl.PgOptions_check,
 			TargetVersion: "6.0.0",
 		}}
@@ -144,7 +144,7 @@ func TestUpgradePrimaries(t *testing.T) {
 
 		opts := []*idl.PgOptions{
 			{
-				Role:          greenplum.PrimaryRole,
+				Role:          greengage.PrimaryRole,
 				Action:        idl.PgOptions_upgrade,
 				TargetVersion: "6.0.0",
 				NewDBID:       "1",
@@ -176,7 +176,7 @@ func TestUpgradePrimaries(t *testing.T) {
 
 		opts := []*idl.PgOptions{
 			{
-				Role:          greenplum.PrimaryRole,
+				Role:          greengage.PrimaryRole,
 				Action:        idl.PgOptions_upgrade,
 				TargetVersion: "6.0.0",
 				OldDBID:       "1",
@@ -207,8 +207,8 @@ func TestUpgradePrimaries(t *testing.T) {
 		defer upgrade.ResetPgUpgradeCommand()
 
 		opts := []*idl.PgOptions{
-			{Role: greenplum.PrimaryRole, Action: idl.PgOptions_upgrade, TargetVersion: "6.0.0", ContentID: 1, OldDBID: "1"},
-			{Role: greenplum.PrimaryRole, Action: idl.PgOptions_upgrade, TargetVersion: "6.0.0", ContentID: 2, OldDBID: "2"},
+			{Role: greengage.PrimaryRole, Action: idl.PgOptions_upgrade, TargetVersion: "6.0.0", ContentID: 1, OldDBID: "1"},
+			{Role: greengage.PrimaryRole, Action: idl.PgOptions_upgrade, TargetVersion: "6.0.0", ContentID: 2, OldDBID: "2"},
 		}
 
 		_, err := agentServer.UpgradePrimaries(context.Background(), &idl.UpgradePrimariesRequest{Opts: opts})
@@ -234,7 +234,7 @@ func TestUpgradePrimaries(t *testing.T) {
 func TestRestoreTablespaces(t *testing.T) {
 	testlog.SetupTestLogger()
 
-	backupDir := "/tmp/backup/.gpupgrade"
+	backupDir := "/tmp/backup/.ggupgrade"
 
 	t.Run("restores user defined tablespaces", func(t *testing.T) {
 		rsync.SetRsyncCommand(exectest.NewCommand(agent.Success))

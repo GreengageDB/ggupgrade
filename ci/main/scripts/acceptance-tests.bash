@@ -25,8 +25,8 @@ function run_migration_scripts_and_tests() {
         cd gpupgrade_src
         make && make install
 
-        gpupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --seed-dir ./data-migration-scripts --output-dir /home/gpadmin/gpupgrade
-        gpupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/gpupgrade --phase initialize
+        ggupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --seed-dir ./data-migration-scripts --output-dir /home/gpadmin/ggupgrade
+        ggupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/ggupgrade --phase initialize
 
         make acceptance --keep-going
     '

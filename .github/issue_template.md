@@ -1,10 +1,10 @@
-### gpupgrade version or build
+### ggupgrade version or build
 
 ### OS version and uname -a
 
 ### go version
 
-### Greenplum version or versions if used
+### Greengage version or versions if used
 
 ### Expected behavior
 

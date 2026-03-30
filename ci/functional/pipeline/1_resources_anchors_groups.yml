@@ -24,15 +24,15 @@ resources:
   - name: gpupgrade_src
     type: git
     source:
-      uri: ((gpupgrade-git-remote))
-      branch: ((gpupgrade-git-branch))
+      uri: ((ggupgrade-git-remote))
+      branch: ((ggupgrade-git-branch))
       fetch_tags: true
 
   - name: schema_dump
     type: gcs
     source:
       json_key: ((upgrade/cm-gcs-service-account-key))
-      bucket: gpupgrade-intermediates
+      bucket: ggupgrade-intermediates
     {{- range .FunctionalJobs }}
       {{- if .DumpPath }}
       versioned_file: {{ .DumpPath }}
@@ -51,26 +51,26 @@ resources:
         bucket: pivotal-gpdb-concourse-resources-dev
         json_key: ((concourse-gcs-resources-service-account-key))
         # Be sure to not use debug builds for functional testing!
-        regexp: server/published/gpdb{{.GPDBVersion}}/greenplum-db-{{.TestRCIdentifier}}({{escapeVersion .GPDBVersion}}.*)-{{.RpmVersion}}-x86_64.debug.rpm
+        regexp: server/published/gpdb{{.GPDBVersion}}/greengage-{{.TestRCIdentifier}}({{escapeVersion .GPDBVersion}}.*)-{{.RpmVersion}}-x86_64.debug.rpm
       {{ continue }}
       {{- end }}
       {{- if eq .GPDBVersion "5" }}
         bucket: pivotal-gpdb-concourse-resources-prod
         json_key: ((concourse-gcs-resources-service-account-key))
         # Be sure to not use debug builds for functional testing!
-        regexp: server/published/gpdb{{.GPDBVersion}}/greenplum-db-{{.TestRCIdentifier}}({{escapeVersion .GPDBVersion}}.*)-{{.RpmVersion}}-x86_64.rpm
+        regexp: server/published/gpdb{{.GPDBVersion}}/greengage-{{.TestRCIdentifier}}({{escapeVersion .GPDBVersion}}.*)-{{.RpmVersion}}-x86_64.rpm
       {{ continue }}
       {{- end }}
         # Releng cannot produce a release candidate RPM that once tagged produces a corresponding RPM with the correct
         # version. Rather another commit is needed to correctly increment the version. This causes lots of headaches for
-        # gpupgrade since we compile in a minimum GPDB version causing gpupgrade release to wait for the correct version of
+        # ggupgrade since we compile in a minimum GPDB version causing ggupgrade release to wait for the correct version of
         # GPDB to flow through the pipelines. For now, use a release candidate that has the future minor version rather than
         # the current minor version. This is problematic since the commit sha and this future version do not correctly
         # match reality.
         bucket: pivotal-gpdb-concourse-resources-prod
         json_key: ((concourse-gcs-resources-service-account-key))
         # Be sure to not use debug builds for functional testing!
-        regexp: minor/release-candidates/gpdb{{.GPDBVersion}}/greenplum-db-server-({{escapeVersion .GPDBVersion}}.*)-{{.RpmVersion}}-x86_64.rpm
+        regexp: minor/release-candidates/gpdb{{.GPDBVersion}}/greengage-server-({{escapeVersion .GPDBVersion}}.*)-{{.RpmVersion}}-x86_64.rpm
   {{- end }}
 {{end}}
 
@@ -80,7 +80,7 @@ resources:
     type: gcs
     source:
       json_key: ((upgrade/cm-gcs-service-account-key))
-      bucket: gpupgrade-intermediates
+      bucket: ggupgrade-intermediates
       versioned_file: functional-testing/cluster_env_files_{{ .BranchName }}.tar.gz
 
   # Since we don't place a passed constraint on `gpupgrade_src` or
@@ -92,15 +92,15 @@ resources:
     type: gcs
     source:
       json_key: ((upgrade/cm-gcs-service-account-key))
-      bucket: gpupgrade-intermediates
+      bucket: ggupgrade-intermediates
       versioned_file: functional-testing/dummy_resource_{{ .BranchName }}.txt
 
   - name: gpupgrade_rpm
     type: gcs
     source:
-      bucket: gpupgrade-artifacts-prod
+      bucket: ggupgrade-artifacts-prod
       json_key: ((upgrade/cm-gcs-service-account-key))
-      regexp: release-candidates/enterprise/gpupgrade-(.*).rpm
+      regexp: release-candidates/enterprise/ggupgrade-(.*).rpm
 
   - name: slack-alert
     type: slack-notification
@@ -197,7 +197,7 @@ anchors:
     put: slack-alert
     params:
       text: |
-        Hey team, <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|gpupgrade/$BUILD_JOB_NAME> failed.
+        Hey team, <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ggupgrade/$BUILD_JOB_NAME> failed.
 
 groups:
   - name: all

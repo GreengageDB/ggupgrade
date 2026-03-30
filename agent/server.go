@@ -16,9 +16,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/utils/daemon"
-	"github.com/greenplum-db/gpupgrade/utils/logger"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils/daemon"
+	"github.com/GreengageDB/ggupgrade/utils/logger"
 )
 
 type Server struct {

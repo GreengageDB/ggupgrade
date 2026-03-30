@@ -13,7 +13,7 @@ echo "Dropping materialized views before upgrading from 6X..."
 views=$(ssh -n cdw "
     set -eux -o pipefail
 
-    source /usr/local/greenplum-db-source/greenplum_path.sh
+    source /usr/local/greengage-db-source/greengage_path.sh
 
     psql -v ON_ERROR_STOP=0 -d regression --tuples-only --no-align --field-separator ' ' <<SQL_EOF
             SELECT relname FROM pg_class WHERE relkind = 'm';
@@ -25,7 +25,7 @@ echo "${views}" | while read -r view; do
         ssh -n cdw "
             set -eux -o pipefail
 
-            source /usr/local/greenplum-db-source/greenplum_path.sh
+            source /usr/local/greengage-db-source/greengage_path.sh
 
             psql -v ON_ERROR_STOP=1 -d regression -c 'DROP MATERIALIZED VIEW IF EXISTS ${view}';
         " || echo "Dropping materialized views failed. Continuing..."

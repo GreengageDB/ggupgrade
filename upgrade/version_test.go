@@ -12,17 +12,17 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 const localVersion = `Version: 1.0.0 Commit: 83aaa4 Release: Enterprise`
 const remoteVersion = `Version: 1.1.0 Commit: 63cc21 Release: Enterprise`
 const versionStdErr = `
-Error: unknown command "\/ersion" for "gpupgrade"
-Run 'gpupgrade --help' for usage.
+Error: unknown command "\/ersion" for "ggupgrade"
+Run 'ggupgrade --help' for usage.
 `
 
 func gpupgrade_local_version() {

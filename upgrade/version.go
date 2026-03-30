@@ -13,9 +13,9 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func LocalVersion() (string, error) {
@@ -50,7 +50,7 @@ func ResetRemoteVersionCommand() {
 func version(host string) (string, error) {
 	gpupgradePath, err := utils.GetGpupgradePath()
 	if err != nil {
-		return "", xerrors.Errorf("getting gpupgrade binary path: %w", err)
+		return "", xerrors.Errorf("getting ggupgrade binary path: %w", err)
 	}
 
 	name := gpupgradePath
@@ -120,7 +120,7 @@ func EnsureGpupgradeVersionsMatch(agentHosts []string) error {
 		return nil
 	}
 
-	return xerrors.Errorf(`gpupgrade version mismatch between gpupgrade hub and agent hosts. 
+	return xerrors.Errorf(`ggupgrade version mismatch between ggupgrade hub and agent hosts. 
     Hub version: %q
 
     Mismatched Agents:

@@ -13,11 +13,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/substeps"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/substeps"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 type msgStream []*idl.Message
@@ -228,23 +227,23 @@ func TestUILoop(t *testing.T) {
 	})
 
 	t.Run("processes responses successfully", func(t *testing.T) {
-		source := MustCreateCluster(t, greenplum.SegConfigs{
-			{ContentID: -1, DbID: 1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greenplum.PrimaryRole, Port: 15432},
-			{ContentID: -1, DbID: 8, Hostname: "smdw", DataDir: "/data/qddir/seg-1", Role: greenplum.MirrorRole, Port: 16432},
-			{ContentID: 0, DbID: 2, Hostname: "sdw1", DataDir: "/data/dbfast1/seg0", Role: greenplum.PrimaryRole, Port: 25432},
-			{ContentID: 0, DbID: 5, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg0", Role: greenplum.MirrorRole, Port: 25435},
+		source := MustCreateCluster(t, greengage.SegConfigs{
+			{ContentID: -1, DbID: 1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole, Port: 15432},
+			{ContentID: -1, DbID: 8, Hostname: "smdw", DataDir: "/data/qddir/seg-1", Role: greengage.MirrorRole, Port: 16432},
+			{ContentID: 0, DbID: 2, Hostname: "sdw1", DataDir: "/data/dbfast1/seg0", Role: greengage.PrimaryRole, Port: 25432},
+			{ContentID: 0, DbID: 5, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg0", Role: greengage.MirrorRole, Port: 25435},
 		})
-		source.GPHome = "/usr/local/greenplum-db-source"
+		source.GPHome = "/usr/local/greengage-db-source"
 		source.Destination = idl.ClusterDestination_source
 		source.Version = semver.MustParse("5.0.0")
 
-		target := MustCreateCluster(t, greenplum.SegConfigs{
-			{ContentID: -1, DbID: 1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greenplum.PrimaryRole, Port: 6000},
-			{ContentID: -1, DbID: 8, Hostname: "smdw", DataDir: "/data/qddir/seg-1", Role: greenplum.MirrorRole, Port: 6001},
-			{ContentID: 0, DbID: 2, Hostname: "sdw1", DataDir: "/data/dbfast1/seg0", Role: greenplum.PrimaryRole, Port: 6002},
-			{ContentID: 0, DbID: 5, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg0", Role: greenplum.MirrorRole, Port: 6005},
+		target := MustCreateCluster(t, greengage.SegConfigs{
+			{ContentID: -1, DbID: 1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole, Port: 6000},
+			{ContentID: -1, DbID: 8, Hostname: "smdw", DataDir: "/data/qddir/seg-1", Role: greengage.MirrorRole, Port: 6001},
+			{ContentID: 0, DbID: 2, Hostname: "sdw1", DataDir: "/data/dbfast1/seg0", Role: greengage.PrimaryRole, Port: 6002},
+			{ContentID: 0, DbID: 5, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg0", Role: greengage.MirrorRole, Port: 6005},
 		})
-		target.GPHome = "/usr/local/greenplum-db-target"
+		target.GPHome = "/usr/local/greengage-db-target"
 		target.Destination = idl.ClusterDestination_target
 		target.Version = semver.MustParse("6.0.0")
 

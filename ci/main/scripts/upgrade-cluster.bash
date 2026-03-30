@@ -20,11 +20,11 @@ fi
 echo "Dumping the source cluster for comparing after upgrade..."
 dump_sql $PGPORT /tmp/source.sql
 
-echo "Performing gpupgrade..."
+echo "Performing ggupgrade..."
 time ssh -n cdw "
     set -eux -o pipefail
 
-    gpupgrade initialize \
+    ggupgrade initialize \
               --non-interactive \
               --target-gphome $GPHOME_TARGET \
               --source-gphome $GPHOME_SOURCE \
@@ -33,8 +33,8 @@ time ssh -n cdw "
               --temp-port-range 6020-6040 \
               --disk-free-ratio 0
 
-    gpupgrade execute --non-interactive --skip-pg-upgrade-checks
-    gpupgrade finalize --non-interactive
+    ggupgrade execute --non-interactive --skip-pg-upgrade-checks
+    ggupgrade finalize --non-interactive
 "
 
 if ! is_GPDB5 ${GPHOME_TARGET}; then

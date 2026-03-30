@@ -7,8 +7,8 @@
 -- 
 -- Note:
 -- 1. There may be cases where an index was dropped on child partition in
--- source cluster explicitly as it was allowed with Greenplum Database 5.x
--- version, but with Greenplum Database 6.x since a CREATE INDEX will be executed
+-- source cluster explicitly as it was allowed with Greengage Database 5.x
+-- version, but with Greengage Database 6.x since a CREATE INDEX will be executed
 -- on the root, indexes will be created on all the child partitions.
 --
 -- 2. If there were any indexes only on the mid-level partitions in source cluster,

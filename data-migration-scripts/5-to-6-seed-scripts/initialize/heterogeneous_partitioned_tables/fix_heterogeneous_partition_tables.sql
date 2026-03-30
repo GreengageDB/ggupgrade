@@ -3,8 +3,8 @@
 
 -- Detect heterogenous partition tables and CTAS the affected leaf tables
 -- The detection query is based on the GPDB pg_upgrade code at:
--- contrib/pg_upgrade/greenplum/check_gp.h
--- check_heterogeneous_partition() in contrib/pg_upgrade/greenplum/check_gp.c
+-- contrib/pg_upgrade/greengage/check_gp.h
+-- check_heterogeneous_partition() in contrib/pg_upgrade/greengage/check_gp.c
 -- We only handle scenario 1 referenced in check_heterogeneous_partition().
 -- Detection query used: CHECK_PARTITION_TABLE_DROPPED_COLUMN_REFERENCES
 

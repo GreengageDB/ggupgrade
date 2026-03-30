@@ -7,19 +7,18 @@ import (
 	"context"
 	"net"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
-func AddReplicationEntriesOnPrimaries(agentConns []*idl.Connection, intermediate *greenplum.Cluster, useHbaHostnames bool) error {
+func AddReplicationEntriesOnPrimaries(agentConns []*idl.Connection, intermediate *greengage.Cluster, useHbaHostnames bool) error {
 	user, err := utils.System.Current()
 	if err != nil {
 		return err
 	}
 
 	request := func(conn *idl.Connection) error {
-		intermediatePrimaries := intermediate.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		intermediatePrimaries := intermediate.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && !seg.IsCoordinator() && seg.IsPrimary()
 		})
 

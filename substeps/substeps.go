@@ -6,7 +6,7 @@ package substeps
 import (
 	"fmt"
 
-	"github.com/greenplum-db/gpupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl"
 )
 
 const Divider = "-----------------------------------------------------------------------------"
@@ -29,8 +29,8 @@ type substepText struct {
 
 var SubstepDescriptions = map[idl.Substep]substepText{
 	idl.Substep_saving_source_cluster_config:                                  substepText{"Saving source cluster configuration...", "Save source cluster configuration"},
-	idl.Substep_start_hub:                                                     substepText{"Starting gpupgrade hub process...", "Start gpupgrade hub process"},
-	idl.Substep_start_agents:                                                  substepText{"Starting gpupgrade agent processes...", "Start gpupgrade agent processes"},
+	idl.Substep_start_hub:                                                     substepText{"Starting ggupgrade hub process...", "Start ggupgrade hub process"},
+	idl.Substep_start_agents:                                                  substepText{"Starting ggupgrade agent processes...", "Start ggupgrade agent processes"},
 	idl.Substep_check_environment:                                             substepText{"Checking environment...", "Check environment"},
 	idl.Substep_create_backupdirs:                                             substepText{"Creating internal backup directories on the segments...", "Create internal backup directories on the segments"},
 	idl.Substep_check_disk_space:                                              substepText{"Checking disk space...", "Check disk space"},
@@ -71,9 +71,9 @@ var SubstepDescriptions = map[idl.Substep]substepText{
 	idl.Substep_execute_finalize_data_migration_scripts:                       substepText{"Executing finalize data migration SQL scripts...", "Executed finalize data migration SQL scripts"},
 	idl.Substep_execute_revert_data_migration_scripts:                         substepText{"Executing revert data migration SQL scripts...", "Executed revert data migration SQL scripts"},
 	idl.Substep_analyze_target_cluster:                                        substepText{"Analyzing target cluster...", "Analyze target cluster"},
-	idl.Substep_ensure_gpupgrade_agents_are_running:                           substepText{"Ensuring gpupgrade agent processes are running...", "Ensure gpupgrade agent processes are running"},
+	idl.Substep_ensure_gpupgrade_agents_are_running:                           substepText{"Ensuring ggupgrade agent processes are running...", "Ensure ggupgrade agent processes are running"},
 	idl.Substep_verify_gpdb_versions:                                          substepText{"Verifying source and target cluster versions...", "Verify source and target cluster versions"},
-	idl.Substep_verify_gpupgrade_is_installed_across_all_hosts:                substepText{"Verifying gpupgrade is installed across all hosts...", "Verify gpupgrade is installed across all hosts"},
+	idl.Substep_verify_gpupgrade_is_installed_across_all_hosts:                substepText{"Verifying ggupgrade is installed across all hosts...", "Verify ggupgrade is installed across all hosts"},
 	idl.Substep_initialize_wait_for_cluster_to_be_ready:                       substepText{"Waiting for cluster to be ready...", "Wait for cluster to be ready"},
 	idl.Substep_wait_for_cluster_to_be_ready_before_upgrade_master:            substepText{"Waiting for cluster to be ready...", "Wait for cluster to be ready"},
 }

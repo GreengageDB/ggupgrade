@@ -28,11 +28,11 @@ RESET
 --------------------------------------------------------------------------------
 -- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 --------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
 -- start_ignore
 -- end_ignore
 (exited with code 1)
-! cat ~/gpAdminLogs/gpupgrade/pg_upgrade/p-1/invalid_indexes.txt;
+! cat ~/gpAdminLogs/ggupgrade/pg_upgrade/p-1/invalid_indexes.txt;
 Database: isolation2test
   public.btree_idx on relation public.tbl_with_btree_index
 

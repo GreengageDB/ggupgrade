@@ -10,36 +10,36 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func TestCheckEnvironmentOnSegments(t *testing.T) {
 	testlog.SetupTestLogger()
 
-	source := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg-1", Port: 15432, Role: greenplum.PrimaryRole},
-		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Port: 16432, Role: greenplum.MirrorRole},
-		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Port: 25433, Role: greenplum.PrimaryRole},
-		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg1", Port: 25434, Role: greenplum.MirrorRole},
-		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Port: 25435, Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Port: 25436, Role: greenplum.MirrorRole},
+	source := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg-1", Port: 15432, Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Port: 16432, Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Port: 25433, Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg1", Port: 25434, Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Port: 25435, Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Port: 25436, Role: greengage.MirrorRole},
 	})
-	source.GPHome = "/usr/local/greenplum-db-source"
+	source.GPHome = "/usr/local/greengage-db-source"
 
-	intermediate := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg.HqtFHX54y0o.-1", Port: 50432, Role: greenplum.PrimaryRole},
-		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby.HqtFHX54y0o", Port: 50433, Role: greenplum.MirrorRole},
-		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg.HqtFHX54y0o.1", Port: 50434, Role: greenplum.PrimaryRole},
-		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg.HqtFHX54y0o.1", Port: 50435, Role: greenplum.MirrorRole},
-		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg.HqtFHX54y0o.2", Port: 50436, Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg.HqtFHX54y0o.2", Port: 50437, Role: greenplum.MirrorRole},
+	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg.HqtFHX54y0o.-1", Port: 50432, Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby.HqtFHX54y0o", Port: 50433, Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg.HqtFHX54y0o.1", Port: 50434, Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg.HqtFHX54y0o.1", Port: 50435, Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg.HqtFHX54y0o.2", Port: 50436, Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg.HqtFHX54y0o.2", Port: 50437, Role: greengage.MirrorRole},
 	})
-	intermediate.GPHome = "/usr/local/greenplum-db-target"
+	intermediate.GPHome = "/usr/local/greengage-db-target"
 
 	t.Run("checks environment on segments", func(t *testing.T) {
 		hub.SetPathCommand(exectest.NewCommand(hub.PathMain))
@@ -94,8 +94,8 @@ func TestCheckEnvironmentOnSegments(t *testing.T) {
 func TestCheckEnvironmentOnSegment(t *testing.T) {
 	testlog.SetupTestLogger()
 
-	sourceGphome := "/usr/local/greenplum-db-source"
-	intermediateGphome := "/usr/local/greenplum-db-target"
+	sourceGphome := "/usr/local/greengage-db-source"
+	intermediateGphome := "/usr/local/greengage-db-target"
 
 	t.Run("success cases", func(t *testing.T) {
 		cases := []struct {
@@ -105,7 +105,7 @@ func TestCheckEnvironmentOnSegment(t *testing.T) {
 		}{
 			{
 				name: "succeeds when PATH does not contain source cluster GPHOME",
-				path: "/usr/local/pxf-gp5/bin:/usr/local/greenplum-cc-4.11.1/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/greenplum-cloud:/home/gpadmin/.local/bin:/home/gpadmin/bin",
+				path: "/usr/local/pxf-gp5/bin:/usr/local/greengage-cc-4.11.1/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/greengage-cloud:/home/gpadmin/.local/bin:/home/gpadmin/bin",
 			},
 			{
 				name:          "succeeds when LD_LIBRARY_PATH does not contain source cluster GPHOME",
@@ -149,12 +149,12 @@ func TestCheckEnvironmentOnSegment(t *testing.T) {
 		}{
 			{
 				name:     "errors when PATH contains source cluster GPHOME",
-				path:     fmt.Sprintf("%[1]s/ext/R-3.3.3/bin:%[1]s/bin:%[1]s/ext/python/bin:/usr/local/pxf-gp5/bin:/usr/local/greenplum-cc-4.11.1/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/greenplum-cloud:/home/gpadmin/.local/bin:/home/gpadmin/bin", sourceGphome),
+				path:     fmt.Sprintf("%[1]s/ext/R-3.3.3/bin:%[1]s/bin:%[1]s/ext/python/bin:/usr/local/pxf-gp5/bin:/usr/local/greengage-cc-4.11.1/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/greengage-cloud:/home/gpadmin/.local/bin:/home/gpadmin/bin", sourceGphome),
 				expected: "PATH contains GPHOME",
 			},
 			{
 				name:     "errors when PATH contains target cluster GPHOME",
-				path:     fmt.Sprintf("%[1]s/ext/R-3.3.3/bin:%[1]s/bin:%[1]s/ext/python/bin:/usr/local/pxf-gp5/bin:/usr/local/greenplum-cc-4.11.1/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/greenplum-cloud:/home/gpadmin/.local/bin:/home/gpadmin/bin", intermediateGphome),
+				path:     fmt.Sprintf("%[1]s/ext/R-3.3.3/bin:%[1]s/bin:%[1]s/ext/python/bin:/usr/local/pxf-gp5/bin:/usr/local/greengage-cc-4.11.1/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/greengage-cloud:/home/gpadmin/.local/bin:/home/gpadmin/bin", intermediateGphome),
 				expected: "PATH contains GPHOME",
 			},
 			{

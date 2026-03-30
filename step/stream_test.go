@@ -11,9 +11,9 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/idl/mock_idl"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl/mock_idl"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
 )
 
 // Since we have no good way to test devNullStream, we instead

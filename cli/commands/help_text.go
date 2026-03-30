@@ -11,9 +11,9 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/substeps"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/substeps"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 var initializeSubsteps substeps.Substeps
@@ -123,10 +123,10 @@ Runs pre-upgrade checks and prepares the cluster for upgrade.
 
 %s will carry out the following steps:
 %s
-During or after gpupgrade initialize, you may revert the cluster to its
-original state by running gpupgrade revert.
+During or after ggupgrade initialize, you may revert the cluster to its
+original state by running ggupgrade revert.
 
-Usage: gpupgrade initialize --file <path/to/config_file>
+Usage: ggupgrade initialize --file <path/to/config_file>
 
 Required Flags:
 
@@ -139,18 +139,18 @@ Optional Flags:
   -v, --verbose              outputs detailed logs for initialize
       --pg-upgrade-verbose   execute pg_upgrade with verbose internal logging. Requires the verbose flag.
 
-gpupgrade log files can be found on all hosts in %s
+ggupgrade log files can be found on all hosts in %s
 `
 const executeHelpText = `
-Upgrades the master and primary segments to the target Greenplum version.
+Upgrades the master and primary segments to the target Greengage version.
 This command should be run only during a downtime window.
 
 %s will carry out the following steps:
 %s
-During or after gpupgrade execute, you may revert the cluster to its
-original state by running gpupgrade revert.
+During or after ggupgrade execute, you may revert the cluster to its
+original state by running ggupgrade revert.
 
-Usage: gpupgrade execute
+Usage: ggupgrade execute
 
 Optional Flags:
 
@@ -162,18 +162,18 @@ Optional Flags:
                              parent directory of the master data directory such as /data given 
                              /data/master/gpseg-1.
 
-gpupgrade log files can be found on all hosts in %s
+ggupgrade log files can be found on all hosts in %s
 `
 const finalizeHelpText = `
-Upgrades the standby master and mirror segments to the target Greenplum version.
+Upgrades the standby master and mirror segments to the target Greengage version.
 This command should be run only during a downtime window.
 
 %s will carry out the following steps:
 %s
-Once you run gpupgrade finalize, you may NOT revert the cluster to its
+Once you run ggupgrade finalize, you may NOT revert the cluster to its
 original state.
 
-Usage: gpupgrade finalize
+Usage: ggupgrade finalize
 
 Optional Flags:
 
@@ -183,16 +183,16 @@ Optional Flags:
 NOTE: After running finalize, you must execute data migration scripts. 
 Refer to documentation for instructions.
 
-gpupgrade log files can be found on all hosts in %s
+ggupgrade log files can be found on all hosts in %s
 `
 const revertHelpText = `
 Returns the cluster to its original state.
-This command cannot be run after gpupgrade finalize has begun.
+This command cannot be run after ggupgrade finalize has begun.
 This command should be run only during a downtime window.
 
 %s will carry out the following steps:
 %s
-Usage: gpupgrade revert
+Usage: ggupgrade revert
 
 Optional Flags:
 
@@ -202,11 +202,11 @@ Optional Flags:
 NOTE: After running revert, you must execute data migration scripts. 
 Refer to documentation for instructions.
 
-Archived gpupgrade log files can be found on all hosts in %s-<upgradeID>-<timestamp>
+Archived ggupgrade log files can be found on all hosts in %s-<upgradeID>-<timestamp>
 `
 const generateHelp = `
 Generates data migration SQL scripts to resolve catalog inconsistencies between 
-the source and target clusters. After which run "gpupgrade apply".
+the source and target clusters. After which run "ggupgrade apply".
 This command does not require downtime.
 
 IMPORTANT: Running the data migration scripts generate takes a snapshot of the 
@@ -214,44 +214,44 @@ database. If any new data or objects that cannot be upgraded are created after
 the generator is run, will be missed. In such scenario, re-generate in order 
 to detect the new data and objects.
 
-Usage: gpupgrade generate --gphome "$GPHOME" --port "$PGPORT"
+Usage: ggupgrade generate --gphome "$GPHOME" --port "$PGPORT"
 
 Required Flags:
 
-  --gphome       path to the Greenplum installation
-  --port         master port for Greenplum cluster
+  --gphome       path to the Greengage installation
+  --port         master port for Greengage cluster
 
 Optional Flags:
 
   --output-dir    output path to the current generated data migration SQL files. 
-                  Defaults to $HOME/gpAdminLogs/gpupgrade/data-migration-scripts
+                  Defaults to $HOME/gpAdminLogs/ggupgrade/data-migration-scripts
 `
 const applyHelp = `
 Applies data migration SQL scripts to resolve catalog inconsistencies between 
-the source and target clusters. First run "gpupgrade generate".
+the source and target clusters. First run "ggupgrade generate".
 This command may require downtime depending on what scripts are run. See online 
 documentation for details.
 
-Usage: gpupgrade apply --gphome "$GPHOME" --port "$PGPORT" --phase initialize
+Usage: ggupgrade apply --gphome "$GPHOME" --port "$PGPORT" --phase initialize
 
 Required Flags:
 
-  --gphome       path to the Greenplum installation
-  --port         master port for Greenplum cluster
+  --gphome       path to the Greengage installation
+  --port         master port for Greengage cluster
   --phase        the data migration phase. Either "pre-initialize", 
                  "post-finalize", "post-revert", or "stats".
 
 Optional Flags:
 
   --input-dir    path to the generated data migration SQL files. 
-                 Defaults to $HOME/gpAdminLogs/gpupgrade/data-migration-scripts
+                 Defaults to $HOME/gpAdminLogs/ggupgrade/data-migration-scripts
 `
 const ConfigHelp = `
 The config subcommand allows one to view configuration parameters only after 
 initialize has started. It is useful for starting or connecting to the 
 target cluster by getting the target cluster data directory and port parameters.
 
-Usage: gpupgrade config show <flag>
+Usage: ggupgrade config show <flag>
 
 Optional Flags:
 
@@ -264,28 +264,28 @@ Optional Flags:
 --target-port
 
 Example:
-  gpupgrade config show --target-datadir
+  ggupgrade config show --target-datadir
 `
 
 const globalHelpText = `
-gpupgrade performs an in-place cluster upgrade to the next major version.
+ggupgrade performs an in-place cluster upgrade to the next major version.
 
-Usage: gpupgrade [command] <flags> 
+Usage: ggupgrade [command] <flags> 
 
 Required Commands:
 
   1. initialize   runs pre-upgrade checks and prepares the cluster for upgrade
 
   2. execute      upgrades the master and primary segments to the target
-                  Greenplum version
+                  Greengage version
 
   3. finalize     upgrades the standby master and mirror segments to the target
-                  Greenplum version
+                  Greengage version
 
 Optional Commands:
 
   revert          returns the cluster to its original state
-                  Note: revert cannot be used after gpupgrade finalize
+                  Note: revert cannot be used after ggupgrade finalize
 
   generate        generates data migration SQL scripts
 
@@ -299,13 +299,13 @@ Optional Commands:
 
 Optional Flags:
 
-  -h, --help      displays help output for gpupgrade
-  -v, --verbose   outputs detailed logs for gpupgrade
-  -V, --version   displays the version of the current gpupgrade utility
+  -h, --help      displays help output for ggupgrade
+  -v, --verbose   outputs detailed logs for ggupgrade
+  -V, --version   displays the version of the current ggupgrade utility
 
-gpupgrade log files can be found on all hosts in %s
+ggupgrade log files can be found on all hosts in %s
 
-Use "gpupgrade [command] --help" for more information about a command.
+Use "ggupgrade [command] --help" for more information about a command.
 `
 
 // Cobra has multiple ways to handle help text, so we want to force all of them to use the same help text

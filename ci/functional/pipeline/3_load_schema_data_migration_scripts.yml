@@ -33,7 +33,7 @@
                 ssh -n cdw "
                     set -eux -o pipefail
 
-                    source /usr/local/greenplum-db-source/greenplum_path.sh
+                    source /usr/local/greengage-db-source/greengage_path.sh
 
                     psql -v ON_ERROR_STOP=1 -d postgres <<SQL_EOF
                         DROP VIEW IF EXISTS problematic_view_or_table;
@@ -47,7 +47,7 @@
                 time ssh -n gpadmin@cdw "
                     set -eux -o pipefail
 
-                    source /usr/local/greenplum-db-source/greenplum_path.sh
+                    source /usr/local/greengage-db-source/greengage_path.sh
                     # This is failing due to a number of errors. Disabling ON_ERROR_STOP until this is fixed.
                     unxz --threads $(nproc) /tmp/dump.sql.xz
                     PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=0 --quiet --dbname postgres -f /tmp/dump.sql
@@ -90,7 +90,7 @@
                 time ssh -n cdw "
                     set -eux -o pipefail
 
-                    source /usr/local/greenplum-db-source/greenplum_path.sh
+                    source /usr/local/greengage-db-source/greengage_path.sh
                     export MASTER_DATA_DIRECTORY=$MASTER_DATA_DIRECTORY
                     export PGPORT=$PGPORT
 
@@ -111,12 +111,12 @@
                 time ssh -n cdw "
                     set -eux -o pipefail
 
-                    gpupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --output-dir /home/gpadmin/gpupgrade
-                    gpupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/gpupgrade --phase stats
-                    gpupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/gpupgrade --phase initialize
+                    ggupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --output-dir /home/gpadmin/ggupgrade
+                    ggupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/ggupgrade --phase stats
+                    ggupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/ggupgrade --phase initialize
 
                     echo 'Outputting stats...'
-                    cat /home/gpadmin/gpAdminLogs/gpupgrade/apply_stats.log
+                    cat /home/gpadmin/gpAdminLogs/ggupgrade/apply_stats.log
                 "
     on_failure:
       do:

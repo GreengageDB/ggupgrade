@@ -21,13 +21,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/daemon"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/logger"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/daemon"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/logger"
 )
 
 var DialTimeout = 3 * time.Second
@@ -315,7 +314,7 @@ func newAgentsNotReadyError(agentsGrpcStatus map[string]connectivity.State) *Age
 }
 
 func (a *AgentsNotReadyError) Error() string {
-	return fmt.Sprintf("Timeout exceeded ensuring gpupgrade agent processes are ready. Hosts with gpupgrade agents processes having non-ready gRPC status:\n%s", a.Agents)
+	return fmt.Sprintf("Timeout exceeded ensuring ggupgrade agent processes are ready. Hosts with ggupgrade agents processes having non-ready gRPC status:\n%s", a.Agents)
 }
 
 func (a *AgentsNotReadyError) Is(err error) bool {
@@ -337,7 +336,7 @@ func EnsureConnsAreReady(agentConns []*idl.Connection, timeout time.Duration) er
 		}
 
 		if time.Since(startTime) > timeout {
-			nextAction := `Check the network between the master and segment hosts. And try restarting the hub and agents with "gpupgrade kill-services && gpupgrade restart-services".`
+			nextAction := `Check the network between the master and segment hosts. And try restarting the hub and agents with "ggupgrade kill-services && ggupgrade restart-services".`
 			return utils.NewNextActionErr(newAgentsNotReadyError(agentsNotReady), nextAction)
 		}
 
@@ -362,10 +361,10 @@ func (s *Server) closeAgentConns() {
 	}
 }
 
-func AgentHosts(c *greenplum.Cluster) []string {
+func AgentHosts(c *greengage.Cluster) []string {
 	uniqueHosts := make(map[string]bool)
 
-	excludingCoordinator := func(seg *greenplum.SegConfig) bool {
+	excludingCoordinator := func(seg *greengage.SegConfig) bool {
 		return !seg.IsCoordinator()
 	}
 

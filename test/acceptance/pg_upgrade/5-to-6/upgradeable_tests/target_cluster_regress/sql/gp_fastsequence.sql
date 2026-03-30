@@ -28,8 +28,8 @@ SELECT gp_segment_id, ctid, count(ctid) FROM aotable_fastsequence GROUP BY gp_se
 
 -- The following gpdb commits changed aotids format which means indexes are not
 -- safe to upgrade.
--- https://github.com/greenplum-db/gpdb/commit/c249ac7a36d9da3d25b6c419fbd07e2c9cfe954f
--- https://github.com/greenplum-db/gpdb/commit/fa1e76c3d72316bdcb34dd3d3b34736cd03e840f
+-- https://github.com/GreengageDB/greengage/commit/c249ac7a36d9da3d25b6c419fbd07e2c9cfe954f
+-- https://github.com/GreengageDB/greengage/commit/fa1e76c3d72316bdcb34dd3d3b34736cd03e840f
 -- Indexes are invalid and should not work after upgrade
 -- This select will cause an expected FATAL that will trigger a crash recovery
 -- on debug builds.
@@ -70,8 +70,8 @@ SELECT gp_segment_id, ctid, count(ctid) FROM aocotable_fastsequence GROUP BY gp_
 
 -- The following gpdb commits changed aotids format which means indexes are not
 -- safe to upgrade.
--- https://github.com/greenplum-db/gpdb/commit/c249ac7a36d9da3d25b6c419fbd07e2c9cfe954f
--- https://github.com/greenplum-db/gpdb/commit/fa1e76c3d72316bdcb34dd3d3b34736cd03e840f
+-- https://github.com/GreengageDB/greengage/commit/c249ac7a36d9da3d25b6c419fbd07e2c9cfe954f
+-- https://github.com/GreengageDB/greengage/commit/fa1e76c3d72316bdcb34dd3d3b34736cd03e840f
 -- Indexes are invalid and should not work after upgrade
 -- This select will cause an expected FATAL that will trigger a crash recovery
 -- on debug builds.

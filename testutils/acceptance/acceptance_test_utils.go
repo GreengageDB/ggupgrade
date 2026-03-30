@@ -16,16 +16,16 @@ import (
 
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/greenplum/connection"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/rsync"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/greengage/connection"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
 var GPHOME_SOURCE string
@@ -78,7 +78,7 @@ func MustGetRepoRoot(t *testing.T) string {
 func Generate(t *testing.T, outputDir string) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "generate",
+	cmd := exec.Command("ggupgrade", "generate",
 		"--non-interactive",
 		"--gphome", GPHOME_SOURCE,
 		"--port", PGPORT,
@@ -95,7 +95,7 @@ func Generate(t *testing.T, outputDir string) string {
 func Apply(t *testing.T, gphome string, port string, phase idl.Step, inputDir string) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "apply",
+	cmd := exec.Command("ggupgrade", "apply",
 		"--non-interactive",
 		"--gphome", gphome,
 		"--port", port,
@@ -112,7 +112,7 @@ func Apply(t *testing.T, gphome string, port string, phase idl.Step, inputDir st
 func Initialize_stopBeforeClusterCreation(t *testing.T) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "initialize",
+	cmd := exec.Command("ggupgrade", "initialize",
 		"--non-interactive", "--verbose",
 		"--source-gphome", GPHOME_SOURCE,
 		"--target-gphome", GPHOME_TARGET,
@@ -131,7 +131,7 @@ func Initialize_stopBeforeClusterCreation(t *testing.T) string {
 func Initialize(t *testing.T, mode idl.Mode) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "initialize",
+	cmd := exec.Command("ggupgrade", "initialize",
 		"--non-interactive", "--verbose",
 		"--mode", mode.String(),
 		"--source-gphome", GPHOME_SOURCE,
@@ -150,7 +150,7 @@ func Initialize(t *testing.T, mode idl.Mode) string {
 func Execute(t *testing.T) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "execute",
+	cmd := exec.Command("ggupgrade", "execute",
 		"--non-interactive", "--verbose")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -163,7 +163,7 @@ func Execute(t *testing.T) string {
 func Finalize(t *testing.T) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "finalize",
+	cmd := exec.Command("ggupgrade", "finalize",
 		"--non-interactive", "--verbose")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -176,7 +176,7 @@ func Finalize(t *testing.T) string {
 func Revert(t *testing.T) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "revert",
+	cmd := exec.Command("ggupgrade", "revert",
 		"--non-interactive", "--verbose")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -192,7 +192,7 @@ func Revert(t *testing.T) string {
 func RevertIgnoreFailures(t *testing.T) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "revert",
+	cmd := exec.Command("ggupgrade", "revert",
 		"--non-interactive", "--verbose")
 	output, _ := cmd.CombinedOutput()
 
@@ -202,7 +202,7 @@ func RevertIgnoreFailures(t *testing.T) string {
 func KillServices(t *testing.T) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "kill-services")
+	cmd := exec.Command("ggupgrade", "kill-services")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("unexpected err: %v stderr: %q", err, output)
@@ -214,7 +214,7 @@ func KillServices(t *testing.T) string {
 func RestartServices(t *testing.T) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "restart-services")
+	cmd := exec.Command("ggupgrade", "restart-services")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("unexpected err: %v stderr: %q", err, output)
@@ -223,17 +223,17 @@ func RestartServices(t *testing.T) string {
 	return strings.TrimSpace(string(output))
 }
 
-func GetSourceCluster(t *testing.T) greenplum.Cluster {
+func GetSourceCluster(t *testing.T) greengage.Cluster {
 	t.Helper()
 	return getCluster(t, GPHOME_SOURCE, testutils.MustConvertStringToInt(t, PGPORT), idl.ClusterDestination_source)
 }
 
-func GetIntermediateCluster(t *testing.T) greenplum.Cluster {
+func GetIntermediateCluster(t *testing.T) greengage.Cluster {
 	t.Helper()
 	return getCluster(t, GPHOME_TARGET, testutils.MustConvertStringToInt(t, TARGET_PGPORT), idl.ClusterDestination_intermediate)
 }
 
-func GetTargetCluster(t *testing.T) greenplum.Cluster {
+func GetTargetCluster(t *testing.T) greengage.Cluster {
 	t.Helper()
 	return getCluster(t, GPHOME_TARGET, testutils.MustConvertStringToInt(t, PGPORT), idl.ClusterDestination_target)
 }
@@ -241,12 +241,12 @@ func GetTargetCluster(t *testing.T) greenplum.Cluster {
 // GetTempTargetCluster creates a target cluster from the source cluster. It is
 // used in a defer clause when a target cluster is needed for cleanup before
 // the upgrade can be run to create the actual target cluster.
-func GetTempTargetCluster(t *testing.T) greenplum.Cluster {
+func GetTempTargetCluster(t *testing.T) greengage.Cluster {
 	t.Helper()
 
 	source := GetSourceCluster(t)
 
-	targetVersion, err := greenplum.Version(GPHOME_TARGET)
+	targetVersion, err := greengage.Version(GPHOME_TARGET)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -259,7 +259,7 @@ func GetTempTargetCluster(t *testing.T) greenplum.Cluster {
 	return *tmpTarget
 }
 
-func getCluster(t *testing.T, gphome string, port int, destination idl.ClusterDestination) greenplum.Cluster {
+func getCluster(t *testing.T, gphome string, port int, destination idl.ClusterDestination) greengage.Cluster {
 	t.Helper()
 
 	db, err := connection.Bootstrap(destination, gphome, port)
@@ -272,7 +272,7 @@ func getCluster(t *testing.T, gphome string, port int, destination idl.ClusterDe
 		}
 	}()
 
-	cluster, err := greenplum.ClusterFromDB(db, gphome, destination)
+	cluster, err := greengage.ClusterFromDB(db, gphome, destination)
 	if err != nil {
 		t.Fatalf("retrieve %s cluster configuration: %v", destination, err)
 	}
@@ -282,7 +282,7 @@ func getCluster(t *testing.T, gphome string, port int, destination idl.ClusterDe
 
 // backupDemoCluster is used with restoreDemoCluster to restore a cluster after
 // finalize.
-func BackupDemoCluster(t *testing.T, backupDir string, source greenplum.Cluster) {
+func BackupDemoCluster(t *testing.T, backupDir string, source greengage.Cluster) {
 	src := filepath.Dir(filepath.Dir(source.CoordinatorDataDir())) + string(os.PathSeparator)
 	dest := backupDir + string(os.PathSeparator)
 
@@ -301,7 +301,7 @@ func BackupDemoCluster(t *testing.T, backupDir string, source greenplum.Cluster)
 }
 
 // restoreDemoCluster restores the cluster after finalize has been run.
-func RestoreDemoCluster(t *testing.T, backupDir string, source greenplum.Cluster, target greenplum.Cluster) {
+func RestoreDemoCluster(t *testing.T, backupDir string, source greengage.Cluster, target greengage.Cluster) {
 	// Depending on where we failed we need to stop either the source or target cluster.
 	err := source.Stop(step.DevNullStream)
 	if err != nil {
@@ -345,8 +345,8 @@ func Isolation2_regress(t *testing.T, sourceVersion semver.Version, gphome strin
 		binDir = "--psqldir"
 		// Set PYTHONPATH directly since it is needed when running the
 		// pg_upgrade tests locally. Normally one would source
-		// greenplum_path.sh, but that causes the following issues:
-		// https://web.archive.org/web/20220506055918/https://groups.google.com/a/greenplum.org/g/gpdb-dev/c/JN-YwjCCReY/m/0L9wBOvlAQAJ
+		// greengage_path.sh, but that causes the following issues:
+		// https://web.archive.org/web/20220506055918/https://groups.google.com/a/greengage.org/g/gpdb-dev/c/JN-YwjCCReY/m/0L9wBOvlAQAJ
 		env = append(env, "PYTHONPATH="+filepath.Join(GPHOME_SOURCE, "lib/python"))
 	} else {
 		MustUnsetenv(t, "PYTHONHOME")
@@ -399,7 +399,7 @@ func MustGetPgUpgradeLog(t *testing.T, contentID int32) string {
 
 	// TODO: we'll need to update this logic once we have fix the GP6 to GP7 pipeline
 	targetVersion := "6.20.0"
-	dir, err := utils.GetPgUpgradeDir(greenplum.PrimaryRole, contentID, "*", targetVersion)
+	dir, err := utils.GetPgUpgradeDir(greengage.PrimaryRole, contentID, "*", targetVersion)
 	if err != nil {
 		t.Fatalf("unexpected err: %v", err)
 	}
@@ -435,7 +435,7 @@ func MustGetLogArchiveDir(t *testing.T, upgradeID string) string {
 	return hub.GetLogArchiveDir(logDir, upgradeID, time.Now())
 }
 
-func CreateMarkerFilesOnMirrors(t *testing.T, mirrors greenplum.ContentToSegConfig) {
+func CreateMarkerFilesOnMirrors(t *testing.T, mirrors greengage.ContentToSegConfig) {
 	t.Helper()
 
 	for _, seg := range mirrors {
@@ -443,7 +443,7 @@ func CreateMarkerFilesOnMirrors(t *testing.T, mirrors greenplum.ContentToSegConf
 	}
 }
 
-func RemoveMarkerFilesOnMirrors(t *testing.T, mirrors greenplum.ContentToSegConfig) {
+func RemoveMarkerFilesOnMirrors(t *testing.T, mirrors greengage.ContentToSegConfig) {
 	t.Helper()
 
 	for _, seg := range mirrors {
@@ -451,7 +451,7 @@ func RemoveMarkerFilesOnMirrors(t *testing.T, mirrors greenplum.ContentToSegConf
 	}
 }
 
-func VerifyMarkerFilesOnPrimaries(t *testing.T, primaries greenplum.ContentToSegConfig, mode idl.Mode) {
+func VerifyMarkerFilesOnPrimaries(t *testing.T, primaries greengage.ContentToSegConfig, mode idl.Mode) {
 	t.Helper()
 
 	for _, seg := range primaries {
@@ -469,7 +469,7 @@ func VerifyMarkerFilesOnPrimaries(t *testing.T, primaries greenplum.ContentToSeg
 	}
 }
 
-func CreateMarkerFilesOnAllSegments(t *testing.T, cluster greenplum.Cluster) {
+func CreateMarkerFilesOnAllSegments(t *testing.T, cluster greengage.Cluster) {
 	t.Helper()
 
 	for _, seg := range cluster.Primaries {
@@ -481,7 +481,7 @@ func CreateMarkerFilesOnAllSegments(t *testing.T, cluster greenplum.Cluster) {
 	}
 }
 
-func RemoveMarkerFilesOnAllSegments(t *testing.T, cluster greenplum.Cluster) {
+func RemoveMarkerFilesOnAllSegments(t *testing.T, cluster greengage.Cluster) {
 	t.Helper()
 
 	for _, seg := range cluster.Primaries {
@@ -493,7 +493,7 @@ func RemoveMarkerFilesOnAllSegments(t *testing.T, cluster greenplum.Cluster) {
 	}
 }
 
-func VerifyMarkerFilesOnAllSegments(t *testing.T, intermediate *greenplum.Cluster, target *greenplum.Cluster) {
+func VerifyMarkerFilesOnAllSegments(t *testing.T, intermediate *greengage.Cluster, target *greengage.Cluster) {
 	t.Helper()
 
 	// Verify the source cluster has the marker files. Since the source cluster

@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 // SPDX-License-Identifier: Apache-2.0
 
-package greenplum
+package greengage
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
 )
 
 func TestVerifyCompatibleGPDBVersions(t *testing.T) {
@@ -20,7 +20,7 @@ func TestVerifyCompatibleGPDBVersions(t *testing.T) {
 		SetVersionCommand(exectest.NewCommand(PostgresGPVersion_6_99_0))
 		defer ResetVersionCommand()
 
-		err := VerifyCompatibleGPDBVersions("/usr/local/greenplum-db-source", "/usr/local/greenplum-db-target")
+		err := VerifyCompatibleGPDBVersions("/usr/local/greengage-db-source", "/usr/local/greengage-db-target")
 		if err != nil {
 			t.Errorf("unexpected err %#v", err)
 		}

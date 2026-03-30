@@ -126,11 +126,11 @@ DROP TABLE intermediate_table;
 --------------------------------------------------------------------------------
 -- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 --------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
 -- NOTE: We sort the output to ensure the test is deterministic. See commit b6a084c. However, this prevents asserting
 -- the correct tables were detected for the sub-checks "invalid dropped column references" and "misaligned columns".
 -- Thus, we split the file and sort the two sub-checks individually.
-! csplit -f parts ~/gpAdminLogs/gpupgrade/pg_upgrade/p-1/heterogeneous_partitioned_tables.txt '/Partitions with misaligned dropped column references:/';
+! csplit -f parts ~/gpAdminLogs/ggupgrade/pg_upgrade/p-1/heterogeneous_partitioned_tables.txt '/Partitions with misaligned dropped column references:/';
 ! cat parts00 | LC_ALL=C sort -b;
 ! cat parts01 | LC_ALL=C sort -b;
 

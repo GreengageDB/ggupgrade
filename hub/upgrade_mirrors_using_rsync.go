@@ -10,13 +10,12 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
-func UpgradeMirrorsUsingRsync(agentConns []*idl.Connection, source *greenplum.Cluster, intermediate *greenplum.Cluster, useHbaHostnames bool) error {
+func UpgradeMirrorsUsingRsync(agentConns []*idl.Connection, source *greengage.Cluster, intermediate *greengage.Cluster, useHbaHostnames bool) error {
 	db, err := sql.Open("pgx", intermediate.Connection())
 	if err != nil {
 		return err
@@ -78,9 +77,9 @@ func UpgradeMirrorsUsingRsync(agentConns []*idl.Connection, source *greenplum.Cl
 	return nil
 }
 
-func RsyncMirrorDataDirsOnSegments(agentConns []*idl.Connection, source *greenplum.Cluster, intermediate *greenplum.Cluster) error {
+func RsyncMirrorDataDirsOnSegments(agentConns []*idl.Connection, source *greengage.Cluster, intermediate *greengage.Cluster) error {
 	request := func(conn *idl.Connection) error {
-		sourcePrimaries := source.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		sourcePrimaries := source.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && !seg.IsCoordinator() && seg.IsPrimary()
 		})
 
@@ -109,9 +108,9 @@ func RsyncMirrorDataDirsOnSegments(agentConns []*idl.Connection, source *greenpl
 	return ExecuteRPC(agentConns, request)
 }
 
-func RsyncMirrorTablespacesOnSegments(agentConns []*idl.Connection, source *greenplum.Cluster, intermediate *greenplum.Cluster) error {
+func RsyncMirrorTablespacesOnSegments(agentConns []*idl.Connection, source *greengage.Cluster, intermediate *greengage.Cluster) error {
 	request := func(conn *idl.Connection) error {
-		sourcePrimaries := source.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		sourcePrimaries := source.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && !seg.IsCoordinator() && seg.IsPrimary()
 		})
 
@@ -146,9 +145,9 @@ func RsyncMirrorTablespacesOnSegments(agentConns []*idl.Connection, source *gree
 	return ExecuteRPC(agentConns, request)
 }
 
-func RenameMirrorTablespacesOnSegments(agentConns []*idl.Connection, source *greenplum.Cluster, intermediate *greenplum.Cluster) error {
+func RenameMirrorTablespacesOnSegments(agentConns []*idl.Connection, source *greengage.Cluster, intermediate *greengage.Cluster) error {
 	request := func(conn *idl.Connection) error {
-		intermediateMirrors := intermediate.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		intermediateMirrors := intermediate.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && !seg.IsStandby() && seg.IsMirror()
 		})
 

@@ -2,7 +2,7 @@
 
 <!-- TOC -->
 - [How to Use](#how-to-use)
-  - [Create a gpupgrade branch](#create-a-gpupgrade-branch)
+  - [Create a ggupgrade branch](#create-a-ggupgrade-branch)
   - [Generating a Dump](#generating-a-dump)
   - [Using a Dump](#using-a-dump)
   - [CCP Cluster Settings](#ccp-cluster-settings)
@@ -18,8 +18,8 @@
 
 # How to Use
 
-#### Create a gpupgrade branch
-- Create a gpupgrade branch without any private information.
+#### Create a ggupgrade branch
+- Create a ggupgrade branch without any private information.
 
 #### Generating a Dump
 - On a production cluster use `gpbackup --metadata-only --dbname <db>` for all databases to generate a schema only metadata dump.
@@ -27,7 +27,7 @@
 - Place the xz'd dump in the `user-schemas` bucket under the `data-gpdb-server` GCP project.
 
 #### Using a Dump
-- Place an xz'd SQL file in `gpupgrade-intermediates/dump/5X` bucket under the `data-gpdb-cm` GCP project.
+- Place an xz'd SQL file in `ggupgrade-intermediates/dump/5X` bucket under the `data-gpdb-cm` GCP project.
 - Pass the `DUMP_PATH` environment variable when making the functional pipeline such as `make DUMP_PATH=dump/5X/dump.sql.xz functional-pipeline`
 
 #### CCP Cluster Settings
@@ -47,9 +47,9 @@ Run `make functional-pipeline` to fly the pipeline
   - Click the browser link and follow the directions.
   - Copy the verification code (bottom box) into the gcloud CLI prompt.
 - Upload the files from the CCP cluster to GCS
-  - `gsutil cp logs.tar.gz gs://gpupgrade-intermediates/functional-testing/logs/`
+  - `gsutil cp logs.tar.gz gs://ggupgrade-intermediates/functional-testing/logs/`
 - Download the files from GCS to your local machine
-  - `gsutil cp gs://gpupgrade-intermediates/functional-testing/logs/logs.tar.gz .` 
+  - `gsutil cp gs://ggupgrade-intermediates/functional-testing/logs/logs.tar.gz .` 
 
 #### Tearing Down the Cluster
 - The end of the pipeline will run the `teardown-cluster` job to destroy the cluster.

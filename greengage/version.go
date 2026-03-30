@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 // SPDX-License-Identifier: Apache-2.0
 
-package greenplum
+package greengage
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ import (
 	"github.com/blang/semver/v4"
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
 )
 
 var versionCommand = exec.Command
@@ -40,20 +40,20 @@ func Version(gphome string) (semver.Version, error) {
 	}
 
 	rawVersion := string(output)
-	parts := strings.SplitN(strings.TrimSpace(rawVersion), "postgres (Greenplum Database) ", 2)
+	parts := strings.SplitN(strings.TrimSpace(rawVersion), "postgres (Greengage Database) ", 2)
 	if len(parts) != 2 {
-		return semver.Version{}, xerrors.Errorf(`Greenplum version %q is not of the form "postgres (Greenplum Database) #.#.#"`, rawVersion)
+		return semver.Version{}, xerrors.Errorf(`Greengage version %q is not of the form "postgres (Greengage Database) #.#.#"`, rawVersion)
 	}
 
 	pattern := regexp.MustCompile(`\d+\.\d+\.\d+`)
 	matches := pattern.FindStringSubmatch(parts[1])
 	if len(matches) < 1 {
-		return semver.Version{}, xerrors.Errorf("parsing Greenplum version %q: %w", rawVersion, err)
+		return semver.Version{}, xerrors.Errorf("parsing Greengage version %q: %w", rawVersion, err)
 	}
 
 	version, err := semver.Parse(matches[0])
 	if err != nil {
-		return semver.Version{}, xerrors.Errorf("parsing Greenplum version %q: %w", rawVersion, err)
+		return semver.Version{}, xerrors.Errorf("parsing Greengage version %q: %w", rawVersion, err)
 	}
 
 	return version, nil

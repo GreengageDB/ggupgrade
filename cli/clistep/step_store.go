@@ -8,9 +8,9 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 // StepStore tracks the overall step status such as running, failed, or completed
@@ -91,24 +91,24 @@ type stepCondition struct {
 	nextAction string
 }
 
-var StepErr = errors.New(`gpupgrade commands must be issued in correct order
+var StepErr = errors.New(`ggupgrade commands must be issued in correct order
 
   1. initialize   runs pre-upgrade checks and prepares the cluster for upgrade
   2. execute      upgrades the master and primary segments to the target
-                  Greenplum version
+                  Greengage version
   3. finalize     upgrades the standby master and mirror segments to the target
-                  Greenplum version. Revert cannot be run after finalize has started.
+                  Greengage version. Revert cannot be run after finalize has started.
 
-Use "gpupgrade --help" for more information`)
+Use "ggupgrade --help" for more information`)
 
-const RunInitialize = `To begin the upgrade, run "gpupgrade initialize".`
+const RunInitialize = `To begin the upgrade, run "ggupgrade initialize".`
 
-const RunExecute = `To proceed with the upgrade, run "gpupgrade execute".
-To return the cluster to its original state, run "gpupgrade revert".`
+const RunExecute = `To proceed with the upgrade, run "ggupgrade execute".
+To return the cluster to its original state, run "ggupgrade revert".`
 
-const RunFinalize = `To proceed with the upgrade, run "gpupgrade finalize".`
+const RunFinalize = `To proceed with the upgrade, run "ggupgrade finalize".`
 
-const RunRevert = `Revert is in progress. Please continue by running "gpupgrade revert".`
+const RunRevert = `Revert is in progress. Please continue by running "ggupgrade revert".`
 
 // conditions expected to have been met for the current step. The next action
 // message is printed if the condition is not met.

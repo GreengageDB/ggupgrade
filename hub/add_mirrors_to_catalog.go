@@ -9,14 +9,13 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
-func addMirrorsToCatalog(intermediate *greenplum.Cluster) error {
-	options := []greenplum.Option{
-		greenplum.UtilityMode(),
-		greenplum.AllowSystemTableMods(),
+func addMirrorsToCatalog(intermediate *greengage.Cluster) error {
+	options := []greengage.Option{
+		greengage.UtilityMode(),
+		greengage.AllowSystemTableMods(),
 	}
 
 	db, err := sql.Open("pgx", intermediate.Connection(options...))
@@ -32,7 +31,7 @@ func addMirrorsToCatalog(intermediate *greenplum.Cluster) error {
 	return AddMirrorsToGpSegmentConfiguration(db, intermediate)
 }
 
-func AddMirrorsToGpSegmentConfiguration(db *sql.DB, intermediate *greenplum.Cluster) (err error) {
+func AddMirrorsToGpSegmentConfiguration(db *sql.DB, intermediate *greengage.Cluster) (err error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return xerrors.Errorf("begin transaction: %w", err)
@@ -50,7 +49,7 @@ func AddMirrorsToGpSegmentConfiguration(db *sql.DB, intermediate *greenplum.Clus
 	return nil
 }
 
-func addSegment(tx *sql.Tx, seg greenplum.SegConfig) error {
+func addSegment(tx *sql.Tx, seg greengage.SegConfig) error {
 	result, err := tx.Exec("INSERT INTO gp_segment_configuration "+
 		"(dbid, content, role, preferred_role, mode, status, port, hostname, address, datadir) "+
 		"VALUES($1, $2, $3, $4, 'n', 'u', $5, $6, $7, $8);", seg.DbID, seg.ContentID, seg.Role, seg.Role, seg.Port, seg.Hostname, seg.Hostname, seg.DataDir)

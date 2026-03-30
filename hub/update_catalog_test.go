@@ -11,60 +11,59 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func TestUpdateGpSegmentConfiguration(t *testing.T) {
 	// success cases
 	cases := []struct {
 		name   string
-		target *greenplum.Cluster
+		target *greengage.Cluster
 	}{
 		{
 			name: "updates ports for every segment",
-			target: hub.MustCreateCluster(t, greenplum.SegConfigs{
-				{DbID: 1, ContentID: -1, Port: 123, Role: greenplum.PrimaryRole},
-				{DbID: 8, ContentID: -1, Port: 789, Role: greenplum.MirrorRole},
-				{DbID: 2, ContentID: 0, Port: 234, Role: greenplum.PrimaryRole},
-				{DbID: 5, ContentID: 0, Port: 111, Role: greenplum.MirrorRole},
-				{DbID: 3, ContentID: 1, Port: 345, Role: greenplum.PrimaryRole},
-				{DbID: 6, ContentID: 1, Port: 222, Role: greenplum.MirrorRole},
-				{DbID: 4, ContentID: 2, Port: 456, Role: greenplum.PrimaryRole},
-				{DbID: 7, ContentID: 2, Port: 333, Role: greenplum.MirrorRole},
+			target: hub.MustCreateCluster(t, greengage.SegConfigs{
+				{DbID: 1, ContentID: -1, Port: 123, Role: greengage.PrimaryRole},
+				{DbID: 8, ContentID: -1, Port: 789, Role: greengage.MirrorRole},
+				{DbID: 2, ContentID: 0, Port: 234, Role: greengage.PrimaryRole},
+				{DbID: 5, ContentID: 0, Port: 111, Role: greengage.MirrorRole},
+				{DbID: 3, ContentID: 1, Port: 345, Role: greengage.PrimaryRole},
+				{DbID: 6, ContentID: 1, Port: 222, Role: greengage.MirrorRole},
+				{DbID: 4, ContentID: 2, Port: 456, Role: greengage.PrimaryRole},
+				{DbID: 7, ContentID: 2, Port: 333, Role: greengage.MirrorRole},
 			}),
 		},
 		{
 			name: "updates ports when there is no standby or mirrors",
-			target: hub.MustCreateCluster(t, greenplum.SegConfigs{
-				{DbID: 1, ContentID: -1, Port: 123, Role: greenplum.PrimaryRole},
-				{DbID: 2, ContentID: 0, Port: 234, Role: greenplum.PrimaryRole},
-				{DbID: 3, ContentID: 1, Port: 345, Role: greenplum.PrimaryRole},
-				{DbID: 4, ContentID: 2, Port: 456, Role: greenplum.PrimaryRole},
+			target: hub.MustCreateCluster(t, greengage.SegConfigs{
+				{DbID: 1, ContentID: -1, Port: 123, Role: greengage.PrimaryRole},
+				{DbID: 2, ContentID: 0, Port: 234, Role: greengage.PrimaryRole},
+				{DbID: 3, ContentID: 1, Port: 345, Role: greengage.PrimaryRole},
+				{DbID: 4, ContentID: 2, Port: 456, Role: greengage.PrimaryRole},
 			}),
 		},
 		{
 			name: "updates ports when there is a standby but no mirrors",
-			target: hub.MustCreateCluster(t, greenplum.SegConfigs{
-				{DbID: 1, ContentID: -1, Port: 123, Role: greenplum.PrimaryRole},
-				{DbID: 5, ContentID: -1, Port: 789, Role: greenplum.MirrorRole},
-				{DbID: 2, ContentID: 0, Port: 234, Role: greenplum.PrimaryRole},
-				{DbID: 3, ContentID: 1, Port: 345, Role: greenplum.PrimaryRole},
-				{DbID: 4, ContentID: 2, Port: 456, Role: greenplum.PrimaryRole},
+			target: hub.MustCreateCluster(t, greengage.SegConfigs{
+				{DbID: 1, ContentID: -1, Port: 123, Role: greengage.PrimaryRole},
+				{DbID: 5, ContentID: -1, Port: 789, Role: greengage.MirrorRole},
+				{DbID: 2, ContentID: 0, Port: 234, Role: greengage.PrimaryRole},
+				{DbID: 3, ContentID: 1, Port: 345, Role: greengage.PrimaryRole},
+				{DbID: 4, ContentID: 2, Port: 456, Role: greengage.PrimaryRole},
 			}),
 		},
 		{
 			name: "updates ports when there is no standby but mirrors",
-			target: hub.MustCreateCluster(t, greenplum.SegConfigs{
-				{DbID: 1, ContentID: -1, Port: 123, Role: greenplum.PrimaryRole},
-				{DbID: 2, ContentID: 0, Port: 234, Role: greenplum.PrimaryRole},
-				{DbID: 5, ContentID: 0, Port: 111, Role: greenplum.MirrorRole},
-				{DbID: 3, ContentID: 1, Port: 345, Role: greenplum.PrimaryRole},
-				{DbID: 6, ContentID: 1, Port: 222, Role: greenplum.MirrorRole},
-				{DbID: 4, ContentID: 2, Port: 456, Role: greenplum.PrimaryRole},
-				{DbID: 7, ContentID: 2, Port: 333, Role: greenplum.MirrorRole},
+			target: hub.MustCreateCluster(t, greengage.SegConfigs{
+				{DbID: 1, ContentID: -1, Port: 123, Role: greengage.PrimaryRole},
+				{DbID: 2, ContentID: 0, Port: 234, Role: greengage.PrimaryRole},
+				{DbID: 5, ContentID: 0, Port: 111, Role: greengage.MirrorRole},
+				{DbID: 3, ContentID: 1, Port: 345, Role: greengage.PrimaryRole},
+				{DbID: 6, ContentID: 1, Port: 222, Role: greengage.MirrorRole},
+				{DbID: 4, ContentID: 2, Port: 456, Role: greengage.PrimaryRole},
+				{DbID: 7, ContentID: 2, Port: 333, Role: greengage.MirrorRole},
 			}),
 		},
 	}
@@ -100,15 +99,15 @@ func TestUpdateGpSegmentConfiguration(t *testing.T) {
 	}
 
 	// error cases
-	target := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Port: 123, Role: greenplum.PrimaryRole},
-		{DbID: 8, ContentID: -1, Port: 789, Role: greenplum.MirrorRole},
-		{DbID: 2, ContentID: 0, Port: 234, Role: greenplum.PrimaryRole},
-		{DbID: 5, ContentID: 0, Port: 111, Role: greenplum.MirrorRole},
-		{DbID: 3, ContentID: 1, Port: 345, Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: 1, Port: 222, Role: greenplum.MirrorRole},
-		{DbID: 4, ContentID: 2, Port: 456, Role: greenplum.PrimaryRole},
-		{DbID: 7, ContentID: 2, Port: 333, Role: greenplum.MirrorRole},
+	target := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Port: 123, Role: greengage.PrimaryRole},
+		{DbID: 8, ContentID: -1, Port: 789, Role: greengage.MirrorRole},
+		{DbID: 2, ContentID: 0, Port: 234, Role: greengage.PrimaryRole},
+		{DbID: 5, ContentID: 0, Port: 111, Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 1, Port: 345, Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Port: 222, Role: greengage.MirrorRole},
+		{DbID: 4, ContentID: 2, Port: 456, Role: greengage.PrimaryRole},
+		{DbID: 7, ContentID: 2, Port: 333, Role: greengage.MirrorRole},
 	})
 
 	expected := fmt.Errorf("sentinel error")
@@ -209,7 +208,7 @@ func TestUpdateGpSegmentConfiguration(t *testing.T) {
 	}
 }
 
-func expectCatalogUpdate(mock sqlmock.Sqlmock, seg greenplum.SegConfig) *sqlmock.ExpectedExec {
+func expectCatalogUpdate(mock sqlmock.Sqlmock, seg greengage.SegConfig) *sqlmock.ExpectedExec {
 	return mock.ExpectExec("UPDATE gp_segment_configuration SET port = (.+), datadir = (.+) WHERE content = (.+) AND role = (.+)").
 		WithArgs(seg.Port, seg.DataDir, seg.ContentID, seg.Role)
 }

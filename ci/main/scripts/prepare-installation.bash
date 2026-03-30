@@ -9,7 +9,7 @@
 # - Installs gpugprade RPM so future tasks have data migration scripts installed.
 #
 # Expected inputs are SOURCE_PACKAGE_NAME TARGET_PACKAGE_NAME such as
-# greenplum-db-5, or greenplum-db-6.
+# greengage-db-5, or greengage-db-6.
 
 set -eux -o pipefail
 
@@ -33,15 +33,15 @@ for host in `cat cluster_env_files/hostfile_all`; do
         set -eux -o pipefail
 
         version=\$(rpm -q --qf '%{version}' '$source_package' | tr _ -)
-        sudo ln -s /usr/local/greenplum-db-\${version} /usr/local/greenplum-db-source
-        sudo chown -R gpadmin:gpadmin /usr/local/greenplum-db-\${version} /usr/local/greenplum-db-source
+        sudo ln -s /usr/local/greengage-db-\${version} /usr/local/greengage-db-source
+        sudo chown -R gpadmin:gpadmin /usr/local/greengage-db-\${version} /usr/local/greengage-db-source
 
         version=\$(rpm -q --qf '%{version}' '$target_package' | tr _ -)
-        sudo ln -s /usr/local/greenplum-db-\${version} /usr/local/greenplum-db-target
-        sudo chown -R gpadmin:gpadmin /usr/local/greenplum-db-\${version} /usr/local/greenplum-db-target
+        sudo ln -s /usr/local/greengage-db-\${version} /usr/local/greengage-db-target
+        sudo chown -R gpadmin:gpadmin /usr/local/greengage-db-\${version} /usr/local/greengage-db-target
     "
 
-    echo "Installing the gpupgrade rpm on host ${host}..."
-    scp enterprise_rpm/gpupgrade-*.rpm gpadmin@$host:/tmp
-    ssh centos@$host sudo rpm -ivh /tmp/gpupgrade-*.rpm
+    echo "Installing the ggupgrade rpm on host ${host}..."
+    scp enterprise_rpm/ggupgrade-*.rpm gpadmin@$host:/tmp
+    ssh centos@$host sudo rpm -ivh /tmp/ggupgrade-*.rpm
 done

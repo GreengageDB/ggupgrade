@@ -14,8 +14,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/upgrade"
 )
 
 func TestAgent(t *testing.T) {
@@ -40,7 +40,7 @@ func TestAgent(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			cmd := exec.Command("gpupgrade", c.args...)
+			cmd := exec.Command("ggupgrade", c.args...)
 
 			// in order to kill the daemonized process enable process groups
 			cmd.SysProcAttr = &unix.SysProcAttr{Setpgid: true}
@@ -50,11 +50,11 @@ func TestAgent(t *testing.T) {
 				// in the group by sending a kill signal to -PGID. In this case,
 				// since the PID is the same as the PGID we can send -PID.
 				if err := unix.Kill(-cmd.Process.Pid, unix.SIGTERM); err != nil {
-					t.Fatalf("failed to kill gpupgrade agent: %+v", err)
+					t.Fatalf("failed to kill ggupgrade agent: %+v", err)
 				}
 			}()
 			if err != nil {
-				t.Errorf("gpupgrade agent returned unexpected error %+v", err)
+				t.Errorf("ggupgrade agent returned unexpected error %+v", err)
 				t.Logf("output:\n%s", string(output))
 			}
 

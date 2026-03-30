@@ -7,10 +7,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/greenplum-db/gpupgrade/config/backupdir"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func (s *Server) Execute(req *idl.ExecuteRequest, stream idl.CliToHub_ExecuteServer) (err error) {
@@ -86,7 +86,7 @@ func (s *Server) Execute(req *idl.ExecuteRequest, stream idl.CliToHub_ExecuteSer
 		}
 
 		nextAction := `Consider setting an alternative backup directory with
-"gpupgrade execute --verbose --parent-backup-dirs /data"
+"ggupgrade execute --verbose --parent-backup-dirs /data"
 
 The parent_backup_dirs parameter sets the internal location to store the backup 
 of the master data directory and user defined master tablespaces. It defaults 

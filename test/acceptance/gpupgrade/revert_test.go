@@ -15,16 +15,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/cli/commands"
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/substeps"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/acceptance"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/cli/commands"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/substeps"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func TestRevert(t *testing.T) {
@@ -52,7 +51,7 @@ func TestRevert(t *testing.T) {
 	})
 
 	t.Run("reverting after initialize exits early", func(t *testing.T) {
-		cmd := exec.Command("gpupgrade", "initialize",
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--verbose",
 			"--mode", idl.Mode_copy.String(),
 			"--source-gphome", acceptance.GPHOME_SOURCE,
@@ -149,7 +148,7 @@ func TestRevert(t *testing.T) {
 		testRevertAfterExecute(t, idl.Mode_link, makeUpgradePrimariesFail)
 	})
 
-	t.Run("can successfully run gpupgrade after a revert", func(t *testing.T) {
+	t.Run("can successfully run ggupgrade after a revert", func(t *testing.T) {
 		acceptance.Initialize(t, idl.Mode_copy)
 		acceptance.Execute(t)
 		acceptance.Revert(t)
@@ -173,8 +172,8 @@ func testRevertAfterExecute(t *testing.T, mode idl.Mode, upgradeFailure UpgradeF
 
 	// add a table
 	table := "public.should_be_reverted"
-	testutils.MustExecuteSQL(t, source.Connection(greenplum.Database("postgres")), fmt.Sprintf(`CREATE TABLE %s (a int); INSERT INTO %s VALUES (1), (2), (3);`, table, table))
-	defer testutils.MustExecuteSQL(t, source.Connection(greenplum.Database("postgres")), fmt.Sprintf(`DROP TABLE %s;`, table))
+	testutils.MustExecuteSQL(t, source.Connection(greengage.Database("postgres")), fmt.Sprintf(`CREATE TABLE %s (a int); INSERT INTO %s VALUES (1), (2), (3);`, table, table))
+	defer testutils.MustExecuteSQL(t, source.Connection(greengage.Database("postgres")), fmt.Sprintf(`DROP TABLE %s;`, table))
 
 	tempDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, tempDir)
@@ -184,7 +183,7 @@ func testRevertAfterExecute(t *testing.T, mode idl.Mode, upgradeFailure UpgradeF
 	defer testutils.MustDeleteTablespaces(t, source, source) // since we revert we need to remove tablespaces from the source cluster and not the target
 
 	// dump all databases before the upgrade
-	err := source.RunGreenplumCmd(step.NewLogStdStreams(false), "pg_dumpall", "--schema-only", "-f", filepath.Join(tempDir, "before.sql"))
+	err := source.RunGreengageCmd(step.NewLogStdStreams(false), "pg_dumpall", "--schema-only", "-f", filepath.Join(tempDir, "before.sql"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -198,7 +197,7 @@ func testRevertAfterExecute(t *testing.T, mode idl.Mode, upgradeFailure UpgradeF
 		intermediate := acceptance.GetIntermediateCluster(t)
 
 		// modify a table on the intermediate cluster to ensure it is properly reverted
-		testutils.MustExecuteSQL(t, intermediate.Connection(greenplum.Database("postgres")), fmt.Sprintf(`TRUNCATE TABLE %s;`, table))
+		testutils.MustExecuteSQL(t, intermediate.Connection(greengage.Database("postgres")), fmt.Sprintf(`TRUNCATE TABLE %s;`, table))
 
 		// modify tablespace data on the intermediate cluster to ensure it is properly reverted
 		testutils.MustTruncateTablespaces(t, intermediate)
@@ -219,7 +218,7 @@ func testRevertAfterExecute(t *testing.T, mode idl.Mode, upgradeFailure UpgradeF
 	acceptance.VerifyMarkerFilesOnPrimaries(t, source.Primaries, mode)
 
 	// verify the table modifications were reverted
-	rows := testutils.MustQueryRow(t, source.Connection(greenplum.Database("postgres")), fmt.Sprintf(`SELECT COUNT(*) FROM %s;`, table))
+	rows := testutils.MustQueryRow(t, source.Connection(greengage.Database("postgres")), fmt.Sprintf(`SELECT COUNT(*) FROM %s;`, table))
 	expected := 3
 	if rows != expected {
 		t.Fatalf("got %d want %d rows", rows, expected)
@@ -229,7 +228,7 @@ func testRevertAfterExecute(t *testing.T, mode idl.Mode, upgradeFailure UpgradeF
 	testutils.VerifyTablespaceData(t, source)
 
 	// dump all databases after the upgrade
-	err = source.RunGreenplumCmd(step.NewLogStdStreams(false), "pg_dumpall", "--schema-only", "-f", filepath.Join(tempDir, "after.sql"))
+	err = source.RunGreengageCmd(step.NewLogStdStreams(false), "pg_dumpall", "--schema-only", "-f", filepath.Join(tempDir, "after.sql"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -242,7 +241,7 @@ func testRevertAfterExecute(t *testing.T, mode idl.Mode, upgradeFailure UpgradeF
 	}
 }
 
-func verifyRevert(t *testing.T, source greenplum.Cluster, intermediate *greenplum.Cluster, revertOutput string, logArchiveDir string) {
+func verifyRevert(t *testing.T, source greengage.Cluster, intermediate *greengage.Cluster, revertOutput string, logArchiveDir string) {
 	t.Helper()
 
 	// Since the logArchiveDir has a timestamp we need to do a partial check
@@ -250,7 +249,7 @@ func verifyRevert(t *testing.T, source greenplum.Cluster, intermediate *greenplu
 
 	match := fmt.Sprintf(commands.RevertCompletedText,
 		source.Version,
-		filepath.Join(source.GPHome, "greenplum_path.sh"), source.CoordinatorDataDir(), source.CoordinatorPort(),
+		filepath.Join(source.GPHome, "greengage_path.sh"), source.CoordinatorDataDir(), source.CoordinatorPort(),
 		logArchiveDir+`\d{5}`,
 		idl.Step_revert,
 		source.GPHome, source.CoordinatorPort(), filepath.Join(logArchiveDir+`\d{5}`, "data-migration-scripts"), idl.Step_revert)
@@ -290,7 +289,7 @@ func verifyRevert(t *testing.T, source greenplum.Cluster, intermediate *greenplu
 func verifyExecute(t *testing.T, failedSubstep idl.Substep) bool {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "execute", "--non-interactive", "--verbose")
+	cmd := exec.Command("ggupgrade", "execute", "--non-interactive", "--verbose")
 	output, err := cmd.CombinedOutput()
 	executeOutput := strings.TrimSpace(string(output))
 	expectExecuteToFail := failedSubstep != idl.Substep_unknown_substep
@@ -308,23 +307,23 @@ func verifyExecute(t *testing.T, failedSubstep idl.Substep) bool {
 }
 
 type UpgradeFailure struct {
-	setup         func(t *testing.T, source greenplum.Cluster) string
-	revert        func(t *testing.T, cluster greenplum.Cluster, path string)
+	setup         func(t *testing.T, source greengage.Cluster) string
+	revert        func(t *testing.T, cluster greengage.Cluster, path string)
 	failedSubstep idl.Substep
 }
 
-func noUpgradeFailureToSetup(t *testing.T, source greenplum.Cluster) string {
+func noUpgradeFailureToSetup(t *testing.T, source greengage.Cluster) string {
 	return ""
 }
 
-func noUpgradeFailureToRevert(t *testing.T, source greenplum.Cluster, path string) {
+func noUpgradeFailureToRevert(t *testing.T, source greengage.Cluster, path string) {
 
 }
 
-func setupCoordinatorUpgradeFailure(t *testing.T, source greenplum.Cluster) string {
+func setupCoordinatorUpgradeFailure(t *testing.T, source greengage.Cluster) string {
 	t.Helper()
 
-	conn := source.Connection(greenplum.Database("postgres"))
+	conn := source.Connection(greengage.Database("postgres"))
 	testutils.MustExecuteSQL(t, conn, `CREATE TABLE public.coordinator_failure (a int, b int); INSERT INTO public.coordinator_failure SELECT i, i FROM generate_series(1,10) i;`)
 	relfile := testutils.MustQueryRow(t, conn, `SELECT relfilenode FROM pg_class WHERE relname='coordinator_failure';`)
 	dbOid := testutils.MustQueryRow(t, conn, `SELECT oid FROM pg_database WHERE datname='postgres';`)
@@ -338,7 +337,7 @@ func setupCoordinatorUpgradeFailure(t *testing.T, source greenplum.Cluster) stri
 	return path
 }
 
-func revertCoordinatorUpgradeFailure(t *testing.T, source greenplum.Cluster, path string) {
+func revertCoordinatorUpgradeFailure(t *testing.T, source greengage.Cluster, path string) {
 	t.Helper()
 
 	err := os.Rename(path+".bak", path)
@@ -346,13 +345,13 @@ func revertCoordinatorUpgradeFailure(t *testing.T, source greenplum.Cluster, pat
 		t.Fatal(err)
 	}
 
-	testutils.MustExecuteSQL(t, source.Connection(greenplum.Database("postgres")), `DROP TABLE IF EXISTS public.coordinator_failure;`)
+	testutils.MustExecuteSQL(t, source.Connection(greengage.Database("postgres")), `DROP TABLE IF EXISTS public.coordinator_failure;`)
 }
 
-func setupPrimaryUpgradeFailure(t *testing.T, source greenplum.Cluster) string {
+func setupPrimaryUpgradeFailure(t *testing.T, source greengage.Cluster) string {
 	t.Helper()
 
-	conn := source.Connection(greenplum.Database("postgres"))
+	conn := source.Connection(greengage.Database("postgres"))
 	testutils.MustExecuteSQL(t, conn, `CREATE TABLE public.primary_failure (a int, b int); INSERT INTO public.primary_failure SELECT i, i FROM generate_series(1,10) i;`)
 	relfile := testutils.MustQueryRow(t, conn, `SELECT relfilenode FROM gp_dist_random('pg_class') WHERE relname='primary_failure' AND gp_segment_id=0;`)
 	dbOid := testutils.MustQueryRow(t, conn, `SELECT oid FROM gp_dist_random('pg_database') WHERE datname='postgres' AND gp_segment_id=0;`)
@@ -367,9 +366,9 @@ func setupPrimaryUpgradeFailure(t *testing.T, source greenplum.Cluster) string {
 	return path
 }
 
-func revertPrimaryUpgradeFailure(t *testing.T, source greenplum.Cluster, path string) {
+func revertPrimaryUpgradeFailure(t *testing.T, source greengage.Cluster, path string) {
 	t.Helper()
 
 	testutils.MustMoveRemoteFile(t, source.Primaries[0].Hostname, path+".bak", path)
-	testutils.MustExecuteSQL(t, source.Connection(greenplum.Database("postgres")), `DROP TABLE IF EXISTS public.primary_failure;`)
+	testutils.MustExecuteSQL(t, source.Connection(greengage.Database("postgres")), `DROP TABLE IF EXISTS public.primary_failure;`)
 }

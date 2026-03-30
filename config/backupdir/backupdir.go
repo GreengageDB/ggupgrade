@@ -9,8 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/greenplum-db/gpupgrade/greenplum"
 )
 
 type BackupDirs struct {
@@ -31,17 +29,17 @@ type AgentHostsToBackupDir map[string]string
 // NOTE: We parse in the hub rather than the CLI since we need to know all hosts
 // to fill in the agent hosts backup directories if the user specifies a single
 // directory and no hosts.
-func ParseParentBackupDirs(input string, cluster greenplum.Cluster) (BackupDirs, error) {
+func ParseParentBackupDirs(input string, cluster greengage.Cluster) (BackupDirs, error) {
 	input = strings.TrimSpace(input)
 	backupDirs := BackupDirs{}
 	backupDirs.AgentHostsToBackupDir = make(AgentHostsToBackupDir)
 
 	// set default backup directories
 	if input == "" {
-		backupDirs.CoordinatorBackupDir = filepath.Join(filepath.Dir(cluster.CoordinatorDataDir()), string(os.PathSeparator), ".gpupgrade")
+		backupDirs.CoordinatorBackupDir = filepath.Join(filepath.Dir(cluster.CoordinatorDataDir()), string(os.PathSeparator), ".ggupgrade")
 
 		for _, seg := range cluster.Primaries.ExcludingCoordinator() {
-			backupDirs.AgentHostsToBackupDir[seg.Hostname] = filepath.Join(filepath.Dir(seg.DataDir), string(os.PathSeparator), ".gpupgrade")
+			backupDirs.AgentHostsToBackupDir[seg.Hostname] = filepath.Join(filepath.Dir(seg.DataDir), string(os.PathSeparator), ".ggupgrade")
 		}
 
 		return backupDirs, nil
@@ -49,7 +47,7 @@ func ParseParentBackupDirs(input string, cluster greenplum.Cluster) (BackupDirs,
 
 	// parse single backup directory across all hosts
 	if !strings.ContainsAny(input, ",:") {
-		backupDir := filepath.Join(filepath.Clean(input), ".gpupgrade")
+		backupDir := filepath.Join(filepath.Clean(input), ".ggupgrade")
 
 		backupDirs.CoordinatorBackupDir = backupDir
 		for _, seg := range cluster.ExcludingCoordinatorOrStandby() {
@@ -65,7 +63,7 @@ func ParseParentBackupDirs(input string, cluster greenplum.Cluster) (BackupDirs,
 	for _, pair := range parts {
 		hostBackupParts := strings.Split(strings.TrimSpace(pair), ":")
 		host := strings.TrimSpace(hostBackupParts[0])
-		backupDir := filepath.Join(filepath.Clean(strings.TrimSpace(hostBackupParts[1])), ".gpupgrade")
+		backupDir := filepath.Join(filepath.Clean(strings.TrimSpace(hostBackupParts[1])), ".ggupgrade")
 
 		if parseCoordinator {
 			backupDirs.CoordinatorBackupDir = backupDir

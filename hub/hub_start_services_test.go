@@ -18,13 +18,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
 
-	"github.com/greenplum-db/gpupgrade/agent"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/agent"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func gpupgrade_agent() {
@@ -102,7 +102,7 @@ func TestRestartAgent(t *testing.T) {
 		}
 	})
 
-	t.Run("returns an error when gpupgrade agent fails", func(t *testing.T) {
+	t.Run("returns an error when ggupgrade agent fails", func(t *testing.T) {
 		hub.SetExecCommand(exectest.NewCommand(gpupgrade_agent_Errors))
 
 		// we fail all connections here so that RestartAgents will run the
@@ -145,7 +145,7 @@ func TestRestartAgent(t *testing.T) {
 				t.Errorf("RestartAgents invoked with %q want ssh", name)
 			}
 
-			cmd := fmt.Sprintf("bash -c \"%s/gpupgrade agent --daemonize --port %d --state-directory %s\"", testutils.MustGetExecutablePath(t), port, stateDir)
+			cmd := fmt.Sprintf("bash -c \"%s/ggupgrade agent --daemonize --port %d --state-directory %s\"", testutils.MustGetExecutablePath(t), port, stateDir)
 			expected := []string{host, cmd}
 			if !reflect.DeepEqual(args, expected) {
 				t.Errorf("got %q want %q", args, expected)

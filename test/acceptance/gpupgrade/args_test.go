@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/cli/commands"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/acceptance"
+	"github.com/GreengageDB/ggupgrade/cli/commands"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
 )
 
 func TestArgs(t *testing.T) {
@@ -22,8 +22,8 @@ func TestArgs(t *testing.T) {
 	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
-	t.Run("gpupgrade initialize fails when passed insufficient arguments", func(t *testing.T) {
-		cmd := exec.Command("gpupgrade", "initialize",
+	t.Run("ggupgrade initialize fails when passed insufficient arguments", func(t *testing.T) {
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--non-interactive",
 		)
 		output, err := cmd.CombinedOutput()
@@ -37,8 +37,8 @@ func TestArgs(t *testing.T) {
 		}
 	})
 
-	t.Run("gpupgrade initialize fails when other flags are used with --file", func(t *testing.T) {
-		cmd := exec.Command("gpupgrade", "initialize",
+	t.Run("ggupgrade initialize fails when other flags are used with --file", func(t *testing.T) {
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--non-interactive",
 			"--file", "/some/config",
 			"--source-gphome", "/usr/local/gpdb5",
@@ -54,8 +54,8 @@ func TestArgs(t *testing.T) {
 		}
 	})
 
-	t.Run("gpupgrade initialize fails when --pg-upgrade-verbose is used without --verbose", func(t *testing.T) {
-		cmd := exec.Command("gpupgrade", "initialize",
+	t.Run("ggupgrade initialize fails when --pg-upgrade-verbose is used without --verbose", func(t *testing.T) {
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--non-interactive",
 			"--source-gphome", acceptance.GPHOME_SOURCE,
 			"--target-gphome", acceptance.GPHOME_TARGET,
@@ -75,7 +75,7 @@ func TestArgs(t *testing.T) {
 		}
 	})
 
-	t.Run("gpupgrade initialize --file with verbose uses the configured values", func(t *testing.T) {
+	t.Run("ggupgrade initialize --file with verbose uses the configured values", func(t *testing.T) {
 		configFile := filepath.Join(stateDir, "gpupgrade_config")
 		contents := fmt.Sprintf(`source-gphome = %s
 target-gphome = %s
@@ -85,7 +85,7 @@ stop-before-cluster-creation = true
 `, acceptance.GPHOME_SOURCE, acceptance.GPHOME_TARGET, acceptance.PGPORT)
 		testutils.MustWriteToFile(t, configFile, contents)
 
-		cmd := exec.Command("gpupgrade", "initialize",
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--non-interactive",
 			"--verbose",
 			"--pg-upgrade-verbose",
@@ -109,7 +109,7 @@ stop-before-cluster-creation = true
 	})
 
 	t.Run("initialize sanitizes source-gphome and target-gphome", func(t *testing.T) {
-		cmd := exec.Command("gpupgrade", "initialize",
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--non-interactive",
 			"--source-gphome", acceptance.GPHOME_SOURCE+string(os.PathSeparator),
 			"--target-gphome", acceptance.GPHOME_TARGET+string(os.PathSeparator)+string(os.PathSeparator),
@@ -134,10 +134,10 @@ stop-before-cluster-creation = true
 		}
 	})
 
-	t.Run("gpupgrade execute fails when --pg-upgrade-verbose is used without --verbose", func(t *testing.T) {
+	t.Run("ggupgrade execute fails when --pg-upgrade-verbose is used without --verbose", func(t *testing.T) {
 		acceptance.Initialize_stopBeforeClusterCreation(t)
 
-		cmd := exec.Command("gpupgrade", "execute",
+		cmd := exec.Command("ggupgrade", "execute",
 			"--non-interactive",
 			"--pg-upgrade-verbose",
 		)

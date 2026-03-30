@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 // SPDX-License-Identifier: Apache-2.0
 
-package greenplum
+package greengage
 
 import (
 	"bytes"
@@ -20,11 +20,11 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 const CoordinatorDbid = 1
@@ -294,7 +294,7 @@ func (c *Cluster) Start(stream step.OutStreams) error {
 		return nil
 	}
 
-	err = c.RunGreenplumCmd(stream, "gpstart", "-a", "-d", c.CoordinatorDataDir())
+	err = c.RunGreengageCmd(stream, "gpstart", "-a", "-d", c.CoordinatorDataDir())
 	if err != nil {
 		return xerrors.Errorf("starting %s cluster: %w", c.Destination, err)
 	}
@@ -303,7 +303,7 @@ func (c *Cluster) Start(stream step.OutStreams) error {
 }
 
 func (c *Cluster) StartCoordinatorOnly(stream step.OutStreams) error {
-	err := c.RunGreenplumCmd(stream, "gpstart", "-a", "-m", "-d", c.CoordinatorDataDir())
+	err := c.RunGreengageCmd(stream, "gpstart", "-a", "-m", "-d", c.CoordinatorDataDir())
 	if err != nil {
 		return xerrors.Errorf("starting %s cluster in master only mode: %w", c.Destination, err)
 	}
@@ -321,7 +321,7 @@ func (c *Cluster) Stop(stream step.OutStreams) error {
 		return nil
 	}
 
-	err = c.RunGreenplumCmd(stream, "gpstop", "-a", "-d", c.CoordinatorDataDir())
+	err = c.RunGreengageCmd(stream, "gpstop", "-a", "-d", c.CoordinatorDataDir())
 	if err != nil {
 		return xerrors.Errorf("stopping %s cluster: %w", c.Destination, err)
 	}
@@ -339,7 +339,7 @@ func (c *Cluster) StopCoordinatorOnly(stream step.OutStreams) error {
 		return nil
 	}
 
-	err = c.RunGreenplumCmd(stream, "gpstop", "-a", "-m", "-d", c.CoordinatorDataDir())
+	err = c.RunGreengageCmd(stream, "gpstop", "-a", "-m", "-d", c.CoordinatorDataDir())
 	if err != nil {
 		return xerrors.Errorf("stopping %s cluster: %w", c.Destination, err)
 	}
@@ -392,31 +392,31 @@ func (c *Cluster) IsCoordinatorRunning(stream step.OutStreams) (bool, error) {
 	return true, nil
 }
 
-var greenplumCommand = exec.Command
+var greengageCommand = exec.Command
 
 // XXX: for internal testing only
-func SetGreenplumCommand(command exectest.Command) {
-	greenplumCommand = command
+func SetGreengageCommand(command exectest.Command) {
+	greengageCommand = command
 }
 
 // XXX: for internal testing only
-func ResetGreenplumCommand() {
-	greenplumCommand = exec.Command
+func ResetGreengageCommand() {
+	greengageCommand = exec.Command
 }
 
-func (c *Cluster) RunGreenplumCmd(streams step.OutStreams, utility string, args ...string) error {
-	return c.runGreenplumCommand(streams, utility, args, nil)
+func (c *Cluster) RunGreengageCmd(streams step.OutStreams, utility string, args ...string) error {
+	return c.runGreengageCommand(streams, utility, args, nil)
 }
 
-func (c *Cluster) RunGreenplumCmdWithEnvironment(streams step.OutStreams, utility string, args []string, envs []string) error {
-	return c.runGreenplumCommand(streams, utility, args, envs)
+func (c *Cluster) RunGreengageCmdWithEnvironment(streams step.OutStreams, utility string, args []string, envs []string) error {
+	return c.runGreengageCommand(streams, utility, args, envs)
 }
 
-func (c *Cluster) runGreenplumCommand(streams step.OutStreams, utility string, args []string, envs []string) error {
+func (c *Cluster) runGreengageCommand(streams step.OutStreams, utility string, args []string, envs []string) error {
 	path := filepath.Join(c.GPHome, "bin", utility)
 	args = append([]string{path}, args...)
 
-	cmd := greenplumCommand("bash", "-c", fmt.Sprintf("source %s/greenplum_path.sh && %s", c.GPHome, shellquote.Join(args...)))
+	cmd := greengageCommand("bash", "-c", fmt.Sprintf("source %s/greengage_path.sh && %s", c.GPHome, shellquote.Join(args...)))
 	cmd.Env = append(cmd.Env, fmt.Sprintf("%v=%v", "MASTER_DATA_DIRECTORY", c.CoordinatorDataDir()))
 	cmd.Env = append(cmd.Env, fmt.Sprintf("%v=%v", "PGPORT", c.CoordinatorPort()))
 	cmd.Env = append(cmd.Env, envs...)
@@ -429,7 +429,7 @@ func (c *Cluster) runGreenplumCommand(streams step.OutStreams, utility string, a
 }
 
 func (c *Cluster) RunCmd(streams step.OutStreams, command string, args ...string) error {
-	cmd := greenplumCommand(command, shellquote.Join(args...))
+	cmd := greengageCommand(command, shellquote.Join(args...))
 
 	cmd.Env = append(cmd.Env, fmt.Sprintf("%v=%v", "MASTER_DATA_DIRECTORY", c.CoordinatorDataDir()))
 	cmd.Env = append(cmd.Env, fmt.Sprintf("%v=%v", "PGPORT", c.CoordinatorPort()))

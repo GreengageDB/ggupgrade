@@ -11,11 +11,11 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func init() {
-	// All gpupgrade binaries are expected to be on the path for integration
+	// All ggupgrade binaries are expected to be on the path for integration
 	// tests. Be nice to developers and check up front; warn if the binaries
 	// being tested aren't contained in a directory directly above this test
 	// file.
@@ -25,7 +25,7 @@ func init() {
 	}
 
 	var allErrs error
-	for _, bin := range []string{"gpupgrade"} {
+	for _, bin := range []string{"ggupgrade"} {
 		binPath, err := exec.LookPath(bin)
 		if err != nil {
 			allErrs = errorlist.Append(allErrs, err)
@@ -39,7 +39,7 @@ func init() {
 	}
 	if allErrs != nil {
 		panic(fmt.Sprintf(
-			"Please put gpupgrade binaries on your PATH before running integration tests.\n%s",
+			"Please put ggupgrade binaries on your PATH before running integration tests.\n%s",
 			allErrs,
 		))
 	}

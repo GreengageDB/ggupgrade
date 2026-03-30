@@ -10,27 +10,26 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/greenplum-db/gpupgrade/config/backupdir"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/idl/mock_idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl/mock_idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func TestDeleteBackupDirectories(t *testing.T) {
-	source := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/coordinator/seg-1", Port: 15432, Role: greenplum.PrimaryRole},
-		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby/seg-1", Port: 16432, Role: greenplum.MirrorRole},
-		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data1/primaries/seg1", Port: 25433, Role: greenplum.PrimaryRole},
-		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data2/mirrors/seg1", Port: 25434, Role: greenplum.MirrorRole},
-		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data2/primaries/seg2", Port: 25435, Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data1/mirrors/seg2", Port: 25436, Role: greenplum.MirrorRole},
-		{DbID: 7, ContentID: 2, Hostname: "sdw3", DataDir: "/data3/mirrors/seg3", Port: 25437, Role: greenplum.MirrorRole},
-		{DbID: 8, ContentID: 2, Hostname: "sdw3", DataDir: "/data3/primaries/seg3", Port: 25438, Role: greenplum.PrimaryRole},
+	source := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/coordinator/seg-1", Port: 15432, Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby/seg-1", Port: 16432, Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data1/primaries/seg1", Port: 25433, Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data2/mirrors/seg1", Port: 25434, Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data2/primaries/seg2", Port: 25435, Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data1/mirrors/seg2", Port: 25436, Role: greengage.MirrorRole},
+		{DbID: 7, ContentID: 2, Hostname: "sdw3", DataDir: "/data3/mirrors/seg3", Port: 25437, Role: greengage.MirrorRole},
+		{DbID: 8, ContentID: 2, Hostname: "sdw3", DataDir: "/data3/primaries/seg3", Port: 25438, Role: greengage.PrimaryRole},
 	})
 
 	backupDirs, err := backupdir.ParseParentBackupDirs("", *source)

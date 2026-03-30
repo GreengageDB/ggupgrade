@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 // SPDX-License-Identifier: Apache-2.0
 
-package greenplum_test
+package greengage_test
 
 import (
 	"bytes"
@@ -14,10 +14,10 @@ import (
 	"github.com/blang/semver/v4"
 	"github.com/pkg/errors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func TestGetTablespaces(t *testing.T) {
@@ -35,19 +35,19 @@ func TestGetTablespaces(t *testing.T) {
 
 		mock.ExpectQuery("SELECT").WillReturnRows(rows)
 
-		actual, err := greenplum.GetTablespaceTuples(db)
+		actual, err := greengage.GetTablespaceTuples(db)
 		if err != nil {
 			t.Errorf("returned error %+v", err)
 		}
 
-		expected := greenplum.TablespaceTuples{
-			greenplum.Tablespace{
+		expected := greengage.TablespaceTuples{
+			greengage.Tablespace{
 				DbId: 1,
 				Oid:  1234,
 				Name: "pg_default",
 				Info: &idl.TablespaceInfo{Location: "/tmp/pg_default_tablespace", UserDefined: false},
 			},
-			greenplum.Tablespace{
+			greengage.Tablespace{
 				DbId: 2,
 				Oid:  1235,
 				Name: "my_tablespace",
@@ -91,7 +91,7 @@ func TestGetTablespaces(t *testing.T) {
 
 			mock.ExpectQuery("SELECT").WillReturnError(c.error)
 
-			tuples, err := greenplum.GetTablespaceTuples(db)
+			tuples, err := greengage.GetTablespaceTuples(db)
 			if !errors.Is(err, c.error) {
 				t.Errorf("returned %#v want %#v", err, c.error)
 			}
@@ -106,12 +106,12 @@ func TestGetTablespaces(t *testing.T) {
 func TestNewTablespaces(t *testing.T) {
 	cases := []struct {
 		name     string
-		tuples   greenplum.TablespaceTuples
-		expected greenplum.Tablespaces
+		tuples   greengage.TablespaceTuples
+		expected greengage.Tablespaces
 	}{
 		{
 			name: "only default tablespace",
-			tuples: greenplum.TablespaceTuples{
+			tuples: greengage.TablespaceTuples{
 				{
 					DbId: 1,
 					Oid:  1663,
@@ -131,7 +131,7 @@ func TestNewTablespaces(t *testing.T) {
 					},
 				},
 			},
-			expected: map[int32]greenplum.SegmentTablespaces{
+			expected: map[int32]greengage.SegmentTablespaces{
 				1: {
 					1663: {
 						Location:    "/tmp/coordinator/gpseg-1",
@@ -148,7 +148,7 @@ func TestNewTablespaces(t *testing.T) {
 		},
 		{
 			name: "multiple tablespaces",
-			tuples: greenplum.TablespaceTuples{
+			tuples: greengage.TablespaceTuples{
 				{
 					DbId: 1,
 					Oid:  1663,
@@ -186,7 +186,7 @@ func TestNewTablespaces(t *testing.T) {
 					},
 				},
 			},
-			expected: map[int32]greenplum.SegmentTablespaces{
+			expected: map[int32]greengage.SegmentTablespaces{
 				1: {
 					1663: {
 						Location:    "/tmp/coordinator/gpseg-1",
@@ -212,7 +212,7 @@ func TestNewTablespaces(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if got := greenplum.NewTablespaces(c.tuples); !reflect.DeepEqual(got, c.expected) {
+			if got := greengage.NewTablespaces(c.tuples); !reflect.DeepEqual(got, c.expected) {
 				t.Errorf("NewTablespaces() = %v, want %v", got, c.expected)
 			}
 		})
@@ -240,7 +240,7 @@ func TestTablespacesFromDB(t *testing.T) {
 		expected := errors.New("connection failed")
 		mock.ExpectQuery("SELECT").WillReturnError(expected)
 
-		tablespaces, err := greenplum.TablespacesFromDB(db, "")
+		tablespaces, err := greengage.TablespacesFromDB(db, "")
 		if !errors.Is(err, expected) {
 			t.Errorf("got %#v want %#v", err, expected)
 		}
@@ -260,7 +260,7 @@ func TestTablespacesFromDB(t *testing.T) {
 		expected := errors.New("failed to get tablespace information")
 		mock.ExpectQuery("SELECT .* upgrade_tablespace").WillReturnError(expected)
 
-		tablespaces, err := greenplum.TablespacesFromDB(db, "")
+		tablespaces, err := greengage.TablespacesFromDB(db, "")
 
 		if err == nil {
 			t.Errorf("Expected an error, but got nil")
@@ -293,7 +293,7 @@ func TestTablespacesFromDB(t *testing.T) {
 		defer write.Close()
 
 		expectedFileName := "/tmp/mappingFile.txt"
-		tablespaces, err := greenplum.TablespacesFromDB(db, expectedFileName)
+		tablespaces, err := greengage.TablespacesFromDB(db, expectedFileName)
 
 		if err != nil {
 			t.Errorf("got unexpected error: %+v", err)
@@ -307,7 +307,7 @@ func TestTablespacesFromDB(t *testing.T) {
 			t.Errorf("Create() got %q, want %q", inputFileName, expectedFileName)
 		}
 
-		expectedTablespaces := greenplum.Tablespaces{
+		expectedTablespaces := greengage.Tablespaces{
 			1: {
 				1663: {
 					Location:    "/tmp/coordinator_tablespace",
@@ -346,7 +346,7 @@ func TestTablespacesFromDB(t *testing.T) {
 			createCalled = true
 			return nil, expectedError
 		}
-		_, err = greenplum.TablespacesFromDB(db, expectedFileName)
+		_, err = greengage.TablespacesFromDB(db, expectedFileName)
 
 		if err == nil {
 			t.Errorf("expected error: %+v", expectedError)
@@ -361,13 +361,13 @@ func TestTablespacesFromDB(t *testing.T) {
 func TestWrite(t *testing.T) {
 	tests := []struct {
 		name     string
-		tuples   greenplum.TablespaceTuples
+		tuples   greengage.TablespaceTuples
 		expected string
 	}{
 		{
 			name: "successfully writes to buffer",
-			tuples: greenplum.TablespaceTuples{
-				greenplum.Tablespace{
+			tuples: greengage.TablespaceTuples{
+				greengage.Tablespace{
 					DbId: 1,
 					Oid:  1663,
 					Name: "default",
@@ -376,7 +376,7 @@ func TestWrite(t *testing.T) {
 						UserDefined: false,
 					},
 				},
-				greenplum.Tablespace{
+				greengage.Tablespace{
 					DbId: 2,
 					Oid:  1664,
 					Name: "my_tablespace",

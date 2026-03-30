@@ -9,14 +9,13 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/config/backupdir"
-	"github.com/greenplum-db/gpupgrade/greenplum"
+	"github.com/GreengageDB/ggupgrade/config/backupdir"
 )
 
-func MustCreateCluster(t *testing.T, segments greenplum.SegConfigs) *greenplum.Cluster {
+func MustCreateCluster(t *testing.T, segments greengage.SegConfigs) *greengage.Cluster {
 	t.Helper()
 
-	cluster, err := greenplum.NewCluster(segments)
+	cluster, err := greengage.NewCluster(segments)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -24,13 +23,13 @@ func MustCreateCluster(t *testing.T, segments greenplum.SegConfigs) *greenplum.C
 	return &cluster
 }
 func TestParseParentBackupDirs(t *testing.T) {
-	source := MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/coordinator/seg-1", Port: 15432, Role: greenplum.PrimaryRole},
-		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby/seg-1", Port: 16432, Role: greenplum.MirrorRole},
-		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data1/primaries/seg1", Port: 25433, Role: greenplum.PrimaryRole},
-		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data2/mirrors/seg1", Port: 25434, Role: greenplum.MirrorRole},
-		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data2/primaries/seg2", Port: 25435, Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data1/mirrors/seg2", Port: 25436, Role: greenplum.MirrorRole},
+	source := MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/coordinator/seg-1", Port: 15432, Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby/seg-1", Port: 16432, Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data1/primaries/seg1", Port: 25433, Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data2/mirrors/seg1", Port: 25434, Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data2/primaries/seg2", Port: 25435, Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data1/mirrors/seg2", Port: 25436, Role: greengage.MirrorRole},
 	})
 
 	cases := []struct {
@@ -42,10 +41,10 @@ func TestParseParentBackupDirs(t *testing.T) {
 			name:  "defaults to the parent directory of the primary data directory on each host",
 			input: "",
 			expected: backupdir.BackupDirs{
-				CoordinatorBackupDir: "/data/coordinator/.gpupgrade",
+				CoordinatorBackupDir: "/data/coordinator/.ggupgrade",
 				AgentHostsToBackupDir: map[string]string{
-					"sdw1": "/data1/primaries/.gpupgrade",
-					"sdw2": "/data2/primaries/.gpupgrade",
+					"sdw1": "/data1/primaries/.ggupgrade",
+					"sdw2": "/data2/primaries/.ggupgrade",
 				},
 			},
 		},
@@ -53,10 +52,10 @@ func TestParseParentBackupDirs(t *testing.T) {
 			name:  "parses multiple hosts and directories",
 			input: "cdw:/data/backup/coordinator,sdw1:/data1/backup/primaries,sdw2:/data2/backup/primaries",
 			expected: backupdir.BackupDirs{
-				CoordinatorBackupDir: "/data/backup/coordinator/.gpupgrade",
+				CoordinatorBackupDir: "/data/backup/coordinator/.ggupgrade",
 				AgentHostsToBackupDir: map[string]string{
-					"sdw1": "/data1/backup/primaries/.gpupgrade",
-					"sdw2": "/data2/backup/primaries/.gpupgrade",
+					"sdw1": "/data1/backup/primaries/.ggupgrade",
+					"sdw2": "/data2/backup/primaries/.ggupgrade",
 				},
 			},
 		},
@@ -64,10 +63,10 @@ func TestParseParentBackupDirs(t *testing.T) {
 			name:  "parses multiple hosts and directories with spaces",
 			input: "   cdw:/data,   sdw1 : /data1 , sdw2 :  /data2   ",
 			expected: backupdir.BackupDirs{
-				CoordinatorBackupDir: "/data/.gpupgrade",
+				CoordinatorBackupDir: "/data/.ggupgrade",
 				AgentHostsToBackupDir: map[string]string{
-					"sdw1": "/data1/.gpupgrade",
-					"sdw2": "/data2/.gpupgrade",
+					"sdw1": "/data1/.ggupgrade",
+					"sdw2": "/data2/.ggupgrade",
 				},
 			},
 		},
@@ -75,10 +74,10 @@ func TestParseParentBackupDirs(t *testing.T) {
 			name:  "parses a single directory",
 			input: "/data",
 			expected: backupdir.BackupDirs{
-				CoordinatorBackupDir: "/data/.gpupgrade",
+				CoordinatorBackupDir: "/data/.ggupgrade",
 				AgentHostsToBackupDir: map[string]string{
-					"sdw1": "/data/.gpupgrade",
-					"sdw2": "/data/.gpupgrade",
+					"sdw1": "/data/.ggupgrade",
+					"sdw2": "/data/.ggupgrade",
 				},
 			},
 		},

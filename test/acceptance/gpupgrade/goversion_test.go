@@ -14,11 +14,11 @@ import (
 
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/testutils/acceptance"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
 )
 
 func TestGoVersion(t *testing.T) {
-	t.Run("gpupgrade is compiled with the expected golang version from go.mod", func(t *testing.T) {
+	t.Run("ggupgrade is compiled with the expected golang version from go.mod", func(t *testing.T) {
 		// Since the go mod version contains the minimum required go version it
 		// must be less than or equal to the compiled version.
 		if !goModVersion(t).LTE(compiledVersion(t)) {
@@ -30,17 +30,17 @@ func TestGoVersion(t *testing.T) {
 func compiledVersion(t *testing.T) semver.Version {
 	t.Helper()
 
-	cmd := exec.Command("go", "version", filepath.Join(acceptance.MustGetRepoRoot(t), "gpupgrade"))
+	cmd := exec.Command("go", "version", filepath.Join(acceptance.MustGetRepoRoot(t), "ggupgrade"))
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("unexpected err: %#v stderr %q", err, output)
 	}
 
-	parts := strings.SplitN(strings.TrimSpace(string(output)), "gpupgrade: go", 2)
+	parts := strings.SplitN(strings.TrimSpace(string(output)), "ggupgrade: go", 2)
 	return semver.MustParse(parts[1])
 }
 
-// goModVersion returns the minimum go version to compile gpupgrade
+// goModVersion returns the minimum go version to compile ggupgrade
 func goModVersion(t *testing.T) semver.Version {
 	t.Helper()
 

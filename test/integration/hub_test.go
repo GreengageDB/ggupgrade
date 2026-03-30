@@ -16,9 +16,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/testutils"
 )
 
 func TestHub(t *testing.T) {
@@ -56,7 +56,7 @@ func TestHub(t *testing.T) {
 			dir := testutils.GetTempDir(t, "")
 			defer testutils.MustRemoveAll(t, dir)
 
-			resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", filepath.Join(dir, ".gpupgrade"))
+			resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", filepath.Join(dir, ".ggupgrade"))
 			defer resetEnv()
 
 			err := commanders.CreateStateDir()
@@ -67,7 +67,7 @@ func TestHub(t *testing.T) {
 			// write initial config.json
 			testutils.MustWriteToFile(t, config.GetConfigFile(), c.configContents)
 
-			cmd := exec.Command("gpupgrade", c.args...)
+			cmd := exec.Command("ggupgrade", c.args...)
 
 			// in order to kill the daemonized process enable process groups
 			cmd.SysProcAttr = &unix.SysProcAttr{Setpgid: true}
@@ -77,11 +77,11 @@ func TestHub(t *testing.T) {
 				// in the group by sending a kill signal to -PGID. In this case,
 				// since the PID is the same as the PGID we can send -PID.
 				if err := unix.Kill(-cmd.Process.Pid, unix.SIGTERM); err != nil {
-					t.Fatalf("failed to kill gpupgrade hub: %+v", err)
+					t.Fatalf("failed to kill ggupgrade hub: %+v", err)
 				}
 			}()
 			if err != nil {
-				t.Errorf("gpupgrade hub returned unexpected error %+v", err)
+				t.Errorf("ggupgrade hub returned unexpected error %+v", err)
 				t.Logf("output:\n%s", string(output))
 			}
 
@@ -102,7 +102,7 @@ func TestHub(t *testing.T) {
 		dir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, dir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", filepath.Join(dir, ".gpupgrade"))
+		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", filepath.Join(dir, ".ggupgrade"))
 		defer resetEnv()
 
 		err := commanders.CreateStateDir()
@@ -112,14 +112,14 @@ func TestHub(t *testing.T) {
 
 		testutils.MustWriteToFile(t, config.GetConfigFile(), `{}`)
 
-		cmd := exec.Command("gpupgrade", "hub")
+		cmd := exec.Command("ggupgrade", "hub")
 		err = cmd.Start()
 		if err != nil {
 			t.Errorf("unexpected error %+v", err)
 		}
 		defer func() {
 			if err := cmd.Process.Kill(); err != nil {
-				t.Fatalf("failed to kill gpupgrade hub: %+v", err)
+				t.Fatalf("failed to kill ggupgrade hub: %+v", err)
 			}
 		}()
 

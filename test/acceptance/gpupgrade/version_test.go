@@ -15,22 +15,22 @@ func TestVersion(t *testing.T) {
 		args []string
 	}{
 		{
-			name: "gpupgrade version prints version",
+			name: "ggupgrade version prints version",
 			args: []string{"version"},
 		},
 		{
-			name: "gpupgrade --version prints version",
+			name: "ggupgrade --version prints version",
 			args: []string{"--version"},
 		},
 		{
-			name: "gpupgrade -V prints version",
+			name: "ggupgrade -V prints version",
 			args: []string{"-V"},
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			cmd := exec.Command("gpupgrade", c.args...)
+			cmd := exec.Command("ggupgrade", c.args...)
 			output, err := cmd.CombinedOutput()
 			if err != nil {
 				t.Fatalf("unexpected err: %#v stderr %q", err, output)

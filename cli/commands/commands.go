@@ -4,19 +4,19 @@
 package commands
 
 /*
- *  This file generates the command-line cli that is the heart of gpupgrade.  It uses Cobra to generate
+ *  This file generates the command-line cli that is the heart of ggupgrade.  It uses Cobra to generate
  *    the cli based on commands and sub-commands. The below in this comment block shows a notional example
  *    of how this looks to give you an idea of what the command structure looks like at the cli.  It is NOT necessarily
  *    up-to-date but is a useful as an orientation to what is going on here.
  *
- * example> gpupgrade
+ * example> ggupgrade
  * 	   2018/09/28 16:09:39 Please specify one command of: check, config, prepare, status, upgrade, or version
  *
- * example> gpupgrade check
- *      collects information and validates the target Greenplum installation can be upgraded
+ * example> ggupgrade check
+ *      collects information and validates the target Greengage installation can be upgraded
  *
  *      Usage:
- * 		gpupgrade check [command]
+ * 		ggupgrade check [command]
  *
  * 		Available Commands:
  * 			config       gather cluster configuration
@@ -27,7 +27,7 @@ package commands
  * 		Flags:
  * 			-h, --help   help for check
  *
- * 		Use "gpupgrade check [command] --help" for more information about a command.
+ * 		Use "ggupgrade check [command] --help" for more information about a command.
  */
 
 import (
@@ -46,12 +46,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func BuildRootCommand() *cobra.Command {
@@ -59,7 +59,7 @@ func BuildRootCommand() *cobra.Command {
 	var format string
 
 	root := &cobra.Command{
-		Use: "gpupgrade",
+		Use: "ggupgrade",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if shouldPrintVersion {
 				printVersion(format)
@@ -97,8 +97,8 @@ func BuildRootCommand() *cobra.Command {
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "subcommands to set parameters for subsequent gpupgrade commands",
-	Long:  "subcommands to set parameters for subsequent gpupgrade commands",
+	Short: "subcommands to set parameters for subsequent ggupgrade commands",
+	Long:  "subcommands to set parameters for subsequent ggupgrade commands",
 }
 
 func createConfigShowSubcommand() *cobra.Command {
@@ -149,8 +149,8 @@ func createConfigShowSubcommand() *cobra.Command {
 	}
 
 	cmd.Flags().Bool("upgrade-id", false, "show upgrade identifier")
-	cmd.Flags().Bool("source-gphome", false, "show path for the source Greenplum installation")
-	cmd.Flags().Bool("target-gphome", false, "show path for the target Greenplum installation")
+	cmd.Flags().Bool("source-gphome", false, "show path for the source Greengage installation")
+	cmd.Flags().Bool("target-gphome", false, "show path for the target Greengage installation")
 	cmd.Flags().Bool("target-datadir", false, "show temporary data directory for target gpdb cluster")
 	cmd.Flags().Bool("target-port", false, "show temporary master port for target cluster")
 
@@ -162,8 +162,8 @@ func version() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "version",
-		Short: "Version of gpupgrade",
-		Long:  `Version of gpupgrade`,
+		Short: "Version of ggupgrade",
+		Long:  `Version of ggupgrade`,
 		Run: func(cmd *cobra.Command, args []string) {
 			printVersion(format)
 		},
@@ -278,7 +278,7 @@ func connectToHubOnPort(port int) (idl.CliToHubClient, error) {
 	if err != nil {
 		err = xerrors.Errorf("connecting to hub on port %d: %w", port, err)
 		if ctx.Err() == context.DeadlineExceeded {
-			nextAction := `Try restarting the hub with "gpupgrade restart-services".`
+			nextAction := `Try restarting the hub with "ggupgrade restart-services".`
 			return nil, utils.NewNextActionErr(err, nextAction)
 		}
 		return nil, err
@@ -311,7 +311,7 @@ func connTimeout() time.Duration {
 	return time.Duration(duration * float64(time.Second))
 }
 
-// hubPort reads the gpupgrade persisted configuration for the current
+// hubPort reads the ggupgrade persisted configuration for the current
 // port. If the configuration does not exist the default port is returned.
 // NOTE: This overloads the hub's persisted configuration with that of the
 // CLI when ideally these would be separate.

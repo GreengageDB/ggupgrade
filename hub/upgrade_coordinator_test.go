@@ -18,17 +18,16 @@ import (
 
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/config/backupdir"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/rsync"
+	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
 const FailureStdout = `
@@ -93,19 +92,19 @@ func TestUpgradeCoordinator(t *testing.T) {
 
 	now := time.Now()
 	pgUpgradeTimestamp := now.Format(hub.TimeStringFormat)
-	pgUpgradeDir, err := utils.GetPgUpgradeDir(greenplum.PrimaryRole, -1, pgUpgradeTimestamp, "6.15.0")
+	pgUpgradeDir, err := utils.GetPgUpgradeDir(greengage.PrimaryRole, -1, pgUpgradeTimestamp, "6.15.0")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	source := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, Port: 5432, DataDir: "/data/old", DbID: 1, Role: greenplum.PrimaryRole},
-		{ContentID: -1, Port: 5433, DataDir: "/data/standby", DbID: 2, Role: greenplum.MirrorRole},
+	source := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, Port: 5432, DataDir: "/data/old", DbID: 1, Role: greengage.PrimaryRole},
+		{ContentID: -1, Port: 5433, DataDir: "/data/standby", DbID: 2, Role: greengage.MirrorRole},
 	})
 	source.GPHome = "/usr/local/source"
 
-	intermediate := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, Port: 5433, DataDir: "/data/new", DbID: 2, Role: greenplum.PrimaryRole},
+	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, Port: 5433, DataDir: "/data/new", DbID: 2, Role: greengage.PrimaryRole},
 	})
 	intermediate.GPHome = "/usr/local/target"
 	intermediate.Version = semver.MustParse("6.15.0")

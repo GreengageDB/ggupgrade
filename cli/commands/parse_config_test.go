@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/cli/commands"
+	"github.com/GreengageDB/ggupgrade/cli/commands"
 )
 
 func TestConfig(t *testing.T) {

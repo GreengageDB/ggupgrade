@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 // SPDX-License-Identifier: Apache-2.0
 
-package greenplum
+package greengage
 
 import (
 	"errors"
@@ -13,38 +13,38 @@ import (
 
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
 )
 
 func PostgresGPVersion_5_27_0_beta() {
-	fmt.Println("postgres (Greenplum Database) 5.27.0+beta.4 build commit:baef9b9ba885f2f4e4a87d5e201caae969ef4401")
+	fmt.Println("postgres (Greengage Database) 5.27.0+beta.4 build commit:baef9b9ba885f2f4e4a87d5e201caae969ef4401")
 }
 
 func PostgresGPVersion_6_dev() {
-	fmt.Println("postgres (Greenplum Database) 6.0.0-beta.1 build dev")
+	fmt.Println("postgres (Greengage Database) 6.0.0-beta.1 build dev")
 }
 
 func PostgresGPVersion_6_7_1() {
-	fmt.Println("postgres (Greenplum Database) 6.7.1 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
+	fmt.Println("postgres (Greengage Database) 6.7.1 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
 }
 
 func PostgresGPVersion_6_99_0() {
-	fmt.Println("postgres (Greenplum Database) 6.99.0 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
+	fmt.Println("postgres (Greengage Database) 6.99.0 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
 }
 
 func PostgresGPVersion_11_341_31() {
-	fmt.Println("postgres (Greenplum Database) 11.341.31 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
+	fmt.Println("postgres (Greengage Database) 11.341.31 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
 }
 
 func PostgresGPVersion_MultiLine() {
-	fmt.Println(`/usr/local/greenplum-db-6.18.2/bin/postgres: /usr/local/greenplum-db-5.29.1+dev.1.g0962183f78/lib/libxml2.so.2: no version information available (required by /usr/local/greenplum-db-6.18.2/bin/postgres)
-/usr/local/greenplum-db-6.18.2/bin/postgres: /usr/local/greenplum-db-5.29.1+dev.1.g0962183f78/lib/libxml2.so.2: no version information available (required by /usr/local/greenplum-db-6.18.2/bin/postgres)
-postgres (Greenplum Database) 6.18.2 build commit:1242aadf0137d3b26ee42c80e579e78bd7a805c7`)
+	fmt.Println(`/usr/local/greengage-db-6.18.2/bin/postgres: /usr/local/greengage-db-5.29.1+dev.1.g0962183f78/lib/libxml2.so.2: no version information available (required by /usr/local/greengage-db-6.18.2/bin/postgres)
+/usr/local/greengage-db-6.18.2/bin/postgres: /usr/local/greengage-db-5.29.1+dev.1.g0962183f78/lib/libxml2.so.2: no version information available (required by /usr/local/greengage-db-6.18.2/bin/postgres)
+postgres (Greengage Database) 6.18.2 build commit:1242aadf0137d3b26ee42c80e579e78bd7a805c7`)
 }
 
 func PostgresGPVersion_0_0_0() {
-	fmt.Println("postgres (Greenplum Database) 0.0.0 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
+	fmt.Println("postgres (Greengage Database) 0.0.0 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
 }
 
 func EmptyString() {
@@ -52,7 +52,7 @@ func EmptyString() {
 }
 
 func MarkerOnly() {
-	fmt.Println("postgres (Greenplum Database)")
+	fmt.Println("postgres (Greengage Database)")
 }
 
 func FailedMain() {
@@ -110,8 +110,8 @@ func TestVersion_Parsing(t *testing.T) {
 		versionCommand exectest.Main
 		expected       error
 	}{
-		{name: "handles empty version", versionCommand: EmptyString, expected: errors.New(`Greenplum version "\n" is not of the form "postgres (Greenplum Database) #.#.#"`)},
-		{name: "handles only marker string", versionCommand: MarkerOnly, expected: errors.New(`Greenplum version "postgres (Greenplum Database)\n" is not of the form "postgres (Greenplum Database) #.#.#"`)},
+		{name: "handles empty version", versionCommand: EmptyString, expected: errors.New(`Greengage version "\n" is not of the form "postgres (Greengage Database) #.#.#"`)},
+		{name: "handles only marker string", versionCommand: MarkerOnly, expected: errors.New(`Greengage version "postgres (Greengage Database)\n" is not of the form "postgres (Greengage Database) #.#.#"`)},
 	}
 
 	for _, c := range errCases {

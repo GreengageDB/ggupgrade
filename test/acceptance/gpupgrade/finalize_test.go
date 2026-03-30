@@ -16,14 +16,14 @@ import (
 
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/cli/commands"
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/acceptance"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/commands"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func TestFinalize(t *testing.T) {
@@ -33,11 +33,11 @@ func TestFinalize(t *testing.T) {
 	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
-	t.Run("in copy mode gpupgrade finalize should swap the target data directories and ports with the source cluster", func(t *testing.T) {
+	t.Run("in copy mode ggupgrade finalize should swap the target data directories and ports with the source cluster", func(t *testing.T) {
 		testFinalize(t, idl.Mode_copy, false)
 	})
 
-	t.Run("in link mode gpupgrade finalize should also delete mirror directories and honors --use-hba-hostnames", func(t *testing.T) {
+	t.Run("in link mode ggupgrade finalize should also delete mirror directories and honors --use-hba-hostnames", func(t *testing.T) {
 		testFinalize(t, idl.Mode_link, true)
 	})
 }
@@ -55,8 +55,8 @@ func testFinalize(t *testing.T, mode idl.Mode, useHbaHostnames bool) {
 	defer acceptance.RemoveMarkerFilesOnAllSegments(t, source)
 
 	table := "public.should_be_reverted"
-	testutils.MustExecuteSQL(t, source.Connection(greenplum.Database("postgres")), fmt.Sprintf(`CREATE TABLE %s (a int); INSERT INTO %s VALUES (1), (2), (3);`, table, table))
-	defer testutils.MustExecuteSQL(t, source.Connection(greenplum.Database("postgres")), fmt.Sprintf(`DROP TABLE %s;`, table))
+	testutils.MustExecuteSQL(t, source.Connection(greengage.Database("postgres")), fmt.Sprintf(`CREATE TABLE %s (a int); INSERT INTO %s VALUES (1), (2), (3);`, table, table))
+	defer testutils.MustExecuteSQL(t, source.Connection(greengage.Database("postgres")), fmt.Sprintf(`DROP TABLE %s;`, table))
 
 	tablespaceDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, tablespaceDir)
@@ -69,7 +69,7 @@ func testFinalize(t *testing.T, mode idl.Mode, useHbaHostnames bool) {
 		hbaHostnames = "--use-hba-hostnames"
 	}
 
-	cmd := exec.Command("gpupgrade", "initialize",
+	cmd := exec.Command("ggupgrade", "initialize",
 		"--non-interactive", "--verbose",
 		"--mode", mode.String(),
 		"--source-gphome", acceptance.GPHOME_SOURCE,
@@ -97,7 +97,7 @@ func testFinalize(t *testing.T, mode idl.Mode, useHbaHostnames bool) {
 
 	acceptance.VerifyMarkerFilesOnAllSegments(t, conf.Intermediate, conf.Target)
 
-	rows := testutils.MustQueryRow(t, conf.Target.Connection(greenplum.Database("postgres")), fmt.Sprintf(`SELECT COUNT(*) FROM %s;`, table))
+	rows := testutils.MustQueryRow(t, conf.Target.Connection(greengage.Database("postgres")), fmt.Sprintf(`SELECT COUNT(*) FROM %s;`, table))
 	expectedRows := 3
 	if rows != expectedRows {
 		t.Fatalf("got %d want %d rows", rows, expectedRows)
@@ -127,7 +127,7 @@ func testFinalize(t *testing.T, mode idl.Mode, useHbaHostnames bool) {
 	}
 }
 
-func verifyFinalize(t *testing.T, source greenplum.Cluster, conf *config.Config, finalizeOutput string, useHbaHostnames bool) {
+func verifyFinalize(t *testing.T, source greengage.Cluster, conf *config.Config, finalizeOutput string, useHbaHostnames bool) {
 	t.Helper()
 
 	// Since the logArchiveDir has a timestamp we need to do a partial check
@@ -139,9 +139,9 @@ func verifyFinalize(t *testing.T, source greenplum.Cluster, conf *config.Config,
 		fmt.Sprintf("%s.<contentID>%s", conf.UpgradeID, upgrade.OldSuffix),
 		conf.Intermediate.CoordinatorDataDir()+upgrade.OldSuffix,
 		logArchiveDir+`\d{5}`,
-		filepath.Join(conf.Target.GPHome, "greenplum_path.sh"),
-		filepath.Join(filepath.Dir(conf.Target.GPHome), "greenplum-db"), conf.Target.GPHome,
-		filepath.Join(conf.Target.GPHome, "greenplum_path.sh"),
+		filepath.Join(conf.Target.GPHome, "greengage_path.sh"),
+		filepath.Join(filepath.Dir(conf.Target.GPHome), "greengage-db"), conf.Target.GPHome,
+		filepath.Join(conf.Target.GPHome, "greengage_path.sh"),
 		conf.Target.CoordinatorDataDir(),
 		conf.Target.CoordinatorPort(),
 		idl.Step_finalize,
@@ -204,7 +204,7 @@ func verifyFinalize(t *testing.T, source greenplum.Cluster, conf *config.Config,
 // copy mode the mirrors are upgraded using gpaddmirrors which can result in
 // different dbid's for a given contentID depending on the order they are
 // added. Thus, manually compare the clusters while ignoring the mirror dbid's.
-func compareFinalizedCluster(t *testing.T, pre greenplum.Cluster, post greenplum.Cluster) {
+func compareFinalizedCluster(t *testing.T, pre greengage.Cluster, post greengage.Cluster) {
 	if pre.Destination != post.Destination {
 		t.Errorf("got %v want %v", pre.Destination, post.Destination)
 	}
@@ -254,7 +254,7 @@ func compareFinalizedCluster(t *testing.T, pre greenplum.Cluster, post greenplum
 	}
 }
 
-func verifyPgHbaConfHostnames(t *testing.T, source greenplum.Cluster, target *greenplum.Cluster, useHbaHostnames bool) {
+func verifyPgHbaConfHostnames(t *testing.T, source greengage.Cluster, target *greengage.Cluster, useHbaHostnames bool) {
 	t.Helper()
 
 	expectation := "no hosts"

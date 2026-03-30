@@ -21,10 +21,10 @@ jobs:
     - in_parallel:
         - put: oss_rpm
           params:
-            file: built_oss/gpupgrade-*.rpm
+            file: built_oss/ggupgrade-*.rpm
         - put: enterprise_rpm
           params:
-            file: built_enterprise/gpupgrade-*.rpm
+            file: built_enterprise/ggupgrade-*.rpm
   on_failure:
     do:
       - <<: *slack_alert

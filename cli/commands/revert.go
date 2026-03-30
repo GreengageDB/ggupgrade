@@ -12,13 +12,12 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/greenplum-db/gpupgrade/cli/clistep"
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/clistep"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func revert() *cobra.Command {
@@ -51,7 +50,7 @@ func revert() *cobra.Command {
 				return err
 			}
 
-			source := &greenplum.Cluster{}
+			source := &greengage.Cluster{}
 			st.RunHubSubstep(func(streams step.OutStreams) error {
 				client, err := connectToHub()
 				if err != nil {
@@ -63,7 +62,7 @@ func revert() *cobra.Command {
 					return err
 				}
 
-				source, err = greenplum.DecodeCluster(response.GetSource())
+				source, err = greengage.DecodeCluster(response.GetSource())
 				if err != nil {
 					return err
 				}
@@ -94,7 +93,7 @@ func revert() *cobra.Command {
 
 			return st.Complete(fmt.Sprintf(RevertCompletedText,
 				source.Version,
-				filepath.Join(source.GPHome, "greenplum_path.sh"), source.CoordinatorDataDir(), source.CoordinatorPort(),
+				filepath.Join(source.GPHome, "greengage_path.sh"), source.CoordinatorDataDir(), source.CoordinatorPort(),
 				response.GetLogArchiveDirectory(),
 				idl.Step_revert,
 				source.GPHome, source.CoordinatorPort(), filepath.Join(response.GetLogArchiveDirectory(), "data-migration-scripts"), idl.Step_revert))

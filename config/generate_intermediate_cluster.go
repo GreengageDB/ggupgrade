@@ -9,18 +9,17 @@ import (
 	"github.com/blang/semver/v4"
 	"github.com/pkg/errors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
-func GenerateIntermediateCluster(source *greenplum.Cluster, ports []int, upgradeID string, version semver.Version, gphome string) (*greenplum.Cluster, error) {
+func GenerateIntermediateCluster(source *greengage.Cluster, ports []int, upgradeID string, version semver.Version, gphome string) (*greengage.Cluster, error) {
 	ports = utils.Sanitize(ports)
 
-	intermediate, err := greenplum.NewCluster([]greenplum.SegConfig{})
+	intermediate, err := greengage.NewCluster([]greengage.SegConfig{})
 	if err != nil {
-		return &greenplum.Cluster{}, err
+		return &greengage.Cluster{}, err
 	}
 
 	var segPrefix string
@@ -31,14 +30,14 @@ func GenerateIntermediateCluster(source *greenplum.Cluster, ports []int, upgrade
 	if coordinator, ok := source.Primaries[-1]; ok {
 		// Reserve a port for the coordinator.
 		if nextPortIndex > len(ports)-1 {
-			return &greenplum.Cluster{}, errors.New("not enough ports")
+			return &greengage.Cluster{}, errors.New("not enough ports")
 		}
 
 		// Save the segment prefix for later.
 		var err error
-		segPrefix, err = greenplum.GetCoordinatorSegPrefix(coordinator.DataDir)
+		segPrefix, err = greengage.GetCoordinatorSegPrefix(coordinator.DataDir)
 		if err != nil {
-			return &greenplum.Cluster{}, err
+			return &greengage.Cluster{}, err
 		}
 
 		coordinator.Port = ports[nextPortIndex]
@@ -50,7 +49,7 @@ func GenerateIntermediateCluster(source *greenplum.Cluster, ports []int, upgrade
 	if standby, ok := source.Mirrors[-1]; ok {
 		// Reserve a port for the standby.
 		if nextPortIndex > len(ports)-1 {
-			return &greenplum.Cluster{}, errors.New("not enough ports")
+			return &greengage.Cluster{}, errors.New("not enough ports")
 		}
 		standby.Port = ports[nextPortIndex]
 		standby.DataDir = upgrade.TempDataDir(standby.DataDir, segPrefix, upgradeID)
@@ -80,13 +79,13 @@ func GenerateIntermediateCluster(source *greenplum.Cluster, ports []int, upgrade
 
 		if portIndex, ok := portIndexByHost[segment.Hostname]; ok {
 			if portIndex > len(ports)-1 {
-				return &greenplum.Cluster{}, errors.New("not enough ports")
+				return &greengage.Cluster{}, errors.New("not enough ports")
 			}
 			segment.Port = ports[portIndex]
 			portIndexByHost[segment.Hostname]++
 		} else {
 			if nextPortIndex > len(ports)-1 {
-				return &greenplum.Cluster{}, errors.New("not enough ports")
+				return &greengage.Cluster{}, errors.New("not enough ports")
 			}
 			segment.Port = ports[nextPortIndex]
 			portIndexByHost[segment.Hostname] = nextPortIndex + 1
@@ -104,13 +103,13 @@ func GenerateIntermediateCluster(source *greenplum.Cluster, ports []int, upgrade
 		if segment, ok := source.Mirrors[content]; ok {
 			if portIndex, ok := portIndexByHost[segment.Hostname]; ok {
 				if portIndex > len(ports)-1 {
-					return &greenplum.Cluster{}, errors.New("not enough ports")
+					return &greengage.Cluster{}, errors.New("not enough ports")
 				}
 				segment.Port = ports[portIndex]
 				portIndexByHost[segment.Hostname]++
 			} else {
 				if nextPortIndex > len(ports)-1 {
-					return &greenplum.Cluster{}, errors.New("not enough ports")
+					return &greengage.Cluster{}, errors.New("not enough ports")
 				}
 				segment.Port = ports[nextPortIndex]
 				portIndexByHost[segment.Hostname] = nextPortIndex + 1
@@ -128,7 +127,7 @@ func GenerateIntermediateCluster(source *greenplum.Cluster, ports []int, upgrade
 	return &intermediate, nil
 }
 
-func EnsureTempPortRangeDoesNotOverlapWithSourceClusterPorts(source *greenplum.Cluster, intermediate *greenplum.Cluster) error {
+func EnsureTempPortRangeDoesNotOverlapWithSourceClusterPorts(source *greengage.Cluster, intermediate *greengage.Cluster) error {
 	type HostPort struct {
 		Host string
 		Port int

@@ -12,13 +12,12 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/greenplum-db/gpupgrade/cli/clistep"
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/clistep"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func finalize() *cobra.Command {
@@ -51,7 +50,7 @@ func finalize() *cobra.Command {
 				return err
 			}
 
-			target := &greenplum.Cluster{}
+			target := &greengage.Cluster{}
 			st.RunHubSubstep(func(streams step.OutStreams) error {
 				client, err := connectToHub()
 				if err != nil {
@@ -63,7 +62,7 @@ func finalize() *cobra.Command {
 					return err
 				}
 
-				target, err = greenplum.DecodeCluster(response.GetTarget())
+				target, err = greengage.DecodeCluster(response.GetTarget())
 				if err != nil {
 					return err
 				}
@@ -104,7 +103,7 @@ If you postpone creating statistics then after the upgrade run "vacuumdb --all -
 					}
 				}
 
-				return target.RunGreenplumCmd(streams, "vacuumdb", "--all", "--analyze-only")
+				return target.RunGreengageCmd(streams, "vacuumdb", "--all", "--analyze-only")
 			})
 
 			st.Run(idl.Substep_delete_master_statedir, func(streams step.OutStreams) error {
@@ -120,9 +119,9 @@ If you postpone creating statistics then after the upgrade run "vacuumdb --all -
 				fmt.Sprintf("%s.<contentID>%s", response.GetUpgradeID(), upgrade.OldSuffix),
 				response.GetArchivedSourceCoordinatorDataDirectory(),
 				response.GetLogArchiveDirectory(),
-				filepath.Join(target.GPHome, "greenplum_path.sh"),
-				filepath.Join(filepath.Dir(target.GPHome), "greenplum-db"), target.GPHome,
-				filepath.Join(target.GPHome, "greenplum_path.sh"),
+				filepath.Join(target.GPHome, "greengage_path.sh"),
+				filepath.Join(filepath.Dir(target.GPHome), "greengage-db"), target.GPHome,
+				filepath.Join(target.GPHome, "greengage_path.sh"),
 				target.CoordinatorDataDir(),
 				target.CoordinatorPort(),
 				idl.Step_finalize,

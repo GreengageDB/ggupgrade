@@ -1,4 +1,4 @@
-# bash completion for gpupgrade                            -*- shell-script -*-
+# bash completion for ggupgrade                            -*- shell-script -*-
 
 __gpupgrade_debug()
 {
@@ -49,7 +49,7 @@ __gpupgrade_handle_go_custom_completion()
     local out requestComp lastParam lastChar comp directive args
 
     # Prepare the command to request completions for the program.
-    # Calling ${words[0]} instead of directly gpupgrade allows to handle aliases
+    # Calling ${words[0]} instead of directly ggupgrade allows to handle aliases
     args=("${words[@]:1}")
     # Disable ActiveHelp which is not supported for bash completion v1
     requestComp="GPUPGRADE_ACTIVE_HELP=0 ${words[0]} __completeNoDesc ${args[*]}"
@@ -896,7 +896,7 @@ _gpupgrade_version()
 
 _gpupgrade_root_command()
 {
-    last_command="gpupgrade"
+    last_command="ggupgrade"
 
     command_aliases=()
 
@@ -955,7 +955,7 @@ __start_gpupgrade()
     local local_nonpersistent_flags=()
     local flags_with_completion=()
     local flags_completion=()
-    local commands=("gpupgrade")
+    local commands=("ggupgrade")
     local command_aliases=()
     local must_have_one_flag=()
     local must_have_one_noun=()
@@ -968,9 +968,9 @@ __start_gpupgrade()
 }
 
 if [[ $(type -t compopt) = "builtin" ]]; then
-    complete -o default -F __start_gpupgrade gpupgrade
+    complete -o default -F __start_gpupgrade ggupgrade
 else
-    complete -o default -o nospace -F __start_gpupgrade gpupgrade
+    complete -o default -o nospace -F __start_gpupgrade ggupgrade
 fi
 
 # ex: ts=4 sw=4 et filetype=sh

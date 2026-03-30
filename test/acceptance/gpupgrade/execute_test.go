@@ -15,13 +15,13 @@ import (
 
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/acceptance"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func TestExecute(t *testing.T) {
@@ -31,7 +31,7 @@ func TestExecute(t *testing.T) {
 	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
-	t.Run("gpupgrade execute should remember that link mode was specified in initialize", func(t *testing.T) {
+	t.Run("ggupgrade execute should remember that link mode was specified in initialize", func(t *testing.T) {
 		table := "public.test_linking"
 
 		source := acceptance.GetSourceCluster(t)
@@ -61,7 +61,7 @@ func TestExecute(t *testing.T) {
 		}
 	})
 
-	t.Run("gpupgrade execute step to upgrade coordinator should always rsync the coordinator data dir from backup", func(t *testing.T) {
+	t.Run("ggupgrade execute step to upgrade coordinator should always rsync the coordinator data dir from backup", func(t *testing.T) {
 		acceptance.Initialize(t, idl.Mode_link)
 		defer acceptance.Revert(t)
 

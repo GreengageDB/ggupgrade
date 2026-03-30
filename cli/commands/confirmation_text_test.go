@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils"
 )
 
 const GPUPGRADE_CONFIG = "../../gpupgrade_config"

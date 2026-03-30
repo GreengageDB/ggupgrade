@@ -9,7 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/utils/syncbuf"
+	"github.com/GreengageDB/ggupgrade/utils/syncbuf"
 )
 
 func TestSyncbuf(t *testing.T) {

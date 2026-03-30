@@ -3,7 +3,7 @@
 
 /*
 The filter command massages the post-upgrade SQL dump by removing known
-differences. Different set of rules are applied for dump from greenplum
+differences. Different set of rules are applied for dump from greengage
 version 5 and 6. In general, the below set of rules are applied on the dump.
 
 - Line rules are regular expressions that will cause any matching lines to
@@ -32,7 +32,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/greenplum-db/gpupgrade/ci/main/scripts/filters"
+	"github.com/GreengageDB/ggupgrade/ci/main/scripts/filters"
 )
 
 var (
@@ -153,7 +153,7 @@ func main() {
 		argCount  = 2
 	)
 
-	flag.IntVar(&version, "version", 0, "identifier specific version of greenplum dump, i.e 5 or 6")
+	flag.IntVar(&version, "version", 0, "identifier specific version of greengage dump, i.e 5 or 6")
 	flag.StringVar(&inputFile, "inputFile", "", "fully qualified input file name containing the dump")
 	flag.Parse()
 

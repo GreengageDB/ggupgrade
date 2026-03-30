@@ -6,19 +6,18 @@ package hub
 import (
 	"context"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
-func CreateRecoveryConfOnSegments(agentConns []*idl.Connection, intermediate *greenplum.Cluster) error {
+func CreateRecoveryConfOnSegments(agentConns []*idl.Connection, intermediate *greengage.Cluster) error {
 	user, err := utils.System.Current()
 	if err != nil {
 		return err
 	}
 
 	request := func(conn *idl.Connection) error {
-		intermediateMirrors := intermediate.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		intermediateMirrors := intermediate.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && !seg.IsStandby() && seg.IsMirror()
 		})
 

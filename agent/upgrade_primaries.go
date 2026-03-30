@@ -14,12 +14,12 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/rsync"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
 func (s *Server) UpgradePrimaries(ctx context.Context, req *idl.UpgradePrimariesRequest) (*idl.UpgradePrimariesReply, error) {
@@ -111,8 +111,8 @@ func RestoreTablespaces(backupDir string, tablespaces map[int32]*idl.TablespaceI
 			continue
 		}
 
-		targetDir := greenplum.GetTablespaceLocationForDbId(tablespace, dbid)
-		sourceDir := greenplum.GetCoordinatorTablespaceLocation(utils.GetTablespaceBackupDir(backupDir), int(oid)) + string(os.PathSeparator)
+		targetDir := greengage.GetTablespaceLocationForDbId(tablespace, dbid)
+		sourceDir := greengage.GetCoordinatorTablespaceLocation(utils.GetTablespaceBackupDir(backupDir), int(oid)) + string(os.PathSeparator)
 
 		options := []rsync.Option{
 			rsync.WithSources(sourceDir),

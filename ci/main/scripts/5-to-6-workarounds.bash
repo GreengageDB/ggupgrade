@@ -12,7 +12,7 @@ echo "Dropping views referencing deprecated objects..."
 ssh -n cdw "
     set -eux -o pipefail
 
-    source /usr/local/greenplum-db-source/greenplum_path.sh
+    source /usr/local/greengage-db-source/greengage_path.sh
 
     # Hardcode this view since it's the only one containing a column with type name.
     psql -v ON_ERROR_STOP=1 regression -c 'DROP VIEW IF EXISTS redundantly_named_part;'
@@ -22,7 +22,7 @@ echo "Dropping columns with abstime, reltime, tinterval user data types..."
 columns=$(ssh -n cdw "
     set -eux -o pipefail
 
-    source /usr/local/greenplum-db-source/greenplum_path.sh
+    source /usr/local/greengage-db-source/greengage_path.sh
 
     # Disable ON_ERROR_STOP due to 6X incompatibility. The
     # gp_distrbution_policy's column attrnums was renamed to distkey
@@ -50,7 +50,7 @@ echo "${columns}" | while read -r schema table column; do
         ssh -n cdw "
             set -eux -o pipefail
 
-            source /usr/local/greenplum-db-source/greenplum_path.sh
+            source /usr/local/greengage-db-source/greengage_path.sh
 
             psql -v ON_ERROR_STOP=1 -d regression -c 'SET SEARCH_PATH TO ${schema}; ALTER TABLE ${table} DROP COLUMN ${column} CASCADE;'
         " || echo "Drop columns with abstime, reltime, tinterval user data types failed. Continuing..."
@@ -61,7 +61,7 @@ echo "Dropping unsupported functions..."
 ssh -n cdw "
     set -eux -o pipefail
 
-    source /usr/local/greenplum-db-source/greenplum_path.sh
+    source /usr/local/greengage-db-source/greengage_path.sh
 
     psql -v ON_ERROR_STOP=1 -d regression -c 'DROP FUNCTION public.myfunc(integer);
     DROP AGGREGATE public.newavg(integer);'

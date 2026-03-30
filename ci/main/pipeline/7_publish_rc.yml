@@ -53,10 +53,10 @@
     - in_parallel:
         - put: oss_rc_rpm
           params:
-            file: renamed_oss_rpm/gpupgrade-*.rpm
+            file: renamed_oss_rpm/ggupgrade-*.rpm
         - put: enterprise_rc_rpm
           params:
-            file: renamed_enterprise_rpm/gpupgrade-*.rpm
+            file: renamed_enterprise_rpm/ggupgrade-*.rpm
   on_failure:
     do:
       - <<: *slack_alert

@@ -1,18 +1,18 @@
-Name: gpupgrade
+Name: ggupgrade
 Version: %{gpupgrade_version}
 # Release is a way of versioning the spec file.
-# Only bump the Release if shipping gpupgrade without also bumping the
+# Only bump the Release if shipping ggupgrade without also bumping the
 # gpugprade_version (ie: VERSION).
 Release: %{gpupgrade_rpm_release}%{?dist}
 Summary: %{summary}
 License: %{license}
-URL: https://github.com/greenplum-db/gpupgrade
+URL: https://github.com/GreengageDB/ggupgrade
 Source0: %{name}.tar.gz
 Prefix: /usr/local/bin
 Requires: openssh rsync >= 3.0
 
 %description
-The gpupgrade package contains gpupgrade which performs in-place upgrades
+The ggupgrade package contains ggupgrade which performs in-place upgrades
 without the need for additional hardware, disk space, and with less downtime.
 
 %prep
@@ -28,24 +28,24 @@ fi
 %install
 # executables
 mkdir -p %{buildroot}%{prefix}
-mv gpupgrade %{buildroot}%{prefix}
+mv ggupgrade %{buildroot}%{prefix}
 
 # additional files
-mkdir -p %{buildroot}%{prefix}/greenplum/%{name}
-mv data-migration-scripts %{buildroot}%{prefix}/greenplum/%{name}
-mv gpupgrade_config %{buildroot}%{prefix}/greenplum/%{name}
-mv gpupgrade.bash %{buildroot}%{prefix}/greenplum/%{name}
-mv open_source_licenses.txt %{buildroot}%{prefix}/greenplum/%{name}
+mkdir -p %{buildroot}%{prefix}/greengage/%{name}
+mv data-migration-scripts %{buildroot}%{prefix}/greengage/%{name}
+mv gpupgrade_config %{buildroot}%{prefix}/greengage/%{name}
+mv ggupgrade.bash %{buildroot}%{prefix}/greengage/%{name}
+mv open_source_licenses.txt %{buildroot}%{prefix}/greengage/%{name}
 
 
 %files
 # executables
-%{prefix}/gpupgrade
+%{prefix}/ggupgrade
 
 # additional files
-%dir %{prefix}/greenplum
-%dir %{prefix}/greenplum/%{name}
-%{prefix}/greenplum/%{name}/data-migration-scripts
-%config %{prefix}/greenplum/%{name}/gpupgrade_config
-%{prefix}/greenplum/%{name}/gpupgrade.bash
-%{prefix}/greenplum/%{name}/open_source_licenses.txt
+%dir %{prefix}/greengage
+%dir %{prefix}/greengage/%{name}
+%{prefix}/greengage/%{name}/data-migration-scripts
+%config %{prefix}/greengage/%{name}/gpupgrade_config
+%{prefix}/greengage/%{name}/ggupgrade.bash
+%{prefix}/greengage/%{name}/open_source_licenses.txt

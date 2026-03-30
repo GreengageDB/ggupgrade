@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func ArchiveLogDirectories(logDir string, logArchiveDir string, agentConns []*idl.Connection, targetCoordinatorHost string) error {
@@ -42,8 +42,8 @@ func ArchiveSegmentLogDirectories(agentConns []*idl.Connection, excludeHostname,
 }
 
 // GetLogArchiveDir returns the name of the file to be used to store logs
-// from this run of gpupgrade during a revert.
+// from this run of ggupgrade during a revert.
 func GetLogArchiveDir(logDir string, upgradeID string, t time.Time) string {
-	archiveName := fmt.Sprintf("gpupgrade-%s-%s", upgradeID, t.Format("20060102T150409"))
+	archiveName := fmt.Sprintf("ggupgrade-%s-%s", upgradeID, t.Format("20060102T150409"))
 	return filepath.Join(filepath.Dir(logDir), archiveName)
 }

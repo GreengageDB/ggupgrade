@@ -7,7 +7,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/greenplum-db/gpupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

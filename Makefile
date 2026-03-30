@@ -4,7 +4,7 @@
 all: build
 
 .DEFAULT_GOAL := all
-MODULE_NAME=gpupgrade
+MODULE_NAME=ggupgrade
 
 
 LINUX_ENV := env GOOS=linux GOARCH=amd64
@@ -38,7 +38,7 @@ unit integration acceptance test: export PATH := $(CURDIR):$(PATH)
 
 .PHONY: unit
 unit:
-	go test -count=1 $(shell go list ./... | grep -v test/integration$$ | grep -v test/acceptance/gpupgrade$$ | grep -v test/acceptance/pg_upgrade$$)
+	go test -count=1 $(shell go list ./... | grep -v test/integration$$ | grep -v test/acceptance/ggupgrade$$ | grep -v test/acceptance/pg_upgrade$$)
 
 .PHONY: integration
 integration:
@@ -46,9 +46,9 @@ integration:
 
 .PHONY: acceptance
 acceptance:
-	go test -count=1 -timeout 1h15m -v ./test/acceptance/gpupgrade
+	go test -count=1 -timeout 1h15m -v ./test/acceptance/ggupgrade
 
-# test runs all tests against the locally built gpupgrade binaries. Use -k to
+# test runs all tests against the locally built ggupgrade binaries. Use -k to
 # continue after failures.
 .PHONY: test check
 test check: unit integration acceptance
@@ -70,14 +70,14 @@ build:
 	$(eval VERSION := $(shell git describe --tags --abbrev=0))
 	$(eval COMMIT := $(shell git rev-parse --short --verify HEAD))
 	$(eval RELEASE=Dev Build)
-	$(eval VERSION_LD_STR := -X 'github.com/greenplum-db/$(MODULE_NAME)/cli/commands.Version=$(VERSION)')
-	$(eval VERSION_LD_STR += -X 'github.com/greenplum-db/$(MODULE_NAME)/cli/commands.Commit=$(COMMIT)')
-	$(eval VERSION_LD_STR += -X 'github.com/greenplum-db/$(MODULE_NAME)/cli/commands.Release=$(RELEASE)')
+	$(eval VERSION_LD_STR := -X 'github.com/GreengageDB/$(MODULE_NAME)/cli/commands.Version=$(VERSION)')
+	$(eval VERSION_LD_STR += -X 'github.com/GreengageDB/$(MODULE_NAME)/cli/commands.Commit=$(COMMIT)')
+	$(eval VERSION_LD_STR += -X 'github.com/GreengageDB/$(MODULE_NAME)/cli/commands.Release=$(RELEASE)')
 
 	$(eval BUILD_FLAGS = -gcflags="all=-N -l")
 	$(eval override BUILD_FLAGS += -ldflags "$(VERSION_LD_STR)")
 
-	$(BUILD_ENV) go build -o gpupgrade $(BUILD_FLAGS) github.com/greenplum-db/gpupgrade/cmd/gpupgrade
+	$(BUILD_ENV) go build -o ggupgrade $(BUILD_FLAGS) github.com/GreengageDB/ggupgrade/cmd/ggupgrade
 	go generate ./cli/bash
 
 build_linux: OS := LINUX
@@ -93,13 +93,13 @@ enterprise-tarball: build tarball
 oss-tarball: RELEASE=Open Source
 oss-tarball: build tarball
 
-TARBALL_NAME=gpupgrade.tar.gz
+TARBALL_NAME=ggupgrade.tar.gz
 
 tarball:
 	[ ! -d tarball ] && mkdir tarball
 	# gather files
-	cp gpupgrade tarball
-	cp cli/bash/gpupgrade.bash tarball
+	cp ggupgrade tarball
+	cp cli/bash/ggupgrade.bash tarball
 	cp gpupgrade_config tarball
 	cp open_source_licenses.txt tarball
 	cp -r data-migration-scripts/ tarball/data-migration-scripts/
@@ -117,7 +117,7 @@ enterprise-rpm: LICENSE=VMware Software EULA
 enterprise-rpm: enterprise-tarball rpm
 
 oss-rpm: RELEASE=Open Source
-oss-rpm: NAME=Greenplum Database Upgrade
+oss-rpm: NAME=Greengage Database Upgrade
 oss-rpm: LICENSE=Apache 2.0
 oss-rpm: oss-tarball rpm
 
@@ -125,7 +125,7 @@ rpm:
 	[ ! -d rpm ] && mkdir rpm
 	mkdir -p rpm/rpmbuild/{BUILD,RPMS,SOURCES,SPECS}
 	cp $(TARBALL_NAME) rpm/rpmbuild/SOURCES
-	cp gpupgrade.spec rpm/rpmbuild/SPECS/
+	cp ggupgrade.spec rpm/rpmbuild/SPECS/
 	rpmbuild \
 	--define "_topdir $${PWD}/rpm/rpmbuild" \
 	--define "gpupgrade_version $(VERSION)" \
@@ -133,13 +133,13 @@ rpm:
 	--define "release_type $(RELEASE)" \
 	--define "license $(LICENSE)" \
 	--define "summary $(NAME)" \
-	-bb $${PWD}/rpm/rpmbuild/SPECS/gpupgrade.spec
-	cp rpm/rpmbuild/RPMS/x86_64/gpupgrade-$(VERSION)*.rpm .
+	-bb $${PWD}/rpm/rpmbuild/SPECS/ggupgrade.spec
+	cp rpm/rpmbuild/RPMS/x86_64/ggupgrade-$(VERSION)*.rpm .
 	rm -r rpm
 
 install:
 	@test $${GOPATH?Error GOPATH not set}
-	cp -f gpupgrade $(GOPATH)/bin/
+	cp -f ggupgrade $(GOPATH)/bin/
 
 # To lint, you must install golangci-lint via one of the supported methods
 # listed at
@@ -149,7 +149,7 @@ install:
 # DO NOT add the linter to the project dependencies in Gopkg.toml, as much as
 # you may want to streamline this installation process, because
 # 1. `go get` is an explicitly unsupported installation method for this utility,
-#    much like it is for gpupgrade itself, and
+#    much like it is for ggupgrade itself, and
 # 2. adding it as a project dependency opens up the possibility of accidentally
 #    vendoring GPL'd code.
 .PHONY: lint
@@ -158,7 +158,7 @@ lint:
 
 clean:
 		# Build artifacts
-		rm -f gpupgrade
+		rm -f ggupgrade
 		# Test artifacts
 		rm -rf /tmp/go-build*
 		rm -rf /tmp/gexec_artifacts*
@@ -170,15 +170,15 @@ clean:
 		rm -f $(TARBALL_NAME)
 		rm -f CHECKSUM
 		rm -rf rpm
-		rm -f gpupgrade-$(VERSION)*.rpm
+		rm -f ggupgrade-$(VERSION)*.rpm
 
 # You can override these from the command line.
 BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 GIT_URI ?= $(shell git ls-remote --get-url)
 
-ifeq ($(GIT_URI),https://github.com/greenplum-db/gpupgrade.git)
+ifeq ($(GIT_URI),https://github.com/GreengageDB/ggupgrade.git)
 ifeq ($(BRANCH),main)
-	PIPELINE_NAME := gpupgrade
+	PIPELINE_NAME := ggupgrade
 	FLY_TARGET := prod
 endif
 endif
@@ -187,7 +187,7 @@ endif
 WORKSPACE ?= ~/workspace
 BRANCH_NAME ?= $(shell git rev-parse --abbrev-ref HEAD | tr '/' ':')
 export BRANCH_NAME
-PIPELINE_NAME ?= gpupgrade:${BRANCH_NAME}
+PIPELINE_NAME ?= ggupgrade:${BRANCH_NAME}
 FLY_TARGET ?= cm
 
 # YAML templating is used to switch between prod and dev pipelines. The
@@ -217,12 +217,12 @@ pipeline:
 		ci/main/pipeline/6_upgrade_and_functional_jobs.yml \
 		ci/main/pipeline/7_publish_rc.yml > ci/main/generated/template.yml
 	PIPELINE_VERSION="6" go generate ./ci/main
-	#NOTE-- make sure your gpupgrade-git-remote uses an https style git"
-	#NOTE-- such as https://github.com/greenplum-db/gpupgrade.git"
+	#NOTE-- make sure your ggupgrade-git-remote uses an https style git"
+	#NOTE-- such as https://github.com/GreengageDB/ggupgrade.git"
 	fly -t $(FLY_TARGET) set-pipeline -p $(PIPELINE_NAME) \
 		-c ci/main/generated/pipeline.yml \
-		-v gpupgrade-git-remote=$(GIT_URI) \
-		-v gpupgrade-git-branch=$(BRANCH)
+		-v ggupgrade-git-remote=$(GIT_URI) \
+		-v ggupgrade-git-branch=$(BRANCH)
 
 pipeline7:
 	mkdir -p ci/main/generated
@@ -234,12 +234,12 @@ pipeline7:
 		ci/main/pipeline/6_upgrade_and_functional_jobs.yml \
 		ci/main/pipeline/7_publish_rc.yml > ci/main/generated/template.yml
 	PIPELINE_VERSION="7" go generate ./ci/main
-	#NOTE-- make sure your gpupgrade-git-remote uses an https style git"
-	#NOTE-- such as https://github.com/greenplum-db/gpupgrade.git"
+	#NOTE-- make sure your ggupgrade-git-remote uses an https style git"
+	#NOTE-- such as https://github.com/GreengageDB/ggupgrade.git"
 	fly -t $(FLY_TARGET) set-pipeline -p 7-$(PIPELINE_NAME) \
 		-c ci/main/generated/pipeline.yml \
-		-v gpupgrade-git-remote=$(GIT_URI) \
-		-v gpupgrade-git-branch=$(BRANCH)
+		-v ggupgrade-git-remote=$(GIT_URI) \
+		-v ggupgrade-git-branch=$(BRANCH)
 
 functional-pipeline:
 	mkdir -p ci/functional/generated
@@ -249,12 +249,12 @@ functional-pipeline:
 		ci/functional/pipeline/4_initialize_upgrade_cluster_validate.yml \
 		ci/functional/pipeline/5_teardown_cluster.yml > ci/functional/generated/template.yml
 	go generate ./ci/functional
-	#NOTE-- make sure your gpupgrade-git-remote uses an https style git"
-	#NOTE-- such as https://github.com/greenplum-db/gpupgrade.git"
+	#NOTE-- make sure your ggupgrade-git-remote uses an https style git"
+	#NOTE-- such as https://github.com/GreengageDB/ggupgrade.git"
 	fly -t $(FLY_TARGET) set-pipeline -p $(PIPELINE_NAME) \
 		-c ci/functional/generated/pipeline.yml \
-		-v gpupgrade-git-remote=$(GIT_URI) \
-		-v gpupgrade-git-branch=$(BRANCH)
+		-v ggupgrade-git-remote=$(GIT_URI) \
+		-v ggupgrade-git-branch=$(BRANCH)
 
 expose-pipeline:
 	fly --target $(FLY_TARGET) expose-pipeline --pipeline $(PIPELINE_NAME)

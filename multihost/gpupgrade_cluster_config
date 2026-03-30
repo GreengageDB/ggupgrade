@@ -10,7 +10,7 @@
 
 
 # Set this to anything you like
-ARRAY_NAME="gpupgrade cluster"
+ARRAY_NAME="ggupgrade cluster"
 
 # This file must exist in the same directory that you execute gpinitsystem in
 MACHINE_LIST_FILE=/vagrant/multihost/hostfile
@@ -18,7 +18,7 @@ MACHINE_LIST_FILE=/vagrant/multihost/hostfile
 # This names the data directories for the Segment Instances and the Entry Postmaster
 SEG_PREFIX=demoDataDir
 
-# This is the port at which to contact the resulting Greenplum database, e.g.
+# This is the port at which to contact the resulting Greengage database, e.g.
 #   psql -p $PORT_BASE -d template1
 PORT_BASE=6100
 
@@ -47,7 +47,7 @@ MIRROR_PORT_BASE=6200
 REPLICATION_PORT_BASE=6300
 MIRROR_REPLICATION_PORT_BASE=6400
 
-# Path for Greenplum mgmt utils and Greenplum binaries
+# Path for Greengage mgmt utils and Greengage binaries
 export PATH
 export MASTER_DATA_DIRECTORY
 export TRUSTED_SHELL

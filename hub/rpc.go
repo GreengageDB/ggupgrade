@@ -6,8 +6,8 @@ package hub
 import (
 	"sync"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func ExecuteRPC(agentConns []*idl.Connection, executeRequest func(conn *idl.Connection) error) error {

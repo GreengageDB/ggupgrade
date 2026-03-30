@@ -6,27 +6,26 @@ package connection
 import (
 	"database/sql"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl"
 )
 
 // Bootstrap returns a sql.DB connection. Most callers will use the Connection
 // function on the cluster object. However, Bootstrap is useful for when a
 // cluster object does not exist and a database connection is needed.
 func Bootstrap(destination idl.ClusterDestination, gphome string, port int) (*sql.DB, error) {
-	cluster, err := greenplum.NewCluster([]greenplum.SegConfig{})
+	cluster, err := greengage.NewCluster([]greengage.SegConfig{})
 	if err != nil {
 		return nil, err
 	}
 
 	// destination and version are needed when creating the connection
 	cluster.Destination = destination
-	cluster.Version, err = greenplum.Version(gphome)
+	cluster.Version, err = greengage.Version(gphome)
 	if err != nil {
 		return nil, err
 	}
 
-	conn := cluster.Connection([]greenplum.Option{greenplum.Port(port)}...)
+	conn := cluster.Connection([]greengage.Option{greengage.Port(port)}...)
 	db, err := sql.Open("pgx", conn)
 	if err != nil {
 		return nil, err

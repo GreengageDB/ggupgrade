@@ -1,16 +1,16 @@
 # ----------------------------
-# gpupgrade configuration file
+# ggupgrade configuration file
 # ----------------------------
 
 # The source cluster master port.
 source_master_port =
 
 # The installation path for the source cluster.
-# For example, /usr/local/<source-greenplum-version>.
+# For example, /usr/local/<source-greengage-version>.
 source_gphome =
 
 # The installation path for the target cluster.
-# For example, /usr/local/<target-greenplum-version>.
+# For example, /usr/local/<target-greengage-version>.
 target_gphome =
 
 # Whether to upgrade using “link” or “copy” mode.
@@ -24,7 +24,7 @@ target_gphome =
 # dynamic_library_path = $libdir
 
 # The disk free ratio specifies what fraction of disk space must be free on
-# every host in order for gpupgrade to run. The ratio ranges from 0.0 to 1.0.
+# every host in order for ggupgrade to run. The ratio ranges from 0.0 to 1.0.
 # Recommended values are 0.6 or 60% free for copy mode, and 0.2 or 20% free for
 # link mode.
 # disk_free_ratio = 0.6
@@ -44,8 +44,8 @@ target_gphome =
 # cluster port range once upgrade is complete.
 # temp_port_range = 50432-65535
 
-# The port for the gpupgrade hub process.
+# The port for the ggupgrade hub process.
 # hub_port = 7527
 
-# The port for the gpupgrade agent process running on all hosts.
+# The port for the ggupgrade agent process running on all hosts.
 # agent_port = 6416

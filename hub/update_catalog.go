@@ -9,14 +9,13 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
-func UpdateCatalog(intermediate *greenplum.Cluster, target *greenplum.Cluster) error {
-	options := []greenplum.Option{
-		greenplum.UtilityMode(),
-		greenplum.AllowSystemTableMods(),
+func UpdateCatalog(intermediate *greengage.Cluster, target *greengage.Cluster) error {
+	options := []greengage.Option{
+		greengage.UtilityMode(),
+		greengage.AllowSystemTableMods(),
 	}
 
 	db, err := sql.Open("pgx", intermediate.Connection(options...))
@@ -32,7 +31,7 @@ func UpdateCatalog(intermediate *greenplum.Cluster, target *greenplum.Cluster) e
 	return UpdateGpSegmentConfiguration(db, target)
 }
 
-func UpdateGpSegmentConfiguration(db *sql.DB, target *greenplum.Cluster) (err error) {
+func UpdateGpSegmentConfiguration(db *sql.DB, target *greengage.Cluster) (err error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return xerrors.Errorf("begin transaction: %w", err)
@@ -56,7 +55,7 @@ func UpdateGpSegmentConfiguration(db *sql.DB, target *greenplum.Cluster) (err er
 	return nil
 }
 
-func updateSegment(tx *sql.Tx, seg greenplum.SegConfig) error {
+func updateSegment(tx *sql.Tx, seg greengage.SegConfig) error {
 	result, err := tx.Exec("UPDATE gp_segment_configuration SET port = $1, datadir = $2 WHERE content = $3 AND role = $4", seg.Port, seg.DataDir, seg.ContentID, seg.Role)
 	if err != nil {
 		return xerrors.Errorf("update gp_segment_configuration: %w", err)

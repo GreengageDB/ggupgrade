@@ -6,7 +6,7 @@ package filters_test
 import (
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/ci/main/scripts/filters"
+	"github.com/GreengageDB/ggupgrade/ci/main/scripts/filters"
 )
 
 func TestReplacePrecision(t *testing.T) {

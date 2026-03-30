@@ -54,8 +54,8 @@
         run:
           path: gpupgrade_src/ci/main/scripts/acceptance-tests.bash
       params:
-        SOURCE_PACKAGE: greenplum-db-{{.Source}}
-        TARGET_PACKAGE: greenplum-db-{{.Target}}
+        SOURCE_PACKAGE: greengage-{{.Source}}
+        TARGET_PACKAGE: greengage-{{.Target}}
   on_failure:
     do:
       - <<: *slack_alert

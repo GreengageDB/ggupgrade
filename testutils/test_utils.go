@@ -18,13 +18,12 @@ import (
 
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/logger"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/logger"
 )
 
 // FailingWriter is an io.Writer for which all calls to Write() return an error.
@@ -37,18 +36,18 @@ func (f *FailingWriter) Write(_ []byte) (int, error) {
 }
 
 // TODO remove in favor of MustCreateCluster
-func CreateMultinodeSampleCluster(baseDir string) *greenplum.Cluster {
-	return &greenplum.Cluster{
-		Primaries: map[int]greenplum.SegConfig{
-			-1: {ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: baseDir + "/seg-1", Role: greenplum.PrimaryRole},
-			0:  {ContentID: 0, DbID: 2, Port: 25432, Hostname: "host1", DataDir: baseDir + "/seg1", Role: greenplum.PrimaryRole},
-			1:  {ContentID: 1, DbID: 3, Port: 25433, Hostname: "host2", DataDir: baseDir + "/seg2", Role: greenplum.PrimaryRole},
+func CreateMultinodeSampleCluster(baseDir string) *greengage.Cluster {
+	return &greengage.Cluster{
+		Primaries: map[int]greengage.SegConfig{
+			-1: {ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: baseDir + "/seg-1", Role: greengage.PrimaryRole},
+			0:  {ContentID: 0, DbID: 2, Port: 25432, Hostname: "host1", DataDir: baseDir + "/seg1", Role: greengage.PrimaryRole},
+			1:  {ContentID: 1, DbID: 3, Port: 25433, Hostname: "host2", DataDir: baseDir + "/seg2", Role: greengage.PrimaryRole},
 		},
 	}
 }
 
 // TODO remove in favor of MustCreateCluster
-func CreateMultinodeSampleClusterPair(baseDir string) (*greenplum.Cluster, *greenplum.Cluster) {
+func CreateMultinodeSampleClusterPair(baseDir string) (*greengage.Cluster, *greengage.Cluster) {
 	gpdbVersion := semver.MustParse("6.0.0")
 
 	sourceCluster := CreateMultinodeSampleCluster(baseDir)
@@ -62,8 +61,8 @@ func CreateMultinodeSampleClusterPair(baseDir string) (*greenplum.Cluster, *gree
 	return sourceCluster, targetCluster
 }
 
-func CreateTablespaces() greenplum.Tablespaces {
-	return greenplum.Tablespaces{
+func CreateTablespaces() greengage.Tablespaces {
+	return greengage.Tablespaces{
 		1: {
 			16384: {
 				Location:    "/tmp/user_ts/m/qddir/16384",
@@ -484,7 +483,7 @@ func MustQuery(t *testing.T, connection string, query string) interface{} {
 	return result
 }
 
-func VerifyClusterIsStopped(t *testing.T, cluster greenplum.Cluster) {
+func VerifyClusterIsStopped(t *testing.T, cluster greengage.Cluster) {
 	t.Helper()
 
 	running, err := cluster.IsCoordinatorRunning(step.DevNullStream)
@@ -496,7 +495,7 @@ func VerifyClusterIsStopped(t *testing.T, cluster greenplum.Cluster) {
 		t.Fatalf("expected cluster to be stopped")
 	}
 
-	err = cluster.RunGreenplumCmd(step.DevNullStream, "pg_isready", "-q", "-p", strconv.Itoa(cluster.CoordinatorPort()))
+	err = cluster.RunGreengageCmd(step.DevNullStream, "pg_isready", "-q", "-p", strconv.Itoa(cluster.CoordinatorPort()))
 	var exitError *exec.ExitError
 	if errors.As(err, &exitError) {
 		if exitError.ProcessState.ExitCode() != 2 {
@@ -505,7 +504,7 @@ func VerifyClusterIsStopped(t *testing.T, cluster greenplum.Cluster) {
 	}
 }
 
-func VerifyClusterIsRunning(t *testing.T, cluster greenplum.Cluster) {
+func VerifyClusterIsRunning(t *testing.T, cluster greengage.Cluster) {
 	t.Helper()
 
 	running, err := cluster.IsCoordinatorRunning(step.DevNullStream)
@@ -522,7 +521,7 @@ func VerifyClusterIsRunning(t *testing.T, cluster greenplum.Cluster) {
 		return
 	}
 
-	err = cluster.RunGreenplumCmd(step.DevNullStream, "pg_isready", "-q", "-p", strconv.Itoa(cluster.CoordinatorPort()))
+	err = cluster.RunGreengageCmd(step.DevNullStream, "pg_isready", "-q", "-p", strconv.Itoa(cluster.CoordinatorPort()))
 	if err != nil {
 		t.Fatal(err)
 	}

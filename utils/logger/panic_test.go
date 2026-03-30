@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/utils/logger"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/utils/logger"
 )
 
 func TestWritePanics(t *testing.T) {

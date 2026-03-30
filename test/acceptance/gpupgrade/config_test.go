@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/acceptance"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
 )
 
 func TestConfig(t *testing.T) {
@@ -58,7 +58,7 @@ func TestConfig(t *testing.T) {
 func configShow(t *testing.T, parameter string) string {
 	t.Helper()
 
-	cmd := exec.Command("gpupgrade", "config", "show", parameter)
+	cmd := exec.Command("ggupgrade", "config", "show", parameter)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("unexpected err: %v stderr: %q", err, output)

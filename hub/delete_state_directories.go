@@ -6,7 +6,7 @@ package hub
 import (
 	"context"
 
-	"github.com/greenplum-db/gpupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl"
 )
 
 func DeleteStateDirectories(agentConns []*idl.Connection, excludeHostname string) error {

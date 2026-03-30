@@ -13,11 +13,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/acceptance"
-	"github.com/greenplum-db/gpupgrade/utils/disk"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
+	"github.com/GreengageDB/ggupgrade/utils/disk"
 )
 
 func TestCheckDiskSpace(t *testing.T) {
@@ -35,7 +34,7 @@ func TestCheckDiskSpace(t *testing.T) {
 		}
 
 		for _, opt := range opts {
-			cmd := exec.Command("gpupgrade", "initialize",
+			cmd := exec.Command("ggupgrade", "initialize",
 				"--non-interactive", "--verbose",
 				"--source-gphome", acceptance.GPHOME_SOURCE,
 				"--target-gphome", acceptance.GPHOME_TARGET,
@@ -65,7 +64,7 @@ func TestCheckDiskSpace(t *testing.T) {
 	})
 
 	t.Run("initialize fails with disk space error", func(t *testing.T) {
-		cmd := exec.Command("gpupgrade", "initialize",
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--non-interactive", "--verbose",
 			"--source-gphome", acceptance.GPHOME_SOURCE,
 			"--target-gphome", acceptance.GPHOME_TARGET,
@@ -113,7 +112,7 @@ func withinTolerance(actual uint64, expected uint64) bool {
 
 func expectedDiskUsage(t *testing.T) map[disk.FilesystemHost]*idl.CheckDiskSpaceReply_DiskUsage {
 	source := acceptance.GetSourceCluster(t)
-	segments := source.SelectSegments(func(seg *greenplum.SegConfig) bool {
+	segments := source.SelectSegments(func(seg *greengage.SegConfig) bool {
 		return !seg.IsMirror()
 	})
 

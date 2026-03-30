@@ -15,16 +15,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/substeps"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/acceptance"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/substeps"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func TestInitialize(t *testing.T) {
@@ -37,7 +36,7 @@ func TestInitialize(t *testing.T) {
 	t.Run("initialize accepts a port range", func(t *testing.T) {
 		expectedPortRange := "30432,30434,30435,30436,30433,30437,30438,30439" // primaries,standby,mirrors
 
-		cmd := exec.Command("gpupgrade", "initialize",
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--non-interactive", "--verbose",
 			"--mode", idl.Mode_copy.String(),
 			"--source-gphome", acceptance.GPHOME_SOURCE,
@@ -76,7 +75,7 @@ func TestInitialize(t *testing.T) {
 	})
 
 	t.Run("fails when temp-port-range overlaps with source cluster ports", func(t *testing.T) {
-		cmd := exec.Command("gpupgrade", "initialize",
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--non-interactive", "--verbose",
 			"--mode", idl.Mode_copy.String(),
 			"--source-gphome", acceptance.GPHOME_SOURCE,
@@ -108,7 +107,7 @@ func TestInitialize(t *testing.T) {
 		stopListening := testutils.MustListenOnPort(t, upgrade.DefaultAgentPort)
 		defer stopListening()
 
-		cmd := exec.Command("gpupgrade", "initialize",
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--non-interactive", "--verbose",
 			"--source-gphome", acceptance.GPHOME_SOURCE,
 			"--target-gphome", acceptance.GPHOME_TARGET,
@@ -139,7 +138,7 @@ func TestInitialize(t *testing.T) {
 		defer testutils.MustExecuteSQL(t, source.Connection(), `DROP TABLE IF EXISTS public.test_pg_upgrade CASCADE;`)
 
 		// re-run initialize and check that pg_upgrade --check ran
-		cmd := exec.Command("gpupgrade", "initialize",
+		cmd := exec.Command("ggupgrade", "initialize",
 			"--non-interactive", "--verbose",
 			"--mode", idl.Mode_copy.String(),
 			"--source-gphome", acceptance.GPHOME_SOURCE,
@@ -166,7 +165,7 @@ func TestInitialize(t *testing.T) {
 		testutils.VerifyClusterIsRunning(t, acceptance.GetSourceCluster(t))
 	})
 
-	t.Run("gpupgrade initialize runs pg_upgrade --check on coordinator and primaries", func(t *testing.T) {
+	t.Run("ggupgrade initialize runs pg_upgrade --check on coordinator and primaries", func(t *testing.T) {
 		acceptance.Initialize(t, idl.Mode_copy)
 		defer acceptance.Revert(t)
 
@@ -205,12 +204,12 @@ func TestInitialize(t *testing.T) {
 			t.Fatalf("got %d want %d", len(source.Primaries), len(intermediate.Primaries))
 		}
 
-		segPrefix, err := greenplum.GetCoordinatorSegPrefix(source.CoordinatorDataDir())
+		segPrefix, err := greengage.GetCoordinatorSegPrefix(source.CoordinatorDataDir())
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		sourcePrimaries := source.SelectSegments(func(segConfig *greenplum.SegConfig) bool {
+		sourcePrimaries := source.SelectSegments(func(segConfig *greengage.SegConfig) bool {
 			return segConfig.IsPrimary() || segConfig.IsCoordinator()
 		})
 

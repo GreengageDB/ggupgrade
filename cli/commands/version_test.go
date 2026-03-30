@@ -6,7 +6,7 @@ package commands_test
 import (
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/cli/commands"
+	"github.com/GreengageDB/ggupgrade/cli/commands"
 )
 
 func TestVersion(t *testing.T) {

@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 // SPDX-License-Identifier: Apache-2.0
 
-package greenplum_test
+package greengage_test
 
 import (
 	"errors"
@@ -10,12 +10,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
 )
 
 func TestStart(t *testing.T) {
@@ -24,8 +24,8 @@ func TestStart(t *testing.T) {
 	dataDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, dataDir)
 
-	source := greenplum.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: dataDir, Role: greenplum.PrimaryRole},
+	source := greengage.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: dataDir, Role: greengage.PrimaryRole},
 	})
 	source.GPHome = "/usr/local/source"
 	source.Destination = idl.ClusterDestination_source
@@ -37,13 +37,13 @@ func TestStart(t *testing.T) {
 				t.Errorf("got %q want %q", name, expected)
 			}
 
-			expectedArgs := []string{"-c", "source /usr/local/source/greenplum_path.sh && /usr/local/source/bin/gpstart -a -d " + dataDir}
+			expectedArgs := []string{"-c", "source /usr/local/source/greengage_path.sh && /usr/local/source/bin/gpstart -a -d " + dataDir}
 			if !reflect.DeepEqual(args, expectedArgs) {
 				t.Errorf("got %q want %q", args, expectedArgs)
 			}
 		})
-		greenplum.SetGreenplumCommand(cmd)
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(cmd)
+		defer greengage.ResetGreengageCommand()
 
 		err := source.Start(step.DevNullStream)
 		if err != nil {
@@ -52,8 +52,8 @@ func TestStart(t *testing.T) {
 	})
 
 	t.Run("start returns errors", func(t *testing.T) {
-		greenplum.SetGreenplumCommand(exectest.NewCommand(FailedMain))
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(exectest.NewCommand(FailedMain))
+		defer greengage.ResetGreengageCommand()
 
 		err := source.Start(step.DevNullStream)
 		var exitError *exec.ExitError
@@ -70,8 +70,8 @@ func TestStart(t *testing.T) {
 	t.Run("start returns nil if the cluster is already running", func(t *testing.T) {
 		testutils.MustWriteToFile(t, filepath.Join(dataDir, "postmaster.pid"), "")
 
-		greenplum.SetIsCoordinatorRunningCommand(exectest.NewCommand(Success))
-		defer greenplum.ResetIsCoordinatorRunningCommand()
+		greengage.SetIsCoordinatorRunningCommand(exectest.NewCommand(Success))
+		defer greengage.ResetIsCoordinatorRunningCommand()
 
 		err := source.Start(step.DevNullStream)
 		if err != nil {
@@ -86,8 +86,8 @@ func TestStartCoordinatorOnly(t *testing.T) {
 	dataDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, dataDir)
 
-	source := greenplum.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: dataDir, Role: greenplum.PrimaryRole},
+	source := greengage.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: dataDir, Role: greengage.PrimaryRole},
 	})
 	source.GPHome = "/usr/local/source"
 	source.Destination = idl.ClusterDestination_source
@@ -99,13 +99,13 @@ func TestStartCoordinatorOnly(t *testing.T) {
 				t.Errorf("got %q want %q", name, expected)
 			}
 
-			expectedArgs := []string{"-c", "source /usr/local/source/greenplum_path.sh && /usr/local/source/bin/gpstart -a -m -d " + dataDir}
+			expectedArgs := []string{"-c", "source /usr/local/source/greengage_path.sh && /usr/local/source/bin/gpstart -a -m -d " + dataDir}
 			if !reflect.DeepEqual(args, expectedArgs) {
 				t.Errorf("got %q want %q", args, expectedArgs)
 			}
 		})
-		greenplum.SetGreenplumCommand(cmd)
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(cmd)
+		defer greengage.ResetGreengageCommand()
 
 		err := source.StartCoordinatorOnly(step.DevNullStream)
 		if err != nil {
@@ -114,8 +114,8 @@ func TestStartCoordinatorOnly(t *testing.T) {
 	})
 
 	t.Run("start coordinator only returns errors", func(t *testing.T) {
-		greenplum.SetGreenplumCommand(exectest.NewCommand(FailedMain))
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(exectest.NewCommand(FailedMain))
+		defer greengage.ResetGreengageCommand()
 
 		err := source.StartCoordinatorOnly(step.DevNullStream)
 		var exitError *exec.ExitError
@@ -136,8 +136,8 @@ func TestStop(t *testing.T) {
 	dataDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, dataDir)
 
-	source := greenplum.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: dataDir, Role: greenplum.PrimaryRole},
+	source := greengage.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: dataDir, Role: greengage.PrimaryRole},
 	})
 	source.GPHome = "/usr/local/source"
 	source.Destination = idl.ClusterDestination_source
@@ -156,8 +156,8 @@ func TestStop(t *testing.T) {
 				t.Errorf("got %q want %q", args, expectedArgs)
 			}
 		})
-		greenplum.SetIsCoordinatorRunningCommand(cmd)
-		defer greenplum.ResetIsCoordinatorRunningCommand()
+		greengage.SetIsCoordinatorRunningCommand(cmd)
+		defer greengage.ResetIsCoordinatorRunningCommand()
 
 		cmd = exectest.NewCommandWithVerifier(Success, func(name string, args ...string) {
 			expected := "bash"
@@ -165,13 +165,13 @@ func TestStop(t *testing.T) {
 				t.Errorf("got %q want %q", name, expected)
 			}
 
-			expectedArgs := []string{"-c", "source /usr/local/source/greenplum_path.sh && /usr/local/source/bin/gpstop -a -d " + dataDir}
+			expectedArgs := []string{"-c", "source /usr/local/source/greengage_path.sh && /usr/local/source/bin/gpstop -a -d " + dataDir}
 			if !reflect.DeepEqual(args, expectedArgs) {
 				t.Errorf("got %q want %q", args, expectedArgs)
 			}
 		})
-		greenplum.SetGreenplumCommand(cmd)
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(cmd)
+		defer greengage.ResetGreengageCommand()
 
 		err := source.Stop(step.DevNullStream)
 		if err != nil {
@@ -182,11 +182,11 @@ func TestStop(t *testing.T) {
 	t.Run("stop returns errors", func(t *testing.T) {
 		testutils.MustWriteToFile(t, filepath.Join(dataDir, "postmaster.pid"), "")
 
-		greenplum.SetIsCoordinatorRunningCommand(exectest.NewCommand(Success))
-		defer greenplum.ResetIsCoordinatorRunningCommand()
+		greengage.SetIsCoordinatorRunningCommand(exectest.NewCommand(Success))
+		defer greengage.ResetIsCoordinatorRunningCommand()
 
-		greenplum.SetGreenplumCommand(exectest.NewCommand(FailedMain))
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(exectest.NewCommand(FailedMain))
+		defer greengage.ResetGreengageCommand()
 
 		err := source.Stop(step.DevNullStream)
 		var exitError *exec.ExitError
@@ -203,8 +203,8 @@ func TestStop(t *testing.T) {
 	t.Run("stop returns nil if the cluster is already stopped", func(t *testing.T) {
 		testutils.MustWriteToFile(t, filepath.Join(dataDir, "postmaster.pid"), "")
 
-		greenplum.SetIsCoordinatorRunningCommand(exectest.NewCommand(IsPostmasterRunningCmd_MatchesNoProcesses))
-		defer greenplum.ResetIsCoordinatorRunningCommand()
+		greengage.SetIsCoordinatorRunningCommand(exectest.NewCommand(IsPostmasterRunningCmd_MatchesNoProcesses))
+		defer greengage.ResetIsCoordinatorRunningCommand()
 
 		err := source.Stop(step.DevNullStream)
 		if err != nil {
@@ -219,8 +219,8 @@ func TestStopCoordinatorOnly(t *testing.T) {
 	dataDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, dataDir)
 
-	source := greenplum.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: dataDir, Role: greenplum.PrimaryRole},
+	source := greengage.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: dataDir, Role: greengage.PrimaryRole},
 	})
 	source.GPHome = "/usr/local/source"
 	source.Destination = idl.ClusterDestination_source
@@ -239,8 +239,8 @@ func TestStopCoordinatorOnly(t *testing.T) {
 				t.Errorf("got %q want %q", args, expectedArgs)
 			}
 		})
-		greenplum.SetIsCoordinatorRunningCommand(cmd)
-		defer greenplum.ResetIsCoordinatorRunningCommand()
+		greengage.SetIsCoordinatorRunningCommand(cmd)
+		defer greengage.ResetIsCoordinatorRunningCommand()
 
 		cmd = exectest.NewCommandWithVerifier(Success, func(name string, args ...string) {
 			expected := "bash"
@@ -248,13 +248,13 @@ func TestStopCoordinatorOnly(t *testing.T) {
 				t.Errorf("got %q want %q", name, expected)
 			}
 
-			expectedArgs := []string{"-c", "source /usr/local/source/greenplum_path.sh && /usr/local/source/bin/gpstop -a -m -d " + dataDir}
+			expectedArgs := []string{"-c", "source /usr/local/source/greengage_path.sh && /usr/local/source/bin/gpstop -a -m -d " + dataDir}
 			if !reflect.DeepEqual(args, expectedArgs) {
 				t.Errorf("got %q want %q", args, expectedArgs)
 			}
 		})
-		greenplum.SetGreenplumCommand(cmd)
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(cmd)
+		defer greengage.ResetGreengageCommand()
 
 		err := source.StopCoordinatorOnly(step.DevNullStream)
 		if err != nil {
@@ -265,11 +265,11 @@ func TestStopCoordinatorOnly(t *testing.T) {
 	t.Run("stop coordinator only returns errors", func(t *testing.T) {
 		testutils.MustWriteToFile(t, filepath.Join(dataDir, "postmaster.pid"), "")
 
-		greenplum.SetIsCoordinatorRunningCommand(exectest.NewCommand(Success))
-		defer greenplum.ResetIsCoordinatorRunningCommand()
+		greengage.SetIsCoordinatorRunningCommand(exectest.NewCommand(Success))
+		defer greengage.ResetIsCoordinatorRunningCommand()
 
-		greenplum.SetGreenplumCommand(exectest.NewCommand(FailedMain))
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(exectest.NewCommand(FailedMain))
+		defer greengage.ResetGreengageCommand()
 
 		err := source.StopCoordinatorOnly(step.DevNullStream)
 		var exitError *exec.ExitError
@@ -286,8 +286,8 @@ func TestStopCoordinatorOnly(t *testing.T) {
 	t.Run("stop coordinator returns nil if the cluster is already shutdown", func(t *testing.T) {
 		testutils.MustWriteToFile(t, filepath.Join(dataDir, "postmaster.pid"), "")
 
-		greenplum.SetIsCoordinatorRunningCommand(exectest.NewCommand(IsPostmasterRunningCmd_MatchesNoProcesses))
-		defer greenplum.ResetIsCoordinatorRunningCommand()
+		greengage.SetIsCoordinatorRunningCommand(exectest.NewCommand(IsPostmasterRunningCmd_MatchesNoProcesses))
+		defer greengage.ResetIsCoordinatorRunningCommand()
 
 		err := source.StopCoordinatorOnly(step.DevNullStream)
 		if err != nil {
@@ -302,8 +302,8 @@ func TestIsCoordinatorRunning(t *testing.T) {
 	dataDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, dataDir)
 
-	source := greenplum.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: dataDir, Role: greenplum.PrimaryRole},
+	source := greengage.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: dataDir, Role: greengage.PrimaryRole},
 	})
 	source.GPHome = "/usr/local/source"
 	source.Destination = idl.ClusterDestination_source
@@ -311,8 +311,8 @@ func TestIsCoordinatorRunning(t *testing.T) {
 	t.Run("IsCoordinatorRunning succeeds", func(t *testing.T) {
 		testutils.MustWriteToFile(t, filepath.Join(dataDir, "postmaster.pid"), "")
 
-		greenplum.SetIsCoordinatorRunningCommand(exectest.NewCommand(Success))
-		defer greenplum.ResetIsCoordinatorRunningCommand()
+		greengage.SetIsCoordinatorRunningCommand(exectest.NewCommand(Success))
+		defer greengage.ResetIsCoordinatorRunningCommand()
 
 		running, err := source.IsCoordinatorRunning(step.DevNullStream)
 		if err != nil {
@@ -327,8 +327,8 @@ func TestIsCoordinatorRunning(t *testing.T) {
 	t.Run("IsCoordinatorRunning returns errors", func(t *testing.T) {
 		testutils.MustWriteToFile(t, filepath.Join(dataDir, "postmaster.pid"), "")
 
-		greenplum.SetIsCoordinatorRunningCommand(exectest.NewCommand(IsPostmasterRunningCmd_Errors))
-		defer greenplum.ResetIsCoordinatorRunningCommand()
+		greengage.SetIsCoordinatorRunningCommand(exectest.NewCommand(IsPostmasterRunningCmd_Errors))
+		defer greengage.ResetIsCoordinatorRunningCommand()
 
 		running, err := source.IsCoordinatorRunning(step.DevNullStream)
 		var expected *exec.ExitError
@@ -342,8 +342,8 @@ func TestIsCoordinatorRunning(t *testing.T) {
 	})
 
 	t.Run("IsCoordinatorRunning returns false with no error when coordinator data directory does not exist", func(t *testing.T) {
-		source := greenplum.MustCreateCluster(t, greenplum.SegConfigs{
-			{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: "/does/not/exist", Role: greenplum.PrimaryRole},
+		source := greengage.MustCreateCluster(t, greengage.SegConfigs{
+			{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: "/does/not/exist", Role: greengage.PrimaryRole},
 		})
 
 		running, err := source.IsCoordinatorRunning(step.DevNullStream)
@@ -359,8 +359,8 @@ func TestIsCoordinatorRunning(t *testing.T) {
 	t.Run("returns false with no error when no processes were matched", func(t *testing.T) {
 		testutils.MustWriteToFile(t, filepath.Join(dataDir, "postmaster.pid"), "")
 
-		greenplum.SetIsCoordinatorRunningCommand(exectest.NewCommand(IsPostmasterRunningCmd_MatchesNoProcesses))
-		defer greenplum.ResetIsCoordinatorRunningCommand()
+		greengage.SetIsCoordinatorRunningCommand(exectest.NewCommand(IsPostmasterRunningCmd_MatchesNoProcesses))
+		defer greengage.ResetIsCoordinatorRunningCommand()
 
 		running, err := source.IsCoordinatorRunning(step.DevNullStream)
 		if err != nil {

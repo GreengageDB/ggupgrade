@@ -41,11 +41,11 @@ CREATE
 --------------------------------------------------------------------------------
 -- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 --------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
 -- start_ignore
 -- end_ignore
 (exited with code 1)
-! cat ~/gpAdminLogs/gpupgrade/pg_upgrade/p-1/partitioned_tables_indexes.txt | LC_ALL=C sort -b;
+! cat ~/gpAdminLogs/ggupgrade/pg_upgrade/p-1/partitioned_tables_indexes.txt | LC_ALL=C sort -b;
 Database:  isolation2test
   public.p_ao_table has 1 index(es)
   public.p_ao_table_1_prt_1 has 1 index(es)

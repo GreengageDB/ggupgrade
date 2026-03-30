@@ -13,14 +13,14 @@ function run_migration_scripts_and_tests() {
         export GOFLAGS="-mod=readonly" # do not update dependencies during build
 
         source gpupgrade_src/ci/main/scripts/environment.bash
-        source "${GPHOME_SOURCE}"/greenplum_path.sh
+        source "${GPHOME_SOURCE}"/greengage_path.sh
 
         echo "Running data migration scripts to ensure a clean cluster..."
-        gpupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT"
-        gpupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --phase initialize
+        ggupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT"
+        ggupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --phase initialize
 
         cd gpupgrade_src
-        go test --cover -count=1 -timeout 30m -v -run "^TestRevert$" ./test/acceptance/gpupgrade
+        go test --cover -count=1 -timeout 30m -v -run "^TestRevert$" ./test/acceptance/ggupgrade
   '
 }
 

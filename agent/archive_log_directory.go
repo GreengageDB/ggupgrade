@@ -7,8 +7,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func (s *Server) ArchiveLogDirectory(ctx context.Context, req *idl.ArchiveLogDirectoryRequest) (*idl.ArchiveLogDirectoryReply, error) {

@@ -34,7 +34,7 @@
                 ssh -n cdw "
                     set -eux -o pipefail
 
-                    source /usr/local/greenplum-db-source/greenplum_path.sh
+                    source /usr/local/greengage-db-source/greengage_path.sh
 
                     psql -v ON_ERROR_STOP=1 -d postgres <<SQL_EOF
                         DROP VIEW IF EXISTS problematic_view_or_table;
@@ -42,11 +42,11 @@
                 SQL_EOF
                 "
 
-                echo "Running gpupgrade initialize..."
+                echo "Running ggupgrade initialize..."
                 time ssh -n cdw "
                     set -eux -o pipefail
 
-                    gpupgrade initialize \
+                    ggupgrade initialize \
                               --non-interactive \
                               --verbose \
                               --target-gphome $GPHOME_TARGET \
@@ -93,14 +93,14 @@
 
                 MODE=${MODE:-"copy"}
 
-                echo "Performing gpupgrade execute and finalize..."
+                echo "Performing ggupgrade execute and finalize..."
                 time ssh -n cdw "
                     set -eux -o pipefail
 
-                    gpupgrade execute  --non-interactive --verbose
-                    gpupgrade finalize --non-interactive --verbose
+                    ggupgrade execute  --non-interactive --verbose
+                    ggupgrade finalize --non-interactive --verbose
 
-                    gpupgrade apply --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/gpupgrade --phase finalize
+                    ggupgrade apply --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/ggupgrade --phase finalize
                 "
                 echo "Upgrade successful..."
         params:
@@ -144,7 +144,7 @@
                 time ssh -n cdw "
                     set -eux -o pipefail
 
-                    source /usr/local/greenplum-db-target/greenplum_path.sh
+                    source /usr/local/greengage-db-target/greengage_path.sh
                     export MASTER_DATA_DIRECTORY=$MASTER_DATA_DIRECTORY
                     export PGPORT=$PGPORT
 
@@ -174,7 +174,7 @@
 
                 echo 'Doing failover tests of mirrors and standby...'
                 source gpupgrade_src/testutils/validate_mirrors_and_standby/validate_mirrors_and_standby.bash
-                validate_mirrors_and_standby /usr/local/greenplum-db-target cdw 5432
+                validate_mirrors_and_standby /usr/local/greengage-db-target cdw 5432
       {{- end -}}
       {{- end }}
     on_failure:

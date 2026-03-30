@@ -1,6 +1,6 @@
 # Contributing
 
-We warmly welcome and appreciate contributions from the community! By participating you agree to the [code of conduct](https://github.com/greenplum-db/gpupgrade/blob/main/CODE-OF-CONDUCT.md).
+We warmly welcome and appreciate contributions from the community! By participating you agree to the [code of conduct](https://github.com/GreengageDB/ggupgrade/blob/main/CODE-OF-CONDUCT.md).
 
 ## Development
 - Gather input early and often rather than waiting until the end. 
@@ -22,7 +22,7 @@ We warmly welcome and appreciate contributions from the community! By participat
   - [Refactoring by Martin Fowler](https://martinfowler.com/books/refactoring.html) including the [Refactoring website](https://refactoring.com/). 
 
 ## Structuring PRs
-Optimize the review experience for others. The goal is to make reviewing PRs easy for others. [Example PR](https://github.com/greenplum-db/gpdb/pull/12573).
+Optimize the review experience for others. The goal is to make reviewing PRs easy for others.
 - Ensure PRs are single focused. If more work is needed specify followup PRs, as multiple PRs per feature is fine.
 - Avoid one large PR that is hard to review. Consider multiple smaller scoped PRs.
 - Ensure PRs are completed before submitting.
@@ -42,7 +42,7 @@ Optimize the review experience for others. The goal is to make reviewing PRs eas
 
 - Sign our [Contributor License Agreement](https://cla.vmware.com/cla/1/preview).
 
-- Fork the gpupgrade repository on GitHub.
+- Fork the ggupgrade repository on GitHub.
 
 - Clone the repository.
 
@@ -101,7 +101,7 @@ Optimize the review experience for others. The goal is to make reviewing PRs eas
 
 # Community
 
-Connect with Greenplum on:
-- [Slack](https://greenplum.slack.com/)
-- [gpdb-dev mailing list](https://groups.google.com/a/greenplum.org/forum/#!forum/gpdb-dev/join)
+Connect with Greengage on:
+- [Slack](https://greengage.slack.com/)
+- [gpdb-dev mailing list](https://groups.google.com/a/greengage.org/forum/#!forum/gpdb-dev/join)
 

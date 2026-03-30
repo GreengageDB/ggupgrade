@@ -11,11 +11,11 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/greenplum-db/gpupgrade/cli/commands"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/daemon"
-	"github.com/greenplum-db/gpupgrade/utils/logger"
+	"github.com/GreengageDB/ggupgrade/cli/commands"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/daemon"
+	"github.com/GreengageDB/ggupgrade/utils/logger"
 )
 
 func main() {

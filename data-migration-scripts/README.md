@@ -2,7 +2,7 @@
 
 Data migration scripts are run at specific **phases** of the upgrade cycle such as initialize, finalize,and revert.
 The data migration scripts are generated from **seed scripts** located here in our repo and
-installed in `/usr/local/bin/greenplum/gpupgrade/data-migration-scripts`. Customers will first **generate** data
+installed in `/usr/local/bin/greengage/ggupgrade/data-migration-scripts`. Customers will first **generate** data
 migration scripts based on their source cluster using the **seed scripts**. Next, they **execute** them depending on 
 the specific **phase**.
 

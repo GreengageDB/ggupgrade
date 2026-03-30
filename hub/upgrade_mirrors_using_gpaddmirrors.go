@@ -8,12 +8,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
-func UpgradeMirrorsUsingGpAddMirrors(streams step.OutStreams, intermediate *greenplum.Cluster, useHbaHostnames bool) (err error) {
+func UpgradeMirrorsUsingGpAddMirrors(streams step.OutStreams, intermediate *greengage.Cluster, useHbaHostnames bool) (err error) {
 	config, err := writeAddMirrorsConfig(intermediate)
 	if err != nil {
 		return err
@@ -24,7 +23,7 @@ func UpgradeMirrorsUsingGpAddMirrors(streams step.OutStreams, intermediate *gree
 		args = append(args, "--hba-hostnames")
 	}
 
-	err = intermediate.RunGreenplumCmd(streams, "gpaddmirrors", args...)
+	err = intermediate.RunGreengageCmd(streams, "gpaddmirrors", args...)
 	if err != nil {
 		return err
 	}
@@ -32,7 +31,7 @@ func UpgradeMirrorsUsingGpAddMirrors(streams step.OutStreams, intermediate *gree
 	return nil
 }
 
-func writeAddMirrorsConfig(intermediate *greenplum.Cluster) (string, error) {
+func writeAddMirrorsConfig(intermediate *greengage.Cluster) (string, error) {
 	var config bytes.Buffer
 	for _, m := range intermediate.Mirrors {
 		if m.IsStandby() {

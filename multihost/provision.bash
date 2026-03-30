@@ -10,7 +10,7 @@ own_directories() {
 }
 
 # Install dependencies
-modify_linux_configuration_for_greenplum() {
+modify_linux_configuration_for_greengage() {
     #
     # see README.Centos.md in gpdb repository
     #
@@ -72,15 +72,15 @@ install_yum_packages() {
         wget
 }
 
-install_greenplum() {
+install_greengage() {
     # assumes that the gpdb rpm has been manually downloaded
     # and has been placed in the multihost directory
     pushd "$GPUPGRADE_SOURCE_PATH/multihost";
-        sudo yum install greenplum-db-*.rpm --assumeyes
+        sudo yum install greengage-db-*.rpm --assumeyes
     popd
-    echo ". /usr/local/greenplum-db/greenplum_path.sh" >> $VAGRANT_USER_HOME/.bashrc
+    echo ". /usr/local/greengage-db/greengage_path.sh" >> $VAGRANT_USER_HOME/.bashrc
 
-    modify_linux_configuration_for_greenplum
+    modify_linux_configuration_for_greengage
 }
 
 generate_ssh_keys() {
@@ -107,7 +107,7 @@ add_hosts_entries() {
 
 install_dependencies() {
     install_yum_packages
-    install_greenplum
+    install_greengage
     install_gpupgrade
 }
 

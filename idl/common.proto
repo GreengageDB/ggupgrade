@@ -3,7 +3,7 @@
 
 syntax = "proto3";
 package idl;
-option go_package = "github.com/greenplum-db/gpupgrade/idl";
+option go_package = "github.com/GreengageDB/ggupgrade/idl";
 
 enum Mode {
   unknown_mode = 0; // http://androiddevblog.com/protocol-buffers-pitfall-adding-enum-values/

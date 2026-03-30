@@ -11,19 +11,18 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/rsync"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
 // format of yyyyMMddTHHmmss
 const TimeStringFormat = "20060102T150405"
 
-func UpgradeCoordinator(streams step.OutStreams, backupDir string, pgUpgradeVerbose bool, skipPgUpgradeChecks bool, pgUpgradeJobs uint, source *greenplum.Cluster, intermediate *greenplum.Cluster, action idl.PgOptions_Action, mode idl.Mode, pgUpgradeTimestamp string) error {
+func UpgradeCoordinator(streams step.OutStreams, backupDir string, pgUpgradeVerbose bool, skipPgUpgradeChecks bool, pgUpgradeJobs uint, source *greengage.Cluster, intermediate *greengage.Cluster, action idl.PgOptions_Action, mode idl.Mode, pgUpgradeTimestamp string) error {
 	oldOptions := ""
 	// When upgrading from 5 the coordinator must be provided with its standby's dbid to allow WAL to sync.
 	if source.Version.Major == 5 && source.HasStandby() {
@@ -75,17 +74,17 @@ func UpgradeCoordinator(streams step.OutStreams, backupDir string, pgUpgradeVerb
 		}
 
 		nextAction := fmt.Sprintf(`Consult the pg_upgrade check output files located: %s
-Refer to the gpupgrade documentation for details on the pg_upgrade check error.
+Refer to the ggupgrade documentation for details on the pg_upgrade check error.
 
 If you haven't already run the "initialize" data migration scripts with
-"gpupgrade initialize" or "gpupgrade apply --gphome %s --port %d --input-dir %s --phase initialize"
+"ggupgrade initialize" or "ggupgrade apply --gphome %s --port %d --input-dir %s --phase initialize"
 
 To connect to the intermediate target cluster:
 source %s
 MASTER_DATA_DIRECTORY=%s
 PGPORT=%d`, pgUpgradeDir,
 			source.GPHome, source.CoordinatorPort(), generatedScriptsOutputDir,
-			filepath.Join(intermediate.GPHome, "greenplum_path.sh"), intermediate.CoordinatorDataDir(), intermediate.CoordinatorPort())
+			filepath.Join(intermediate.GPHome, "greengage_path.sh"), intermediate.CoordinatorDataDir(), intermediate.CoordinatorPort())
 
 		return utils.NewNextActionErr(xerrors.Errorf("%s master: %v", action, err), nextAction)
 	}

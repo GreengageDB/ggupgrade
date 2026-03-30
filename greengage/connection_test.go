@@ -1,15 +1,15 @@
 // Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 // SPDX-License-Identifier: Apache-2.0
 
-package greenplum_test
+package greengage_test
 
 import (
 	"testing"
 
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
 )
 
 func TestConnection(t *testing.T) {
@@ -18,34 +18,34 @@ func TestConnection(t *testing.T) {
 	cases := []struct {
 		name     string
 		version  semver.Version
-		options  []greenplum.Option
+		options  []greengage.Option
 		expected string
 	}{
 		{
 			"defaults to coordinator port",
 			semver.MustParse("5.0.0"),
-			[]greenplum.Option{},
+			[]greengage.Option{},
 			"postgresql://localhost:15432/template1?search_path=",
 		},
 		{
 			"uses specified port value",
 			semver.MustParse("5.0.0"),
-			[]greenplum.Option{
-				greenplum.Port(12345),
+			[]greengage.Option{
+				greengage.Port(12345),
 			},
 			"postgresql://localhost:12345/template1?search_path=",
 		},
 		{
 			"defaults to template1 database",
 			semver.MustParse("5.0.0"),
-			[]greenplum.Option{},
+			[]greengage.Option{},
 			"postgresql://localhost:15432/template1?search_path=",
 		},
 		{
 			"uses specified database value",
 			semver.MustParse("5.0.0"),
-			[]greenplum.Option{
-				greenplum.Database("another_database"),
+			[]greengage.Option{
+				greengage.Database("another_database"),
 			},
 			"postgresql://localhost:15432/another_database?search_path=",
 		},
@@ -53,49 +53,49 @@ func TestConnection(t *testing.T) {
 		{
 			"uses correct utility mode parameter when connecting to a 5X cluster",
 			semver.MustParse("5.0.0"),
-			[]greenplum.Option{
-				greenplum.UtilityMode(),
+			[]greengage.Option{
+				greengage.UtilityMode(),
 			},
 			"postgresql://localhost:15432/template1?search_path=&gp_session_role=utility",
 		},
 		{
 			"uses correct utility mode parameter when connecting to a 6X cluster",
 			semver.MustParse("6.0.0"),
-			[]greenplum.Option{
-				greenplum.UtilityMode(),
+			[]greengage.Option{
+				greengage.UtilityMode(),
 			},
 			"postgresql://localhost:15432/template1?search_path=&gp_session_role=utility",
 		},
 		{
 			"uses correct utility mode parameter when connecting to a 7X cluster",
 			semver.MustParse("7.0.0"),
-			[]greenplum.Option{
-				greenplum.UtilityMode(),
+			[]greengage.Option{
+				greengage.UtilityMode(),
 			},
 			"postgresql://localhost:15432/template1?search_path=&gp_role=utility",
 		},
 		{
 			"allow system table mods",
 			semver.MustParse("6.0.0"),
-			[]greenplum.Option{
-				greenplum.AllowSystemTableMods(),
+			[]greengage.Option{
+				greengage.AllowSystemTableMods(),
 			},
 			"postgresql://localhost:15432/template1?search_path=&allow_system_table_mods=true",
 		},
 		{
 			"can set multiple options",
 			semver.MustParse("6.0.0"),
-			[]greenplum.Option{
-				greenplum.Port(1234),
-				greenplum.UtilityMode(),
-				greenplum.AllowSystemTableMods(),
+			[]greengage.Option{
+				greengage.Port(1234),
+				greengage.UtilityMode(),
+				greengage.AllowSystemTableMods(),
 			},
 			"postgresql://localhost:1234/template1?search_path=&gp_session_role=utility&allow_system_table_mods=true",
 		},
 	}
 
-	source := MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: "/data/qddir/seg-1", Role: greenplum.PrimaryRole},
+	source := MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole},
 	})
 
 	for _, c := range cases {

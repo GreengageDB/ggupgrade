@@ -1,6 +1,6 @@
-# gpupgrade multi-host testing
+# ggupgrade multi-host testing
 
-Multi-host environment for gpupgrade
+Multi-host environment for ggupgrade
 
 Creates three hosts via vagrant. One that runs the hub,
 one that runs the agent for the segments, and one that runs the
@@ -19,7 +19,7 @@ segments on the `segment-agent` host, three mirrors on the
 
 ## Setup:
 
-* The latest GPDB6 RPM can be found on Tanzu Network. Download the Centos 7 rpm of the Greenplum Database Server and place it in the `gpupgrade/multihost` directory
+* The latest GPDB6 RPM can be found on Tanzu Network. Download the Centos 7 rpm of the Greengage Database Server and place it in the `ggupgrade/multihost` directory
 
     https://network.pivotal.io/products/pivotal-gpdb
 
@@ -36,7 +36,7 @@ segments on the `segment-agent` host, three mirrors on the
     ./multihost/sync-ssh-keys.bash
     ```
 
-* Generate a greenplum cluster
+* Generate a greengage cluster
 
     ```bash
     ./multihost/generate-cluster.bash

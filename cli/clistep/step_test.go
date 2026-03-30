@@ -12,13 +12,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/cli/clistep"
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/substeps"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/clistep"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/substeps"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func TestSubstep(t *testing.T) {
@@ -454,7 +454,7 @@ func TestSubstep(t *testing.T) {
 			t.Errorf("unexpected err %#v", err)
 		}
 
-		nextAction := "re-run gpupgrade"
+		nextAction := "re-run ggupgrade"
 		st.RunHubSubstep(func(streams step.OutStreams) error {
 			return utils.NewNextActionErr(errors.New("oops"), nextAction)
 		})
@@ -465,7 +465,7 @@ func TestSubstep(t *testing.T) {
 			t.Errorf("got type %T want %T", err, nextActions)
 		}
 
-		genericNextAction := "Please address the above issue and run \"gpupgrade initialize\" again.\nIf you would like to return the cluster to its original state, please run \"gpupgrade revert\".\n"
+		genericNextAction := "Please address the above issue and run \"ggupgrade initialize\" again.\nIf you would like to return the cluster to its original state, please run \"ggupgrade revert\".\n"
 		expected := nextAction + "\n\n" + genericNextAction
 		if nextActions.NextAction != expected {
 			t.Errorf("got next action %q want %q", nextActions.NextAction, expected)
@@ -687,7 +687,7 @@ func TestStepStatus(t *testing.T) {
 		}
 
 		expected := `confirmation text
-Continue with gpupgrade initialize?  Yy|Nn: 
+Continue with ggupgrade initialize?  Yy|Nn: 
 Proceeding with upgrade
 
 Initialize in progress.
@@ -729,7 +729,7 @@ func TestPrompt(t *testing.T) {
 	t.Run("returns error when failing to read input", func(t *testing.T) {
 		input := ""
 		reader := bufio.NewReader(strings.NewReader(input))
-		prompt := fmt.Sprintf("Continue with gpupgrade %s?  Yy|Nn: ", idl.Step_execute)
+		prompt := fmt.Sprintf("Continue with ggupgrade %s?  Yy|Nn: ", idl.Step_execute)
 		err := clistep.Prompt(reader, prompt)
 		if err != io.EOF {
 			t.Errorf("Prompt(%q) returned error: %+v ", input, io.EOF)
@@ -739,7 +739,7 @@ func TestPrompt(t *testing.T) {
 	t.Run("returns true when user proceeds", func(t *testing.T) {
 		for _, input := range []string{"y\n", "Y\n"} {
 			reader := bufio.NewReader(strings.NewReader(input))
-			prompt := fmt.Sprintf("Continue with gpupgrade %s?  Yy|Nn: ", idl.Step_execute)
+			prompt := fmt.Sprintf("Continue with ggupgrade %s?  Yy|Nn: ", idl.Step_execute)
 			err := clistep.Prompt(reader, prompt)
 			if err != nil {
 				t.Errorf("Prompt(%q) returned error: %+v ", input, err)
@@ -750,7 +750,7 @@ func TestPrompt(t *testing.T) {
 	t.Run("returns step.Quit when user cancels", func(t *testing.T) {
 		for _, input := range []string{"n\n", "N\n"} {
 			reader := bufio.NewReader(strings.NewReader(input))
-			prompt := fmt.Sprintf("Continue with gpupgrade %s?  Yy|Nn: ", idl.Step_execute)
+			prompt := fmt.Sprintf("Continue with ggupgrade %s?  Yy|Nn: ", idl.Step_execute)
 			err := clistep.Prompt(reader, prompt)
 			if !errors.Is(err, step.Quit) {
 				t.Errorf("unexpected error %#v", err)
