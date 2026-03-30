@@ -19,6 +19,7 @@ import (
 	"github.com/blang/semver/v4"
 
 	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/hub"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/step"
