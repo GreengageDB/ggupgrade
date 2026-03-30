@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/step"
 	"github.com/GreengageDB/ggupgrade/utils"
 )
