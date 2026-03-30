@@ -13,6 +13,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/upgrade"
 	"github.com/GreengageDB/ggupgrade/utils"
