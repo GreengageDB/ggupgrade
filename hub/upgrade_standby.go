@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/step"
 )
 
