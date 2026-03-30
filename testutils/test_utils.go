@@ -19,6 +19,7 @@ import (
 	"github.com/blang/semver/v4"
 
 	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/step"
 	"github.com/GreengageDB/ggupgrade/upgrade"
 	"github.com/GreengageDB/ggupgrade/utils"
