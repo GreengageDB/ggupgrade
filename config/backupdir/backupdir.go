@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/GreengageDB/ggupgrade/greengage"
 )
 
 type BackupDirs struct {
