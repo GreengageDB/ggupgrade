@@ -1,0 +1,51 @@
+# ----------------------------
+# ggupgrade configuration file
+# ----------------------------
+
+# The source cluster master port.
+source_master_port =
+
+# The installation path for the source cluster.
+# For example, /usr/local/<source-greengage-version>.
+source_gphome =
+
+# The installation path for the target cluster.
+# For example, /usr/local/<target-greengage-version>.
+target_gphome =
+
+# Whether to upgrade using “link” or “copy” mode.
+# The copy method performs the upgrade on a copy of the primary segments.
+# The link method directly upgrades the primary segments.
+# mode = copy
+
+# For extensions installed outside of target_gphome include the extension’s
+# path in the dynamic_library_path value. For example, for pxf set
+# dynamic_library_path to /usr/local/pxf-gp6/gpextable.
+# dynamic_library_path = $libdir
+
+# The disk free ratio specifies what fraction of disk space must be free on
+# every host in order for ggupgrade to run. The ratio ranges from 0.0 to 1.0.
+# Recommended values are 0.6 or 60% free for copy mode, and 0.2 or 20% free for
+# link mode.
+# disk_free_ratio = 0.6
+
+# Databases to upgrade in parallel based on the number of specified threads.
+# pg_upgrade_jobs = 4
+
+# Whether to populate pg_hba.conf with hostnames or IP addresses during
+# gpinitsystem and other utilities.
+# Choose "true" to use host names, or "false" to use IP addresses.
+# use_hba_hostnames = false
+
+# The temporary port range for the target cluster.
+# The temporary port range should be reserved prior to initialize.
+# The format is a comma separated list of ports and port ranges, e.g.
+# “6000,6002-6005,6012.” The ports will be reconfigured to use the source
+# cluster port range once upgrade is complete.
+# temp_port_range = 50432-65535
+
+# The port for the ggupgrade hub process.
+# hub_port = 7527
+
+# The port for the ggupgrade agent process running on all hosts.
+# agent_port = 6416
