@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/greengage"
 )
 
 func MustCreateCluster(t *testing.T, segments greengage.SegConfigs) *greengage.Cluster {
