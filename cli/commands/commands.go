@@ -287,7 +287,7 @@ func connectToHubOnPort(port int) (idl.CliToHubClient, error) {
 	return idl.NewCliToHubClient(conn), nil
 }
 
-// connTimeout retrieves the GPUPGRADE_CONNECTION_TIMEOUT environment variable,
+// connTimeout retrieves the GGUPGRADE_CONNECTION_TIMEOUT environment variable,
 // interprets it as a (possibly fractional) number of seconds, and converts it
 // into a Duration. The default is one second if the envvar is unset or
 // unreadable.
@@ -296,14 +296,14 @@ func connectToHubOnPort(port int) (idl.CliToHubClient, error) {
 func connTimeout() time.Duration {
 	const defaultDuration = time.Second
 
-	seconds, ok := os.LookupEnv("GPUPGRADE_CONNECTION_TIMEOUT")
+	seconds, ok := os.LookupEnv("GGUPGRADE_CONNECTION_TIMEOUT")
 	if !ok {
 		return defaultDuration
 	}
 
 	duration, err := strconv.ParseFloat(seconds, 64)
 	if err != nil {
-		log.Printf(`GPUPGRADE_CONNECTION_TIMEOUT of "%s" is invalid (%s); using default of one second`,
+		log.Printf(`GGUPGRADE_CONNECTION_TIMEOUT of "%s" is invalid (%s); using default of one second`,
 			seconds, err)
 		return defaultDuration
 	}

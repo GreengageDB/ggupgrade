@@ -2,7 +2,7 @@
 # Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 # SPDX-License-Identifier: Apache-2.0
 
-GPUPGRADE_SOURCE_PATH=/vagrant
+GGUPGRADE_SOURCE_PATH=/vagrant
 VAGRANT_USER_HOME=/home/vagrant
 
 own_directories() {
@@ -75,7 +75,7 @@ install_yum_packages() {
 install_greengage() {
     # assumes that the gpdb rpm has been manually downloaded
     # and has been placed in the multihost directory
-    pushd "$GPUPGRADE_SOURCE_PATH/multihost";
+    pushd "$GGUPGRADE_SOURCE_PATH/multihost";
         sudo yum install greengage-db-*.rpm --assumeyes
     popd
     echo ". /usr/local/greengage-db/greengage_path.sh" >> $VAGRANT_USER_HOME/.bashrc
@@ -87,8 +87,8 @@ generate_ssh_keys() {
     ssh-keygen -f /home/vagrant/.ssh/id_rsa -t rsa -P ""
 }
 
-install_gpupgrade() {
-    cd "$GPUPGRADE_SOURCE_PATH" || exit
+install_ggupgrade() {
+    cd "$GGUPGRADE_SOURCE_PATH" || exit
 
     echo 'export PATH=$PATH:/home/vagrant/go/bin' >> $VAGRANT_USER_HOME/.bashrc
 
@@ -108,7 +108,7 @@ add_hosts_entries() {
 install_dependencies() {
     install_yum_packages
     install_greengage
-    install_gpupgrade
+    install_ggupgrade
 }
 
 setup_dns() {

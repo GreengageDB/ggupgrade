@@ -52,7 +52,7 @@ __ggupgrade_handle_go_custom_completion()
     # Calling ${words[0]} instead of directly ggupgrade allows to handle aliases
     args=("${words[@]:1}")
     # Disable ActiveHelp which is not supported for bash completion v1
-    requestComp="GPUPGRADE_ACTIVE_HELP=0 ${words[0]} __completeNoDesc ${args[*]}"
+    requestComp="GGUPGRADE_ACTIVE_HELP=0 ${words[0]} __completeNoDesc ${args[*]}"
 
     lastParam=${words[$((${#words[@]}-1))]}
     lastChar=${lastParam:$((${#lastParam}-1)):1}
@@ -362,7 +362,7 @@ __ggupgrade_handle_word()
 
 _ggupgrade_apply_help()
 {
-    last_command="gpupgrade_apply_help"
+    last_command="ggupgrade_apply_help"
 
     command_aliases=()
 
@@ -382,7 +382,7 @@ _ggupgrade_apply_help()
 
 _ggupgrade_apply()
 {
-    last_command="gpupgrade_apply"
+    last_command="ggupgrade_apply"
 
     command_aliases=()
 
@@ -423,7 +423,7 @@ _ggupgrade_apply()
 
 _ggupgrade_config_show_help()
 {
-    last_command="gpupgrade_config_show_help"
+    last_command="ggupgrade_config_show_help"
 
     command_aliases=()
 
@@ -443,7 +443,7 @@ _ggupgrade_config_show_help()
 
 _ggupgrade_config_show()
 {
-    last_command="gpupgrade_config_show"
+    last_command="ggupgrade_config_show"
 
     command_aliases=()
 
@@ -499,7 +499,7 @@ _ggupgrade_config()
 
 _ggupgrade_execute_help()
 {
-    last_command="gpupgrade_execute_help"
+    last_command="ggupgrade_execute_help"
 
     command_aliases=()
 
@@ -519,7 +519,7 @@ _ggupgrade_execute_help()
 
 _ggupgrade_execute()
 {
-    last_command="gpupgrade_execute"
+    last_command="ggupgrade_execute"
 
     command_aliases=()
 
@@ -554,7 +554,7 @@ _ggupgrade_execute()
 
 _ggupgrade_finalize_help()
 {
-    last_command="gpupgrade_finalize_help"
+    last_command="ggupgrade_finalize_help"
 
     command_aliases=()
 
@@ -574,7 +574,7 @@ _ggupgrade_finalize_help()
 
 _ggupgrade_finalize()
 {
-    last_command="gpupgrade_finalize"
+    last_command="ggupgrade_finalize"
 
     command_aliases=()
 
@@ -603,7 +603,7 @@ _ggupgrade_finalize()
 
 _ggupgrade_generate_help()
 {
-    last_command="gpupgrade_generate_help"
+    last_command="ggupgrade_generate_help"
 
     command_aliases=()
 
@@ -623,7 +623,7 @@ _ggupgrade_generate_help()
 
 _ggupgrade_generate()
 {
-    last_command="gpupgrade_generate"
+    last_command="ggupgrade_generate"
 
     command_aliases=()
 
@@ -660,7 +660,7 @@ _ggupgrade_generate()
 
 _ggupgrade_help()
 {
-    last_command="gpupgrade_help"
+    last_command="ggupgrade_help"
 
     command_aliases=()
 
@@ -680,7 +680,7 @@ _ggupgrade_help()
 
 _ggupgrade_initialize_help()
 {
-    last_command="gpupgrade_initialize_help"
+    last_command="ggupgrade_initialize_help"
 
     command_aliases=()
 
@@ -700,7 +700,7 @@ _ggupgrade_initialize_help()
 
 _ggupgrade_initialize()
 {
-    last_command="gpupgrade_initialize"
+    last_command="ggupgrade_initialize"
 
     command_aliases=()
 
@@ -783,7 +783,7 @@ _ggupgrade_initialize()
 
 _ggupgrade_kill-services()
 {
-    last_command="gpupgrade_kill-services"
+    last_command="ggupgrade_kill-services"
 
     command_aliases=()
 
@@ -803,7 +803,7 @@ _ggupgrade_kill-services()
 
 _ggupgrade_restart-services()
 {
-    last_command="gpupgrade_restart-services"
+    last_command="ggupgrade_restart-services"
 
     command_aliases=()
 
@@ -823,7 +823,7 @@ _ggupgrade_restart-services()
 
 _ggupgrade_revert_help()
 {
-    last_command="gpupgrade_revert_help"
+    last_command="ggupgrade_revert_help"
 
     command_aliases=()
 
@@ -843,7 +843,7 @@ _ggupgrade_revert_help()
 
 _ggupgrade_revert()
 {
-    last_command="gpupgrade_revert"
+    last_command="ggupgrade_revert"
 
     command_aliases=()
 
@@ -937,7 +937,7 @@ _ggupgrade_root_command()
     noun_aliases=()
 }
 
-__start_gpupgrade()
+__start_ggupgrade()
 {
     local cur prev words cword split
     declare -A flaghash 2>/dev/null || :
@@ -968,9 +968,9 @@ __start_gpupgrade()
 }
 
 if [[ $(type -t compopt) = "builtin" ]]; then
-    complete -o default -F __start_gpupgrade ggupgrade
+    complete -o default -F __start_ggupgrade ggupgrade
 else
-    complete -o default -o nospace -F __start_gpupgrade ggupgrade
+    complete -o default -o nospace -F __start_ggupgrade ggupgrade
 fi
 
 # ex: ts=4 sw=4 et filetype=sh

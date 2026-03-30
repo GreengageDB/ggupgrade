@@ -48,17 +48,17 @@ func ResetRemoteVersionCommand() {
 }
 
 func version(host string) (string, error) {
-	gpupgradePath, err := utils.GetGgupgradePath()
+	ggupgradePath, err := utils.GetGgupgradePath()
 	if err != nil {
 		return "", xerrors.Errorf("getting ggupgrade binary path: %w", err)
 	}
 
-	name := gpupgradePath
+	name := ggupgradePath
 	args := []string{"version", "--format", "oneline"}
 	if host != "" {
 		versionCommand = remoteVersionCommand
 		name = "ssh"
-		args = []string{"-q", host, fmt.Sprintf(`bash -c "%s version --format oneline"`, gpupgradePath)}
+		args = []string{"-q", host, fmt.Sprintf(`bash -c "%s version --format oneline"`, ggupgradePath)}
 	}
 
 	cmd := versionCommand(name, args...)

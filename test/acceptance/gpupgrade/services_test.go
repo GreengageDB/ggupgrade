@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 // SPDX-License-Identifier: Apache-2.0
 
-package gpupgrade_test
+package ggupgrade_test
 
 import (
 	"errors"
@@ -74,7 +74,7 @@ func TestServices(t *testing.T) {
 
 		for _, command := range commands {
 			cmd := exec.Command("ggupgrade", command...)
-			cmd.Env = append(os.Environ(), "GPUPGRADE_CONNECTION_TIMEOUT=0")
+			cmd.Env = append(os.Environ(), "GGUPGRADE_CONNECTION_TIMEOUT=0")
 			output, err := cmd.CombinedOutput()
 			expected := `Try restarting the hub with "ggupgrade restart-services".`
 			if !strings.Contains(string(output), expected) {

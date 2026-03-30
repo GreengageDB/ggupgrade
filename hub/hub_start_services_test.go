@@ -27,18 +27,18 @@ import (
 	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
-func gpupgrade_agent() {
+func ggupgrade_agent() {
 }
 
-func gpupgrade_agent_Errors() {
+func ggupgrade_agent_Errors() {
 	os.Stderr.WriteString("could not find state-directory")
 	os.Exit(1)
 }
 
 func init() {
 	exectest.RegisterMains(
-		gpupgrade_agent,
-		gpupgrade_agent_Errors,
+		ggupgrade_agent,
+		ggupgrade_agent_Errors,
 	)
 }
 
@@ -60,7 +60,7 @@ func TestRestartAgent(t *testing.T) {
 	stateDir := "/not/existent/directory"
 	ctx := context.Background()
 
-	hub.SetExecCommand(exectest.NewCommand(gpupgrade_agent))
+	hub.SetExecCommand(exectest.NewCommand(ggupgrade_agent))
 	defer hub.ResetExecCommand()
 
 	t.Run("does not start running agents", func(t *testing.T) {
@@ -103,10 +103,10 @@ func TestRestartAgent(t *testing.T) {
 	})
 
 	t.Run("returns an error when ggupgrade agent fails", func(t *testing.T) {
-		hub.SetExecCommand(exectest.NewCommand(gpupgrade_agent_Errors))
+		hub.SetExecCommand(exectest.NewCommand(ggupgrade_agent_Errors))
 
 		// we fail all connections here so that RestartAgents will run the
-		//  (error producing) gpupgrade_agent_Errors
+		//  (error producing) ggupgrade_agent_Errors
 		dialer := func(ctx context.Context, address string) (net.Conn, error) {
 			return nil, immediateFailure{}
 		}
@@ -140,7 +140,7 @@ func TestRestartAgent(t *testing.T) {
 	t.Run("starts agents with correct args including specified port and state directory", func(t *testing.T) {
 		host := "host1"
 
-		execCmd := exectest.NewCommandWithVerifier(gpupgrade_agent, func(name string, args ...string) {
+		execCmd := exectest.NewCommandWithVerifier(ggupgrade_agent, func(name string, args ...string) {
 			if name != "ssh" {
 				t.Errorf("RestartAgents invoked with %q want ssh", name)
 			}
