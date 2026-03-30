@@ -6,6 +6,7 @@ package connection
 import (
 	"database/sql"
 
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 )
 
