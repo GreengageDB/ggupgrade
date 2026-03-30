@@ -154,9 +154,9 @@ SQL_EOF
 
         CREATE EXTERNAL TABLE pxf_read_test (a TEXT, b TEXT, c TEXT)
             LOCATION ('pxf://tmp/dummy1'
-                      '?FRAGMENTER=org.greengage.pxf.api.examples.DemoFragmenter'
-                      '&ACCESSOR=org.greengage.pxf.api.examples.DemoAccessor'
-                      '&RESOLVER=org.greengage.pxf.api.examples.DemoTextResolver')
+                      '?FRAGMENTER=org.greenplum.pxf.api.examples.DemoFragmenter'
+                      '&ACCESSOR=org.greenplum.pxf.api.examples.DemoAccessor'
+                      '&RESOLVER=org.greenplum.pxf.api.examples.DemoTextResolver')
             FORMAT 'TEXT' (DELIMITER ',');
         CREATE TABLE pxf_read_test_materialized AS SELECT * FROM pxf_read_test;
 
