@@ -16,6 +16,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/testutils"
 	"github.com/GreengageDB/ggupgrade/testutils/exectest"
