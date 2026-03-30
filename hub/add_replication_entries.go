@@ -7,6 +7,7 @@ import (
 	"context"
 	"net"
 
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/utils"
 )
