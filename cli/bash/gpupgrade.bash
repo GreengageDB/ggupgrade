@@ -1,6 +1,6 @@
 # bash completion for ggupgrade                            -*- shell-script -*-
 
-__gpupgrade_debug()
+__ggupgrade_debug()
 {
     if [[ -n ${BASH_COMP_DEBUG_FILE:-} ]]; then
         echo "$*" >> "${BASH_COMP_DEBUG_FILE}"
@@ -9,13 +9,13 @@ __gpupgrade_debug()
 
 # Homebrew on Macs have version 1.3 of bash-completion which doesn't include
 # _init_completion. This is a very minimal version of that function.
-__gpupgrade_init_completion()
+__ggupgrade_init_completion()
 {
     COMPREPLY=()
     _get_comp_words_by_ref "$@" cur prev words cword
 }
 
-__gpupgrade_index_of_word()
+__ggupgrade_index_of_word()
 {
     local w word=$1
     shift
@@ -27,7 +27,7 @@ __gpupgrade_index_of_word()
     index=-1
 }
 
-__gpupgrade_contains_word()
+__ggupgrade_contains_word()
 {
     local w word=$1; shift
     for w in "$@"; do
@@ -36,9 +36,9 @@ __gpupgrade_contains_word()
     return 1
 }
 
-__gpupgrade_handle_go_custom_completion()
+__ggupgrade_handle_go_custom_completion()
 {
-    __gpupgrade_debug "${FUNCNAME[0]}: cur is ${cur}, words[*] is ${words[*]}, #words[@] is ${#words[@]}"
+    __ggupgrade_debug "${FUNCNAME[0]}: cur is ${cur}, words[*] is ${words[*]}, #words[@] is ${#words[@]}"
 
     local shellCompDirectiveError=1
     local shellCompDirectiveNoSpace=2
@@ -56,16 +56,16 @@ __gpupgrade_handle_go_custom_completion()
 
     lastParam=${words[$((${#words[@]}-1))]}
     lastChar=${lastParam:$((${#lastParam}-1)):1}
-    __gpupgrade_debug "${FUNCNAME[0]}: lastParam ${lastParam}, lastChar ${lastChar}"
+    __ggupgrade_debug "${FUNCNAME[0]}: lastParam ${lastParam}, lastChar ${lastChar}"
 
     if [ -z "${cur}" ] && [ "${lastChar}" != "=" ]; then
         # If the last parameter is complete (there is a space following it)
         # We add an extra empty parameter so we can indicate this to the go method.
-        __gpupgrade_debug "${FUNCNAME[0]}: Adding extra empty parameter"
+        __ggupgrade_debug "${FUNCNAME[0]}: Adding extra empty parameter"
         requestComp="${requestComp} \"\""
     fi
 
-    __gpupgrade_debug "${FUNCNAME[0]}: calling ${requestComp}"
+    __ggupgrade_debug "${FUNCNAME[0]}: calling ${requestComp}"
     # Use eval to handle any environment variables and such
     out=$(eval "${requestComp}" 2>/dev/null)
 
@@ -77,23 +77,23 @@ __gpupgrade_handle_go_custom_completion()
         # There is not directive specified
         directive=0
     fi
-    __gpupgrade_debug "${FUNCNAME[0]}: the completion directive is: ${directive}"
-    __gpupgrade_debug "${FUNCNAME[0]}: the completions are: ${out}"
+    __ggupgrade_debug "${FUNCNAME[0]}: the completion directive is: ${directive}"
+    __ggupgrade_debug "${FUNCNAME[0]}: the completions are: ${out}"
 
     if [ $((directive & shellCompDirectiveError)) -ne 0 ]; then
         # Error code.  No completion.
-        __gpupgrade_debug "${FUNCNAME[0]}: received error from custom completion go code"
+        __ggupgrade_debug "${FUNCNAME[0]}: received error from custom completion go code"
         return
     else
         if [ $((directive & shellCompDirectiveNoSpace)) -ne 0 ]; then
             if [[ $(type -t compopt) = "builtin" ]]; then
-                __gpupgrade_debug "${FUNCNAME[0]}: activating no space"
+                __ggupgrade_debug "${FUNCNAME[0]}: activating no space"
                 compopt -o nospace
             fi
         fi
         if [ $((directive & shellCompDirectiveNoFileComp)) -ne 0 ]; then
             if [[ $(type -t compopt) = "builtin" ]]; then
-                __gpupgrade_debug "${FUNCNAME[0]}: activating no file completion"
+                __ggupgrade_debug "${FUNCNAME[0]}: activating no file completion"
                 compopt +o default
             fi
         fi
@@ -109,7 +109,7 @@ __gpupgrade_handle_go_custom_completion()
         done
 
         filteringCmd="_filedir $fullFilter"
-        __gpupgrade_debug "File filtering command: $filteringCmd"
+        __ggupgrade_debug "File filtering command: $filteringCmd"
         $filteringCmd
     elif [ $((directive & shellCompDirectiveFilterDirs)) -ne 0 ]; then
         # File completion for directories only
@@ -117,10 +117,10 @@ __gpupgrade_handle_go_custom_completion()
         # Use printf to strip any trailing newline
         subdir=$(printf "%s" "${out}")
         if [ -n "$subdir" ]; then
-            __gpupgrade_debug "Listing directories in $subdir"
-            __gpupgrade_handle_subdirs_in_dir_flag "$subdir"
+            __ggupgrade_debug "Listing directories in $subdir"
+            __ggupgrade_handle_subdirs_in_dir_flag "$subdir"
         else
-            __gpupgrade_debug "Listing directories in ."
+            __ggupgrade_debug "Listing directories in ."
             _filedir -d
         fi
     else
@@ -130,9 +130,9 @@ __gpupgrade_handle_go_custom_completion()
     fi
 }
 
-__gpupgrade_handle_reply()
+__ggupgrade_handle_reply()
 {
-    __gpupgrade_debug "${FUNCNAME[0]}"
+    __ggupgrade_debug "${FUNCNAME[0]}"
     local comp
     case $cur in
         -*)
@@ -160,7 +160,7 @@ __gpupgrade_handle_reply()
 
                 local index flag
                 flag="${cur%=*}"
-                __gpupgrade_index_of_word "${flag}" "${flags_with_completion[@]}"
+                __ggupgrade_index_of_word "${flag}" "${flags_with_completion[@]}"
                 COMPREPLY=()
                 if [[ ${index} -ge 0 ]]; then
                     PREFIX=""
@@ -184,7 +184,7 @@ __gpupgrade_handle_reply()
 
     # check if we are handling a flag with special work handling
     local index
-    __gpupgrade_index_of_word "${prev}" "${flags_with_completion[@]}"
+    __ggupgrade_index_of_word "${prev}" "${flags_with_completion[@]}"
     if [[ ${index} -ge 0 ]]; then
         ${flags_completion[${index}]}
         return
@@ -201,7 +201,7 @@ __gpupgrade_handle_reply()
         completions+=("${must_have_one_noun[@]}")
     elif [[ -n "${has_completion_function}" ]]; then
         # if a go completion function is provided, defer to that function
-        __gpupgrade_handle_go_custom_completion
+        __ggupgrade_handle_go_custom_completion
     fi
     if [[ ${#must_have_one_flag[@]} -ne 0 ]]; then
         completions+=("${must_have_one_flag[@]}")
@@ -217,9 +217,9 @@ __gpupgrade_handle_reply()
     fi
 
     if [[ ${#COMPREPLY[@]} -eq 0 ]]; then
-        if declare -F __gpupgrade_custom_func >/dev/null; then
+        if declare -F __ggupgrade_custom_func >/dev/null; then
             # try command name qualified custom func
-            __gpupgrade_custom_func
+            __ggupgrade_custom_func
         else
             # otherwise fall back to unqualified for compatibility
             declare -F __custom_func >/dev/null && __custom_func
@@ -239,21 +239,21 @@ __gpupgrade_handle_reply()
 }
 
 # The arguments should be in the form "ext1|ext2|extn"
-__gpupgrade_handle_filename_extension_flag()
+__ggupgrade_handle_filename_extension_flag()
 {
     local ext="$1"
     _filedir "@(${ext})"
 }
 
-__gpupgrade_handle_subdirs_in_dir_flag()
+__ggupgrade_handle_subdirs_in_dir_flag()
 {
     local dir="$1"
     pushd "${dir}" >/dev/null 2>&1 && _filedir -d && popd >/dev/null 2>&1 || return
 }
 
-__gpupgrade_handle_flag()
+__ggupgrade_handle_flag()
 {
-    __gpupgrade_debug "${FUNCNAME[0]}: c is $c words[c] is ${words[c]}"
+    __ggupgrade_debug "${FUNCNAME[0]}: c is $c words[c] is ${words[c]}"
 
     # if a command required a flag, and we found it, unset must_have_one_flag()
     local flagname=${words[c]}
@@ -264,13 +264,13 @@ __gpupgrade_handle_flag()
         flagname=${flagname%=*} # strip everything after the =
         flagname="${flagname}=" # but put the = back
     fi
-    __gpupgrade_debug "${FUNCNAME[0]}: looking for ${flagname}"
-    if __gpupgrade_contains_word "${flagname}" "${must_have_one_flag[@]}"; then
+    __ggupgrade_debug "${FUNCNAME[0]}: looking for ${flagname}"
+    if __ggupgrade_contains_word "${flagname}" "${must_have_one_flag[@]}"; then
         must_have_one_flag=()
     fi
 
     # if you set a flag which only applies to this command, don't show subcommands
-    if __gpupgrade_contains_word "${flagname}" "${local_nonpersistent_flags[@]}"; then
+    if __ggupgrade_contains_word "${flagname}" "${local_nonpersistent_flags[@]}"; then
       commands=()
     fi
 
@@ -287,8 +287,8 @@ __gpupgrade_handle_flag()
     fi
 
     # skip the argument to a two word flag
-    if [[ ${words[c]} != *"="* ]] && __gpupgrade_contains_word "${words[c]}" "${two_word_flags[@]}"; then
-        __gpupgrade_debug "${FUNCNAME[0]}: found a flag ${words[c]}, skip the next argument"
+    if [[ ${words[c]} != *"="* ]] && __ggupgrade_contains_word "${words[c]}" "${two_word_flags[@]}"; then
+        __ggupgrade_debug "${FUNCNAME[0]}: found a flag ${words[c]}, skip the next argument"
         c=$((c+1))
         # if we are looking for a flags value, don't show commands
         if [[ $c -eq $cword ]]; then
@@ -300,13 +300,13 @@ __gpupgrade_handle_flag()
 
 }
 
-__gpupgrade_handle_noun()
+__ggupgrade_handle_noun()
 {
-    __gpupgrade_debug "${FUNCNAME[0]}: c is $c words[c] is ${words[c]}"
+    __ggupgrade_debug "${FUNCNAME[0]}: c is $c words[c] is ${words[c]}"
 
-    if __gpupgrade_contains_word "${words[c]}" "${must_have_one_noun[@]}"; then
+    if __ggupgrade_contains_word "${words[c]}" "${must_have_one_noun[@]}"; then
         must_have_one_noun=()
-    elif __gpupgrade_contains_word "${words[c]}" "${noun_aliases[@]}"; then
+    elif __ggupgrade_contains_word "${words[c]}" "${noun_aliases[@]}"; then
         must_have_one_noun=()
     fi
 
@@ -314,53 +314,53 @@ __gpupgrade_handle_noun()
     c=$((c+1))
 }
 
-__gpupgrade_handle_command()
+__ggupgrade_handle_command()
 {
-    __gpupgrade_debug "${FUNCNAME[0]}: c is $c words[c] is ${words[c]}"
+    __ggupgrade_debug "${FUNCNAME[0]}: c is $c words[c] is ${words[c]}"
 
     local next_command
     if [[ -n ${last_command} ]]; then
         next_command="_${last_command}_${words[c]//:/__}"
     else
         if [[ $c -eq 0 ]]; then
-            next_command="_gpupgrade_root_command"
+            next_command="_ggupgrade_root_command"
         else
             next_command="_${words[c]//:/__}"
         fi
     fi
     c=$((c+1))
-    __gpupgrade_debug "${FUNCNAME[0]}: looking for ${next_command}"
+    __ggupgrade_debug "${FUNCNAME[0]}: looking for ${next_command}"
     declare -F "$next_command" >/dev/null && $next_command
 }
 
-__gpupgrade_handle_word()
+__ggupgrade_handle_word()
 {
     if [[ $c -ge $cword ]]; then
-        __gpupgrade_handle_reply
+        __ggupgrade_handle_reply
         return
     fi
-    __gpupgrade_debug "${FUNCNAME[0]}: c is $c words[c] is ${words[c]}"
+    __ggupgrade_debug "${FUNCNAME[0]}: c is $c words[c] is ${words[c]}"
     if [[ "${words[c]}" == -* ]]; then
-        __gpupgrade_handle_flag
-    elif __gpupgrade_contains_word "${words[c]}" "${commands[@]}"; then
-        __gpupgrade_handle_command
+        __ggupgrade_handle_flag
+    elif __ggupgrade_contains_word "${words[c]}" "${commands[@]}"; then
+        __ggupgrade_handle_command
     elif [[ $c -eq 0 ]]; then
-        __gpupgrade_handle_command
-    elif __gpupgrade_contains_word "${words[c]}" "${command_aliases[@]}"; then
+        __ggupgrade_handle_command
+    elif __ggupgrade_contains_word "${words[c]}" "${command_aliases[@]}"; then
         # aliashash variable is an associative array which is only supported in bash > 3.
         if [[ -z "${BASH_VERSION:-}" || "${BASH_VERSINFO[0]:-}" -gt 3 ]]; then
             words[c]=${aliashash[${words[c]}]}
-            __gpupgrade_handle_command
+            __ggupgrade_handle_command
         else
-            __gpupgrade_handle_noun
+            __ggupgrade_handle_noun
         fi
     else
-        __gpupgrade_handle_noun
+        __ggupgrade_handle_noun
     fi
-    __gpupgrade_handle_word
+    __ggupgrade_handle_word
 }
 
-_gpupgrade_apply_help()
+_ggupgrade_apply_help()
 {
     last_command="gpupgrade_apply_help"
 
@@ -380,7 +380,7 @@ _gpupgrade_apply_help()
     noun_aliases=()
 }
 
-_gpupgrade_apply()
+_ggupgrade_apply()
 {
     last_command="gpupgrade_apply"
 
@@ -421,7 +421,7 @@ _gpupgrade_apply()
     noun_aliases=()
 }
 
-_gpupgrade_config_show_help()
+_ggupgrade_config_show_help()
 {
     last_command="gpupgrade_config_show_help"
 
@@ -441,7 +441,7 @@ _gpupgrade_config_show_help()
     noun_aliases=()
 }
 
-_gpupgrade_config_show()
+_ggupgrade_config_show()
 {
     last_command="gpupgrade_config_show"
 
@@ -476,9 +476,9 @@ _gpupgrade_config_show()
     noun_aliases=()
 }
 
-_gpupgrade_config()
+_ggupgrade_config()
 {
-    last_command="gpupgrade_config"
+    last_command="ggupgrade_config"
 
     command_aliases=()
 
@@ -497,7 +497,7 @@ _gpupgrade_config()
     noun_aliases=()
 }
 
-_gpupgrade_execute_help()
+_ggupgrade_execute_help()
 {
     last_command="gpupgrade_execute_help"
 
@@ -517,7 +517,7 @@ _gpupgrade_execute_help()
     noun_aliases=()
 }
 
-_gpupgrade_execute()
+_ggupgrade_execute()
 {
     last_command="gpupgrade_execute"
 
@@ -552,7 +552,7 @@ _gpupgrade_execute()
     noun_aliases=()
 }
 
-_gpupgrade_finalize_help()
+_ggupgrade_finalize_help()
 {
     last_command="gpupgrade_finalize_help"
 
@@ -572,7 +572,7 @@ _gpupgrade_finalize_help()
     noun_aliases=()
 }
 
-_gpupgrade_finalize()
+_ggupgrade_finalize()
 {
     last_command="gpupgrade_finalize"
 
@@ -601,7 +601,7 @@ _gpupgrade_finalize()
     noun_aliases=()
 }
 
-_gpupgrade_generate_help()
+_ggupgrade_generate_help()
 {
     last_command="gpupgrade_generate_help"
 
@@ -621,7 +621,7 @@ _gpupgrade_generate_help()
     noun_aliases=()
 }
 
-_gpupgrade_generate()
+_ggupgrade_generate()
 {
     last_command="gpupgrade_generate"
 
@@ -658,7 +658,7 @@ _gpupgrade_generate()
     noun_aliases=()
 }
 
-_gpupgrade_help()
+_ggupgrade_help()
 {
     last_command="gpupgrade_help"
 
@@ -678,7 +678,7 @@ _gpupgrade_help()
     noun_aliases=()
 }
 
-_gpupgrade_initialize_help()
+_ggupgrade_initialize_help()
 {
     last_command="gpupgrade_initialize_help"
 
@@ -698,7 +698,7 @@ _gpupgrade_initialize_help()
     noun_aliases=()
 }
 
-_gpupgrade_initialize()
+_ggupgrade_initialize()
 {
     last_command="gpupgrade_initialize"
 
@@ -781,7 +781,7 @@ _gpupgrade_initialize()
     noun_aliases=()
 }
 
-_gpupgrade_kill-services()
+_ggupgrade_kill-services()
 {
     last_command="gpupgrade_kill-services"
 
@@ -801,7 +801,7 @@ _gpupgrade_kill-services()
     noun_aliases=()
 }
 
-_gpupgrade_restart-services()
+_ggupgrade_restart-services()
 {
     last_command="gpupgrade_restart-services"
 
@@ -821,7 +821,7 @@ _gpupgrade_restart-services()
     noun_aliases=()
 }
 
-_gpupgrade_revert_help()
+_ggupgrade_revert_help()
 {
     last_command="gpupgrade_revert_help"
 
@@ -841,7 +841,7 @@ _gpupgrade_revert_help()
     noun_aliases=()
 }
 
-_gpupgrade_revert()
+_ggupgrade_revert()
 {
     last_command="gpupgrade_revert"
 
@@ -870,9 +870,9 @@ _gpupgrade_revert()
     noun_aliases=()
 }
 
-_gpupgrade_version()
+_ggupgrade_version()
 {
-    last_command="gpupgrade_version"
+    last_command="ggupgrade_version"
 
     command_aliases=()
 
@@ -894,7 +894,7 @@ _gpupgrade_version()
     noun_aliases=()
 }
 
-_gpupgrade_root_command()
+_ggupgrade_root_command()
 {
     last_command="ggupgrade"
 
@@ -945,7 +945,7 @@ __start_gpupgrade()
     if declare -F _init_completion >/dev/null 2>&1; then
         _init_completion -s || return
     else
-        __gpupgrade_init_completion -n "=" || return
+        __ggupgrade_init_completion -n "=" || return
     fi
 
     local c=0
@@ -964,7 +964,7 @@ __start_gpupgrade()
     local nouns=()
     local noun_aliases=()
 
-    __gpupgrade_handle_word
+    __ggupgrade_handle_word
 }
 
 if [[ $(type -t compopt) = "builtin" ]]; then

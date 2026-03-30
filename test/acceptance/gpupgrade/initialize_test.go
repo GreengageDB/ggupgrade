@@ -17,6 +17,7 @@ import (
 
 	"github.com/GreengageDB/ggupgrade/cli/commanders"
 	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/step"
 	"github.com/GreengageDB/ggupgrade/substeps"
@@ -30,7 +31,7 @@ func TestInitialize(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	t.Run("initialize accepts a port range", func(t *testing.T) {

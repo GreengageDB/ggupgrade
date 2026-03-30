@@ -90,11 +90,11 @@ func (s *Server) Stop() {
 
 func createStateDirectory(dir string) error {
 	// When the agent is started it is passed the state directory. Ensure it also
-	// sets GPUPGRADE_HOME in its environment such that utils functions work.
-	// This is critical for our acceptance tests which often set GPUPGRADE_HOME.
-	err := os.Setenv("GPUPGRADE_HOME", dir)
+	// sets GGUPGRADE_HOME in its environment such that utils functions work.
+	// This is critical for our acceptance tests which often set GGUPGRADE_HOME.
+	err := os.Setenv("GGUPGRADE_HOME", dir)
 	if err != nil {
-		return xerrors.Errorf("set GPUPGRADE_HOME=%s: %w", dir, err)
+		return xerrors.Errorf("set GGUPGRADE_HOME=%s: %w", dir, err)
 	}
 
 	if err := os.MkdirAll(dir, 0777); err != nil {

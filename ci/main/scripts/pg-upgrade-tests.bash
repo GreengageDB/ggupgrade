@@ -8,8 +8,8 @@ set -eux -o pipefail
 # in its own isolated container with no shared state. Thus, installing the RPM,
 # and making isolation2 needs to be done in the same task/container.
 
-source gpupgrade_src/ci/main/scripts/environment.bash
-source gpupgrade_src/ci/main/scripts/ci-helpers.bash
+source ggupgrade_src/ci/main/scripts/environment.bash
+source ggupgrade_src/ci/main/scripts/ci-helpers.bash
 
 make_pg_isolation2_regress_for_the_target_GPDB_version() {
     # setup_configure_vars and configure expect GPHOME=/usr/local/greengage-db-devel
@@ -30,7 +30,7 @@ make_pg_isolation2_regress_for_the_target_GPDB_version() {
 }
 
 run_pg_upgrade_tests() {
-    chown -R gpadmin:gpadmin gpupgrade_src
+    chown -R gpadmin:gpadmin ggupgrade_src
     time su gpadmin -c '
         set -eux -o pipefail
 
@@ -39,7 +39,7 @@ run_pg_upgrade_tests() {
         export GOFLAGS="-mod=readonly" # do not update dependencies during build
         export ISOLATION2_PATH=$(readlink -e gpdb_src/src/test/isolation2)
 
-        cd gpupgrade_src
+        cd ggupgrade_src
         make pg-upgrade-tests
     '
 }

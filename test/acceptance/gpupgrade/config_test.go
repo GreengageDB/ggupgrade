@@ -17,7 +17,7 @@ func TestConfig(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	acceptance.Initialize_stopBeforeClusterCreation(t)

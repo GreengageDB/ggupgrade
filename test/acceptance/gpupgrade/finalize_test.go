@@ -30,7 +30,7 @@ func TestFinalize(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	t.Run("in copy mode ggupgrade finalize should swap the target data directories and ports with the source cluster", func(t *testing.T) {

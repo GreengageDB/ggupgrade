@@ -100,7 +100,7 @@ tarball:
 	# gather files
 	cp ggupgrade tarball
 	cp cli/bash/ggupgrade.bash tarball
-	cp gpupgrade_config tarball
+	cp ggupgrade_config tarball
 	cp open_source_licenses.txt tarball
 	cp -r data-migration-scripts/ tarball/data-migration-scripts/
 	# remove test files
@@ -128,8 +128,8 @@ rpm:
 	cp ggupgrade.spec rpm/rpmbuild/SPECS/
 	rpmbuild \
 	--define "_topdir $${PWD}/rpm/rpmbuild" \
-	--define "gpupgrade_version $(VERSION)" \
-	--define "gpupgrade_rpm_release 1" \
+	--define "ggupgrade_version $(VERSION)" \
+	--define "ggupgrade_rpm_release 1" \
 	--define "release_type $(RELEASE)" \
 	--define "license $(LICENSE)" \
 	--define "summary $(NAME)" \
@@ -211,9 +211,9 @@ pipeline:
 	mkdir -p ci/main/generated
 	cat ci/main/pipeline/1_resources_anchors_groups.yml \
 		ci/main/pipeline/2_build_lint.yml \
-		ci/main/pipeline/3_gpupgrade_jobs.yml  \
+		ci/main/pipeline/3_ggupgrade_jobs.yml  \
 		ci/main/pipeline/4_pg_upgrade_jobs.yml  \
-		ci/main/pipeline/5_multi_host_gpupgrade_jobs.yml \
+		ci/main/pipeline/5_multi_host_ggupgrade_jobs.yml \
 		ci/main/pipeline/6_upgrade_and_functional_jobs.yml \
 		ci/main/pipeline/7_publish_rc.yml > ci/main/generated/template.yml
 	PIPELINE_VERSION="6" go generate ./ci/main
@@ -228,9 +228,9 @@ pipeline7:
 	mkdir -p ci/main/generated
 	cat ci/main/pipeline/1_resources_anchors_groups.yml \
 		ci/main/pipeline/2_build_lint.yml \
-		ci/main/pipeline/3_gpupgrade_jobs.yml  \
+		ci/main/pipeline/3_ggupgrade_jobs.yml  \
 		ci/main/pipeline/4_pg_upgrade_jobs.yml  \
-		ci/main/pipeline/5_multi_host_gpupgrade_jobs.yml \
+		ci/main/pipeline/5_multi_host_ggupgrade_jobs.yml \
 		ci/main/pipeline/6_upgrade_and_functional_jobs.yml \
 		ci/main/pipeline/7_publish_rc.yml > ci/main/generated/template.yml
 	PIPELINE_VERSION="7" go generate ./ci/main

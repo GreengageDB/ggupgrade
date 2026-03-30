@@ -33,7 +33,7 @@ func TestSubstep(t *testing.T) {
 			}
 		}()
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 		defer resetEnv()
 
 		d := BufferStandardDescriptors(t)
@@ -434,7 +434,7 @@ func TestSubstep(t *testing.T) {
 	})
 
 	t.Run("fails to create a new step when the state directory does not exist", func(t *testing.T) {
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", "/does/not/exist")
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", "/does/not/exist")
 		defer resetEnv()
 
 		_, err := clistep.Begin(idl.Step_initialize, false, true, "")
@@ -545,7 +545,7 @@ func TestStepStatus(t *testing.T) {
 		}
 	}()
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	stepStore, err := clistep.NewStepFileStore()

@@ -13,12 +13,12 @@ import (
 )
 
 func Test_PgUpgrade_NonUpgradeable_Tests(t *testing.T) {
-	// Since finalize archives the stateDir (GPUPGRADE_HOME) backups and
+	// Since finalize archives the stateDir (GGUPGRADE_HOME) backups and
 	// migration scripts cannot be stored here.
 	stateDir := testutils.GetTempDir(t, "stateDir")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	source := acceptance.GetSourceCluster(t)

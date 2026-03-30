@@ -5,7 +5,7 @@
           - get: dummy_resource
             passed: [ data-migration-scripts ]
             trigger: true
-          - get: gpupgrade_src
+          - get: ggupgrade_src
           - get: saved_cluster_env_files
       - task: run_initialize
         config:
@@ -16,7 +16,7 @@
               repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
             - name: saved_cluster_env_files
           run:
             path: bash
@@ -25,8 +25,8 @@
               - |
                 set -eux -o pipefail
 
-                source gpupgrade_src/ci/main/scripts/environment.bash
-                source gpupgrade_src/ci/main/scripts/ci-helpers.bash
+                source ggupgrade_src/ci/main/scripts/environment.bash
+                source ggupgrade_src/ci/main/scripts/ci-helpers.bash
 
                 MODE=${MODE:-"copy"}
 
@@ -68,7 +68,7 @@
           - get: dummy_resource
             passed: [ initialize ]
             trigger: true
-          - get: gpupgrade_src
+          - get: ggupgrade_src
           - get: saved_cluster_env_files
       - task: upgrade_cluster
         config:
@@ -79,7 +79,7 @@
               repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
             - name: saved_cluster_env_files
           run:
             path: bash
@@ -88,8 +88,8 @@
               - |
                 set -eux -o pipefail
 
-                source gpupgrade_src/ci/main/scripts/environment.bash
-                source gpupgrade_src/ci/main/scripts/ci-helpers.bash
+                source ggupgrade_src/ci/main/scripts/environment.bash
+                source ggupgrade_src/ci/main/scripts/ci-helpers.bash
 
                 MODE=${MODE:-"copy"}
 
@@ -118,7 +118,7 @@
           - get: dummy_resource
             passed: [ upgrade ]
             trigger: true
-          - get: gpupgrade_src
+          - get: ggupgrade_src
           - get: saved_cluster_env_files
       - task: run_gpcheckcat
         config:
@@ -129,7 +129,7 @@
               repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
             - name: saved_cluster_env_files
           run:
             path: bash
@@ -138,7 +138,7 @@
               - |
                 set -eux -o pipefail
 
-                source gpupgrade_src/ci/main/scripts/environment.bash
+                source ggupgrade_src/ci/main/scripts/environment.bash
 
                 echo "Running gpcheckcat..."
                 time ssh -n cdw "
@@ -161,7 +161,7 @@
               repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
             - name: saved_cluster_env_files
           run:
             path: bash
@@ -170,10 +170,10 @@
               - |
                 set -eux -o pipefail
 
-                source gpupgrade_src/ci/main/scripts/environment.bash
+                source ggupgrade_src/ci/main/scripts/environment.bash
 
                 echo 'Doing failover tests of mirrors and standby...'
-                source gpupgrade_src/testutils/validate_mirrors_and_standby/validate_mirrors_and_standby.bash
+                source ggupgrade_src/testutils/validate_mirrors_and_standby/validate_mirrors_and_standby.bash
                 validate_mirrors_and_standby /usr/local/greengage-db-target cdw 5432
       {{- end -}}
       {{- end }}

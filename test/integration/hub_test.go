@@ -56,7 +56,7 @@ func TestHub(t *testing.T) {
 			dir := testutils.GetTempDir(t, "")
 			defer testutils.MustRemoveAll(t, dir)
 
-			resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", filepath.Join(dir, ".ggupgrade"))
+			resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", filepath.Join(dir, ".ggupgrade"))
 			defer resetEnv()
 
 			err := commanders.CreateStateDir()
@@ -102,7 +102,7 @@ func TestHub(t *testing.T) {
 		dir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, dir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", filepath.Join(dir, ".ggupgrade"))
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", filepath.Join(dir, ".ggupgrade"))
 		defer resetEnv()
 
 		err := commanders.CreateStateDir()

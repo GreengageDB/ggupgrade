@@ -28,7 +28,7 @@ func TestExecute(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	t.Run("ggupgrade execute should remember that link mode was specified in initialize", func(t *testing.T) {

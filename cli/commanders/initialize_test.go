@@ -33,11 +33,11 @@ func IsHubRunning_Error() {
 	os.Exit(2)
 }
 
-func GpupgradeHub_good_Main() {
+func GgupgradeHub_good_Main() {
 	fmt.Print("Hi, Hub started.")
 }
 
-func GpupgradeHub_bad_Main() {
+func GgupgradeHub_bad_Main() {
 	fmt.Fprint(os.Stderr, "Sorry, Hub could not be started.")
 	os.Exit(1)
 }
@@ -47,8 +47,8 @@ func init() {
 		IsHubRunning_True,
 		IsHubRunning_False,
 		IsHubRunning_Error,
-		GpupgradeHub_good_Main,
-		GpupgradeHub_bad_Main,
+		GgupgradeHub_good_Main,
+		GgupgradeHub_bad_Main,
 	)
 }
 
@@ -113,7 +113,7 @@ func TestStartHub_Succeeds(t *testing.T) {
 	defer teardown()
 
 	execCommandHubCount = exectest.NewCommand(IsHubRunning_False)
-	execCommandHubStart = exectest.NewCommand(GpupgradeHub_good_Main)
+	execCommandHubStart = exectest.NewCommand(GgupgradeHub_good_Main)
 	err := StartHub(step.DevNullStream)
 	if err != nil {
 		t.Errorf("unexpected error %#v", err)
@@ -125,7 +125,7 @@ func TestStartHub_FailsToStartWhenHubIsRunningErrors(t *testing.T) {
 	defer teardown()
 
 	execCommandHubCount = exectest.NewCommand(IsHubRunning_Error)
-	execCommandHubStart = exectest.NewCommand(GpupgradeHub_good_Main) // should not hit this, but fail it we do
+	execCommandHubStart = exectest.NewCommand(GgupgradeHub_good_Main) // should not hit this, but fail it we do
 	err := StartHub(step.DevNullStream)
 	var expected *exec.ExitError
 	if !errors.As(err, &expected) {
@@ -138,7 +138,7 @@ func TestStartHub_IsSkippedWhenHubIsRunning(t *testing.T) {
 	defer teardown()
 
 	execCommandHubCount = exectest.NewCommand(IsHubRunning_True)
-	execCommandHubStart = exectest.NewCommand(GpupgradeHub_bad_Main) // should not hit this, but fail if we do
+	execCommandHubStart = exectest.NewCommand(GgupgradeHub_bad_Main) // should not hit this, but fail if we do
 	err := StartHub(step.DevNullStream)
 
 	if !errors.Is(err, step.Skip) {
@@ -151,7 +151,7 @@ func TestStartHub_FailsWhenStartingTheHubErrors(t *testing.T) {
 	defer teardown()
 
 	execCommandHubCount = exectest.NewCommand(IsHubRunning_False)
-	execCommandHubStart = exectest.NewCommand(GpupgradeHub_bad_Main)
+	execCommandHubStart = exectest.NewCommand(GgupgradeHub_bad_Main)
 	err := StartHub(step.DevNullStream)
 	if err == nil {
 		t.Errorf("expected error %#v got nil", err)
@@ -167,14 +167,14 @@ func TestCreateStateDir(t *testing.T) {
 	oldStateDir, isSet := os.LookupEnv("GPUGRADE_HOME")
 	defer func() {
 		if isSet {
-			os.Setenv("GPUPGRADE_HOME", oldStateDir)
+			os.Setenv("GGUPGRADE_HOME", oldStateDir)
 		}
 	}()
 
 	stateDir := filepath.Join(home, ".ggupgrade")
-	err = os.Setenv("GPUPGRADE_HOME", stateDir)
+	err = os.Setenv("GGUPGRADE_HOME", stateDir)
 	if err != nil {
-		t.Fatalf("failed to set GPUPGRADE_HOME %#v", err)
+		t.Fatalf("failed to set GGUPGRADE_HOME %#v", err)
 	}
 
 	t.Run("test idempotence", func(t *testing.T) {

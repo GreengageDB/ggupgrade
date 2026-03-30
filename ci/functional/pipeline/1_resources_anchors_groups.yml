@@ -21,7 +21,7 @@ resource_types:
       tag: 0.11.14
 
 resources:
-  - name: gpupgrade_src
+  - name: ggupgrade_src
     type: git
     source:
       uri: ((ggupgrade-git-remote))
@@ -83,7 +83,7 @@ resources:
       bucket: ggupgrade-intermediates
       versioned_file: functional-testing/cluster_env_files_{{ .BranchName }}.tar.gz
 
-  # Since we don't place a passed constraint on `gpupgrade_src` or
+  # Since we don't place a passed constraint on `ggupgrade_src` or
   # `saved_cluster_env_files` use a `dummy_resource` to automatically trigger
   # subsequent jobs in the pipeline.
   # Make the dummy_resource resource unique with git branch name to avoid
@@ -95,7 +95,7 @@ resources:
       bucket: ggupgrade-intermediates
       versioned_file: functional-testing/dummy_resource_{{ .BranchName }}.txt
 
-  - name: gpupgrade_rpm
+  - name: ggupgrade_rpm
     type: gcs
     source:
       bucket: ggupgrade-artifacts-prod

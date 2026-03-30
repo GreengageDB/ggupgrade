@@ -1,7 +1,7 @@
 - name: publish-release-candidate
   plan:
     - in_parallel:
-        - get: gpupgrade_src
+        - get: ggupgrade_src
           trigger: true
           passed:
             - build
@@ -42,14 +42,14 @@
             repository: golang
             tag: 1.16
         inputs:
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: oss_rpm
           - name: enterprise_rpm
         outputs:
           - name: renamed_oss_rpm
           - name: renamed_enterprise_rpm
         run:
-          path: gpupgrade_src/ci/main/scripts/add-semver.bash
+          path: ggupgrade_src/ci/main/scripts/add-semver.bash
     - in_parallel:
         - put: oss_rc_rpm
           params:

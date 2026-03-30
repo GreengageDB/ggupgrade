@@ -48,7 +48,7 @@ func ResetRemoteVersionCommand() {
 }
 
 func version(host string) (string, error) {
-	gpupgradePath, err := utils.GetGpupgradePath()
+	gpupgradePath, err := utils.GetGgupgradePath()
 	if err != nil {
 		return "", xerrors.Errorf("getting ggupgrade binary path: %w", err)
 	}
@@ -73,7 +73,7 @@ func version(host string) (string, error) {
 	return string(output), nil
 }
 
-func EnsureGpupgradeVersionsMatch(agentHosts []string) error {
+func EnsureGgupgradeVersionsMatch(agentHosts []string) error {
 	type HostVersion struct {
 		host    string
 		version string

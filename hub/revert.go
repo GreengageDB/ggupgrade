@@ -44,7 +44,7 @@ Cannot revert and restore the source cluster. Please contact support.`)
 		return err
 	}
 
-	st.RunConditionally(idl.Substep_ensure_gpupgrade_agents_are_running, configCreated && agentsStarted, func(_ step.OutStreams) error {
+	st.RunConditionally(idl.Substep_ensure_ggupgrade_agents_are_running, configCreated && agentsStarted, func(_ step.OutStreams) error {
 		_, err := RestartAgents(context.Background(), nil, AgentHosts(s.Source), s.AgentPort, utils.GetStateDir())
 		if err != nil {
 			return err

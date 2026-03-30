@@ -62,7 +62,7 @@ compare_dumps() {
 
     echo "Comparing dumps at ${source_dump} and ${target_dump}..."
 
-    pushd gpupgrade_src
+    pushd ggupgrade_src
         # 5 to 6 requires some massaging of the diff due to expected changes.
         if (( $FILTER_DIFF )); then
             go build ./ci/main/scripts/filters/filter

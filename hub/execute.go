@@ -19,7 +19,7 @@ func (s *Server) Execute(req *idl.ExecuteRequest, stream idl.CliToHub_ExecuteSer
 		return err
 	}
 
-	st.AlwaysRun(idl.Substep_ensure_gpupgrade_agents_are_running, func(_ step.OutStreams) error {
+	st.AlwaysRun(idl.Substep_ensure_ggupgrade_agents_are_running, func(_ step.OutStreams) error {
 		_, err := RestartAgents(context.Background(), nil, AgentHosts(s.Source), s.AgentPort, utils.GetStateDir())
 		if err != nil {
 			return err

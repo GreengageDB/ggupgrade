@@ -5,7 +5,7 @@
         - get: enterprise_rpm
           trigger: true
           passed: [ build ]
-        - get: gpupgrade_src
+        - get: ggupgrade_src
           passed: [ build ]
         - get: rpm_gpdb_source
           resource: gpdb{{.Source}}_{{.Platform}}_rpm
@@ -49,18 +49,18 @@
             repository: registry.access.redhat.com/ubi8/ubi
             tag: latest
         inputs:
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: cluster_env_files
           - name: enterprise_rpm
           {{- if ne .Source .Target }}
           - name: rpm_gpdb_target
           {{- end }}
         run:
-          path: gpupgrade_src/ci/main/scripts/prepare-installation.bash
+          path: ggupgrade_src/ci/main/scripts/prepare-installation.bash
           args:
             - greengage-db-{{.Source}}
             - greengage-db-{{.Target}}
-    - task: multihost_gpupgrade_tests
+    - task: multihost_ggupgrade_tests
       config:
         platform: linux
         image_resource:
@@ -71,10 +71,10 @@
         inputs:
           - name: ccp_src
           - name: cluster_env_files
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: enterprise_rpm
         run:
-          path: gpupgrade_src/ci/main/scripts/acceptance-multihost-tests.bash
+          path: ggupgrade_src/ci/main/scripts/acceptance-multihost-tests.bash
       params:
   ensure:
     do:

@@ -13,6 +13,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/testutils"
 	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
@@ -23,7 +24,7 @@ func TestCheckDiskSpace(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	t.Run("initialize fails when passed invalid --disk-free-ratio values", func(t *testing.T) {

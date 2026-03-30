@@ -19,7 +19,7 @@ func TestArgs(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	t.Run("ggupgrade initialize fails when passed insufficient arguments", func(t *testing.T) {
@@ -76,7 +76,7 @@ func TestArgs(t *testing.T) {
 	})
 
 	t.Run("ggupgrade initialize --file with verbose uses the configured values", func(t *testing.T) {
-		configFile := filepath.Join(stateDir, "gpupgrade_config")
+		configFile := filepath.Join(stateDir, "ggupgrade_config")
 		contents := fmt.Sprintf(`source-gphome = %s
 target-gphome = %s
 source-master-port = %s

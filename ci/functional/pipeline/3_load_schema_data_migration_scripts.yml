@@ -5,7 +5,7 @@
           - get: dummy_resource
             passed: [ generate-cluster ]
             trigger: true
-          - get: gpupgrade_src
+          - get: ggupgrade_src
           - get: saved_cluster_env_files
           - get: schema_dump
       - task: load_schema
@@ -17,7 +17,7 @@
               repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
             - name: saved_cluster_env_files
             - name: schema_dump
           run:
@@ -27,7 +27,7 @@
               - |
                 set -eux -o pipefail
 
-                source gpupgrade_src/ci/main/scripts/environment.bash
+                source ggupgrade_src/ci/main/scripts/environment.bash
 
                 echo "Dropping unsupported objects and Adding necessary objects..."
                 ssh -n cdw "
@@ -64,7 +64,7 @@
           - get: dummy_resource
             passed: [ load-schema ]
             trigger: true
-          - get: gpupgrade_src
+          - get: ggupgrade_src
           - get: saved_cluster_env_files
       - task: generate_and_apply_data_migration_scripts
         config:
@@ -75,7 +75,7 @@
               repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
             - name: saved_cluster_env_files
           run:
             path: bash
@@ -84,7 +84,7 @@
               - |
                 set -eux -o pipefail
 
-                source gpupgrade_src/ci/main/scripts/environment.bash
+                source ggupgrade_src/ci/main/scripts/environment.bash
 
                 echo "Setting source cluster GUCs..."
                 time ssh -n cdw "

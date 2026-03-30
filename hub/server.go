@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/utils"
 	"github.com/GreengageDB/ggupgrade/utils/daemon"
@@ -208,7 +209,7 @@ func RestartAgents(ctx context.Context,
 			log.Printf("failed to dial agent on %s: %v", host, err)
 			log.Printf("starting agent on %s", host)
 
-			path, err := utils.GetGpupgradePath()
+			path, err := utils.GetGgupgradePath()
 			if err != nil {
 				errs <- err
 				return

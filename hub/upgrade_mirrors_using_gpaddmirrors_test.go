@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/testutils"
 )
 
@@ -17,7 +18,7 @@ func TestWriteAddMirrorsConfig(t *testing.T) {
 		stateDir := testutils.GetTempDir(t, "")
 		defer os.RemoveAll(stateDir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 		defer resetEnv()
 
 		intermediate := MustCreateCluster(t, greengage.SegConfigs{

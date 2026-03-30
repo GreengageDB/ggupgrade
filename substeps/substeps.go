@@ -71,9 +71,9 @@ var SubstepDescriptions = map[idl.Substep]substepText{
 	idl.Substep_execute_finalize_data_migration_scripts:                       substepText{"Executing finalize data migration SQL scripts...", "Executed finalize data migration SQL scripts"},
 	idl.Substep_execute_revert_data_migration_scripts:                         substepText{"Executing revert data migration SQL scripts...", "Executed revert data migration SQL scripts"},
 	idl.Substep_analyze_target_cluster:                                        substepText{"Analyzing target cluster...", "Analyze target cluster"},
-	idl.Substep_ensure_gpupgrade_agents_are_running:                           substepText{"Ensuring ggupgrade agent processes are running...", "Ensure ggupgrade agent processes are running"},
+	idl.Substep_ensure_ggupgrade_agents_are_running:                           substepText{"Ensuring ggupgrade agent processes are running...", "Ensure ggupgrade agent processes are running"},
 	idl.Substep_verify_gpdb_versions:                                          substepText{"Verifying source and target cluster versions...", "Verify source and target cluster versions"},
-	idl.Substep_verify_gpupgrade_is_installed_across_all_hosts:                substepText{"Verifying ggupgrade is installed across all hosts...", "Verify ggupgrade is installed across all hosts"},
+	idl.Substep_verify_ggupgrade_is_installed_across_all_hosts:                substepText{"Verifying ggupgrade is installed across all hosts...", "Verify ggupgrade is installed across all hosts"},
 	idl.Substep_initialize_wait_for_cluster_to_be_ready:                       substepText{"Waiting for cluster to be ready...", "Wait for cluster to be ready"},
 	idl.Substep_wait_for_cluster_to_be_ready_before_upgrade_master:            substepText{"Waiting for cluster to be ready...", "Wait for cluster to be ready"},
 }

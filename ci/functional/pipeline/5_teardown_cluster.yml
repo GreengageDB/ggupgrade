@@ -5,7 +5,7 @@
           - get: dummy_resource
             passed: [ validate ]
             trigger: true
-          - get: gpupgrade_src
+          - get: ggupgrade_src
           - get: saved_cluster_env_files
           - get: ccp_src
           - get: terraform.d
@@ -20,7 +20,7 @@
               repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
             - name: saved_cluster_env_files
           outputs:
             - name: terraform
@@ -31,7 +31,7 @@
               - |
                 set -eux -o pipefail
 
-                source gpupgrade_src/ci/main/scripts/environment.bash
+                source ggupgrade_src/ci/main/scripts/environment.bash
 
                 cp -R cluster_env_files/terraform/* terraform
     ensure:
@@ -46,7 +46,7 @@
   - name: manually-destroy-cluster
     plan:
       - in_parallel:
-          - get: gpupgrade_src
+          - get: ggupgrade_src
           - get: saved_cluster_env_files
           - get: ccp_src
           - get: terraform.d
@@ -61,7 +61,7 @@
               repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
             - name: saved_cluster_env_files
           outputs:
             - name: terraform
@@ -72,7 +72,7 @@
               - |
                 set -eux -o pipefail
 
-                source gpupgrade_src/ci/main/scripts/environment.bash
+                source ggupgrade_src/ci/main/scripts/environment.bash
 
                 cp -R cluster_env_files/terraform/* terraform
     ensure:

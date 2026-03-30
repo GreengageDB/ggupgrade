@@ -4,7 +4,7 @@
 
 set -eux -o pipefail
 
-cd gpupgrade_src
+cd ggupgrade_src
 export GOFLAGS="-mod=readonly" # do not update dependencies during build
 git fetch --tags
 

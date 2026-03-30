@@ -4,8 +4,8 @@
 
 set -eux -o pipefail
 
-source gpupgrade_src/ci/main/scripts/environment.bash
-source gpupgrade_src/ci/main/scripts/ci-helpers.bash
+source ggupgrade_src/ci/main/scripts/environment.bash
+source ggupgrade_src/ci/main/scripts/ci-helpers.bash
 ./ccp_src/scripts/setup_ssh_to_cluster.sh
 
 echo "Dropping views referencing deprecated objects..."

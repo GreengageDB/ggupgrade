@@ -46,7 +46,7 @@ func init() {
 	)
 }
 
-func TestGpupgradeVersion(t *testing.T) {
+func TestGgupgradeVersion(t *testing.T) {
 	testlog.SetupTestLogger()
 
 	t.Run("returns the version", func(t *testing.T) {
@@ -87,7 +87,7 @@ func TestGpupgradeVersion(t *testing.T) {
 	})
 }
 
-func TestGpupgradeVersionOnHost(t *testing.T) {
+func TestGgupgradeVersionOnHost(t *testing.T) {
 	testlog.SetupTestLogger()
 	host := "sdw1"
 
@@ -137,7 +137,7 @@ func TestEnsureVersionsMatch(t *testing.T) {
 		upgrade.SetLocalVersionCommand(exectest.NewCommand(gpupgrade_local_version))
 		defer upgrade.ResetLocalVersionCommand()
 
-		err := upgrade.EnsureGpupgradeVersionsMatch([]string{""})
+		err := upgrade.EnsureGgupgradeVersionsMatch([]string{""})
 		if err != nil {
 			t.Errorf("unexpected err %#v", err)
 		}
@@ -147,7 +147,7 @@ func TestEnsureVersionsMatch(t *testing.T) {
 		upgrade.SetLocalVersionCommand(exectest.NewCommand(gpupgrade_version_fails))
 		defer upgrade.ResetLocalVersionCommand()
 
-		err := upgrade.EnsureGpupgradeVersionsMatch([]string{""})
+		err := upgrade.EnsureGgupgradeVersionsMatch([]string{""})
 		expected := `failed with "oops": exit status 1`
 		if !strings.HasSuffix(err.Error(), expected) {
 			t.Errorf("got %v want %v", err, expected)
@@ -162,7 +162,7 @@ func TestEnsureVersionsMatch(t *testing.T) {
 		defer upgrade.ResetRemoteVersionCommand()
 
 		hosts := []string{"sdw1", "sdw2"}
-		err := upgrade.EnsureGpupgradeVersionsMatch(hosts)
+		err := upgrade.EnsureGgupgradeVersionsMatch(hosts)
 		var expected errorlist.Errors
 		if !errors.As(err, &expected) {
 			t.Fatalf("got type %T, want type %T", err, expected)
@@ -181,7 +181,7 @@ func TestEnsureVersionsMatch(t *testing.T) {
 		defer upgrade.ResetRemoteVersionCommand()
 
 		hosts := []string{"sdw1"}
-		err := upgrade.EnsureGpupgradeVersionsMatch(hosts)
+		err := upgrade.EnsureGgupgradeVersionsMatch(hosts)
 		expected := upgrade.MismatchedVersions{remoteVersion: hosts}
 		if !strings.HasSuffix(err.Error(), expected.String()) {
 			t.Error("expected error to contain mismatched agents")

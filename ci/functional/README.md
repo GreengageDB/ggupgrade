@@ -73,11 +73,11 @@ There are some design considerations since each step in the upgrade process is i
 We tar up and save the `cluster_env_files` that are produced from the generated CCP cluster. This `saved_cluster_env_files` 
 resource is passed to each job since it has the information needed to connect to the cluster.
 
-We do not place a passed constraint on `gpupgrade_src` or `saved_cluster_env_files` to easily push new changes to these 
+We do not place a passed constraint on `ggupgrade_src` or `saved_cluster_env_files` to easily push new changes to these 
 resources. Without a passed constraint the job can be re-triggered and not fail with `fatal: reference is not a tree: error.`
 This occurs when the commit history has been overwritten by a force-push and the job cannot find the correct SHA.
 
-Since we don't place a passed constraint on `gpupgrade_src` or `saved_cluster_env_files` we use a `dummy_resource` to 
+Since we don't place a passed constraint on `ggupgrade_src` or `saved_cluster_env_files` we use a `dummy_resource` to 
 automatically trigger subsequent jobs during the upgrade workflow. 
 
 The `saved_cluster_env_files` and `dummy_resource` include the branch name to avoid collisions when multiple pipelines are 

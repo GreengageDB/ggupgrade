@@ -13,6 +13,7 @@ import (
 
 	"github.com/GreengageDB/ggupgrade/cli/commands"
 	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/testutils"
 	"github.com/GreengageDB/ggupgrade/testutils/exectest"
@@ -34,7 +35,7 @@ func TestConfig(t *testing.T) {
 		stateDir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, stateDir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 		defer resetEnv()
 
 		if err := conf.Write(); err != nil {
@@ -56,7 +57,7 @@ func TestCreate(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	greengage.SetVersionCommand(exectest.NewCommand(PostgresGPVersion_5_29_10))

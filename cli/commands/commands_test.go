@@ -20,8 +20,8 @@ func TestGetHubPort(t *testing.T) {
 		stateDir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, stateDir)
 
-		// set GPUPGRADE_HOME to the stateDir to provide a home for the config file
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+		// set GGUPGRADE_HOME to the stateDir to provide a home for the config file
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 		defer resetEnv()
 
 		// save the expected port value to the conf file
@@ -58,7 +58,7 @@ func TestGetHubPort(t *testing.T) {
 		stateDir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, stateDir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 		defer resetEnv()
 
 		testutils.PathMustNotExist(t, config.GetConfigFile())

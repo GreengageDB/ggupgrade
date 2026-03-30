@@ -101,7 +101,7 @@ func ResetSystemFunctions() {
 }
 
 func GetStateDir() string {
-	stateDir := os.Getenv("GPUPGRADE_HOME")
+	stateDir := os.Getenv("GGUPGRADE_HOME")
 	if stateDir == "" {
 		stateDir = filepath.Join(os.Getenv("HOME"), ".ggupgrade")
 	}
@@ -207,7 +207,7 @@ func GetJSONFile(stateDir string, fileName string) (path string, err error) {
 	return path, nil
 }
 
-func GetGpupgradePath() (string, error) {
+func GetGgupgradePath() (string, error) {
 	hubPath, err := os.Executable()
 	if err != nil {
 		return "", err

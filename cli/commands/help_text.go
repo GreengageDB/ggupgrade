@@ -40,7 +40,7 @@ func init() {
 		idl.Substep_generate_data_migration_scripts,
 		idl.Substep_execute_stats_data_migration_scripts,
 		idl.Substep_execute_initialize_data_migration_scripts,
-		idl.Substep_verify_gpupgrade_is_installed_across_all_hosts,
+		idl.Substep_verify_ggupgrade_is_installed_across_all_hosts,
 		idl.Substep_start_agents,
 		idl.Substep_check_environment,
 		idl.Substep_create_backupdirs,
@@ -55,7 +55,7 @@ func init() {
 	}
 
 	executeSubsteps = substeps.Substeps{
-		idl.Substep_ensure_gpupgrade_agents_are_running,
+		idl.Substep_ensure_ggupgrade_agents_are_running,
 		idl.Substep_check_active_connections_on_source_cluster,
 		idl.Substep_wait_for_cluster_to_be_ready_before_upgrade_master,
 		idl.Substep_shutdown_source_cluster,
@@ -66,7 +66,7 @@ func init() {
 	}
 
 	finalizeSubsteps = substeps.Substeps{
-		idl.Substep_ensure_gpupgrade_agents_are_running,
+		idl.Substep_ensure_ggupgrade_agents_are_running,
 		idl.Substep_check_active_connections_on_target_cluster,
 		idl.Substep_upgrade_mirrors,
 		idl.Substep_upgrade_standby,
@@ -87,7 +87,7 @@ func init() {
 	}
 
 	revertSubsteps = substeps.Substeps{
-		idl.Substep_ensure_gpupgrade_agents_are_running,
+		idl.Substep_ensure_ggupgrade_agents_are_running,
 		idl.Substep_check_active_connections_on_target_cluster,
 		idl.Substep_shutdown_target_cluster,
 		idl.Substep_delete_target_cluster_datadirs,
@@ -131,7 +131,7 @@ Usage: ggupgrade initialize --file <path/to/config_file>
 Required Flags:
 
   -f, --file      config file containing upgrade parameters
-                  (e.g. gpupgrade_config)
+                  (e.g. ggupgrade_config)
 
 Optional Flags:
 

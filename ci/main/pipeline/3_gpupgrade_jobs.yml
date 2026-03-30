@@ -3,7 +3,7 @@
 - name: unit-and-integration-tests
   plan:
     - in_parallel:
-        - get: gpupgrade_src
+        - get: ggupgrade_src
           trigger: true
         - get: gpdb_src_source
           resource: gpdb{{.Source}}_src
@@ -16,10 +16,10 @@
             repository: gcr.io/data-gpdb-public-images/gpdb{{.Target}}-{{.Platform}}-test{{.AppendImageName}}
             tag: latest
         inputs:
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: gpdb_src_source
         run:
-          path: gpupgrade_src/ci/main/scripts/unit-and-integration-tests.bash
+          path: ggupgrade_src/ci/main/scripts/unit-and-integration-tests.bash
   on_failure:
     do:
       - <<: *slack_alert
@@ -28,7 +28,7 @@
 - name: {{.Name}}
   plan:
     - in_parallel:
-        - get: gpupgrade_src
+        - get: ggupgrade_src
           trigger: true
         - get: gpdb_src_source
           resource: gpdb{{.Source}}_src
@@ -47,12 +47,12 @@
             repository: gcr.io/data-gpdb-public-images/gpdb{{.Target}}-{{.Platform}}-test{{.AppendImageName}}
             tag: latest
         inputs:
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: gpdb_src_source
           - name: rpm_gpdb_source
           - name: rpm_gpdb_target
         run:
-          path: gpupgrade_src/ci/main/scripts/acceptance-tests.bash
+          path: ggupgrade_src/ci/main/scripts/acceptance-tests.bash
       params:
         SOURCE_PACKAGE: greengage-db-{{.Source}}
         TARGET_PACKAGE: greengage-db-{{.Target}}

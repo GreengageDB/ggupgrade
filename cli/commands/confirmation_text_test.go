@@ -10,7 +10,7 @@ import (
 	"github.com/GreengageDB/ggupgrade/testutils"
 )
 
-const GPUPGRADE_CONFIG = "../../gpupgrade_config"
+const GPUPGRADE_CONFIG = "../../ggupgrade_config"
 
 func TestInitializeConfirmationText(t *testing.T) {
 	t.Run("contains all names defined in the example config file", func(t *testing.T) {

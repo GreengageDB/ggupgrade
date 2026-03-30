@@ -4,8 +4,8 @@
 
 set -eux -o pipefail
 
-source gpupgrade_src/ci/main/scripts/environment.bash
-source gpupgrade_src/ci/main/scripts/ci-helpers.bash
+source ggupgrade_src/ci/main/scripts/environment.bash
+source ggupgrade_src/ci/main/scripts/ci-helpers.bash
 ./ccp_src/scripts/setup_ssh_to_cluster.sh
 
 scp sqldump/dump.sql.xz gpadmin@cdw:/tmp/
@@ -65,8 +65,8 @@ done
 
 if is_GPDB5 ${GPHOME_SOURCE}; then
     echo "Applying 5-to-6 workarounds..."
-    bash gpupgrade_src/ci/main/scripts/5-to-6-workarounds.bash
+    bash ggupgrade_src/ci/main/scripts/5-to-6-workarounds.bash
 elif is_GPDB6 ${GPHOME_SOURCE}; then
     echo "Applying 6-to-7 workarounds..."
-    bash gpupgrade_src/ci/main/scripts/6-to-7-workarounds.bash
+    bash ggupgrade_src/ci/main/scripts/6-to-7-workarounds.bash
 fi

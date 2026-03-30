@@ -21,7 +21,7 @@ resource_types:
     tag: 0.11.14
 
 resources:
-- name: gpupgrade_src
+- name: ggupgrade_src
   type: git
   source:
     uri: ((ggupgrade-git-remote))

@@ -16,6 +16,7 @@ import (
 	"github.com/blang/semver/v4"
 
 	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/hub"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/step"
@@ -235,7 +236,7 @@ func TestCopyCoordinatorTablespaces(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer os.RemoveAll(stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{

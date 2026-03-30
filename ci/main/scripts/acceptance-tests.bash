@@ -8,11 +8,11 @@ set -eux -o pipefail
 # in its own isolated container with no shared state. Thus, installing the RPM
 # needs to be done in the same task/container as running the tests.
 
-source gpupgrade_src/ci/main/scripts/environment.bash
-source gpupgrade_src/ci/main/scripts/ci-helpers.bash
+source ggupgrade_src/ci/main/scripts/environment.bash
+source ggupgrade_src/ci/main/scripts/ci-helpers.bash
 
 function run_migration_scripts_and_tests() {
-    chown -R gpadmin:gpadmin gpupgrade_src
+    chown -R gpadmin:gpadmin ggupgrade_src
     su gpadmin -c '
         set -eux -o pipefail
 
@@ -22,7 +22,7 @@ function run_migration_scripts_and_tests() {
         export GOFLAGS="-mod=readonly" # do not update dependencies during build
 
         mkdir -p $GOPATH/bin
-        cd gpupgrade_src
+        cd ggupgrade_src
         make && make install
 
         ggupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --seed-dir ./data-migration-scripts --output-dir /home/gpadmin/ggupgrade

@@ -194,7 +194,7 @@ Cross-compile with:
 ### Running
 
 ```
-ggupgrade initialize --file ./gpupgrade_config
+ggupgrade initialize --file ./ggupgrade_config
 OR
 ggupgrade initialize --source-gphome "$GPHOME" --target-gphome "$GPHOME" --source-master-port 6000 --mode link --disk-free-ratio 0 --seed-dir ~/workspace/ggupgrade/data-migration-scripts
 ggupgrade execute
