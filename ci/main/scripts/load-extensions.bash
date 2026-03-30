@@ -68,7 +68,7 @@ time ssh -n cdw "
     psql -v ON_ERROR_STOP=1 -d gptext_db <<SQL_EOF
         CREATE TABLE gptext_test(id INT PRIMARY KEY, content TEXT);
         INSERT INTO gptext_test VALUES (1, 'Greengage Database balabalabala');
-        INSERT INTO gptext_test VALUES (2, 'VMware Greengage balabala');
+        INSERT INTO gptext_test VALUES (2, 'Greengage balabala');
 
         SELECT * FROM gptext.create_index('public', 'gptext_test', 'id', 'content');
         SELECT * FROM gptext.index(table(SELECT * FROM gptext_test), 'gptext_db.public.gptext_test');
