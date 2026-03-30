@@ -54,8 +54,8 @@
         run:
           path: gpupgrade_src/ci/main/scripts/acceptance-tests.bash
       params:
-        SOURCE_PACKAGE: greengage-{{.Source}}
-        TARGET_PACKAGE: greengage-{{.Target}}
+        SOURCE_PACKAGE: greengage-db-{{.Source}}
+        TARGET_PACKAGE: greengage-db-{{.Target}}
   on_failure:
     do:
       - <<: *slack_alert

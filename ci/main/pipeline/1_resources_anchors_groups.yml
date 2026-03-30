@@ -62,13 +62,13 @@ resources:
       # Test release candidate rpms built with --build-test-rc are published to the -dev bucket.
       bucket: pivotal-gpdb-concourse-resources-dev
       json_key: ((concourse-gcs-resources-service-account-key))
-      regexp: server/published/gpdb{{.GPDBVersion}}/greengage-{{.TestRCIdentifier}}({{escapeVersion .GPDBVersion}}.*)-{{.RpmVersion}}-x86_64.debug.rpm
+      regexp: server/published/gpdb{{.GPDBVersion}}/greengage-db-{{.TestRCIdentifier}}({{escapeVersion .GPDBVersion}}.*)-{{.RpmVersion}}-x86_64.debug.rpm
     {{ continue }}
     {{- end }}
     {{- if eq .GPDBVersion "5" }}
       bucket: pivotal-gpdb-concourse-resources-prod
       json_key: ((concourse-gcs-resources-service-account-key))
-      regexp: server/published/gpdb{{.GPDBVersion}}/greengage-{{.TestRCIdentifier}}({{escapeVersion .GPDBVersion}}.*)-{{.RpmVersion}}-x86_64.debug.rpm
+      regexp: server/published/gpdb{{.GPDBVersion}}/greengage-db-{{.TestRCIdentifier}}({{escapeVersion .GPDBVersion}}.*)-{{.RpmVersion}}-x86_64.debug.rpm
     {{ continue }}
     {{- end }}
     {{- if and (eq .GPDBVersion "6") (eq .Platform "rocky8") }}

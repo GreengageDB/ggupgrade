@@ -58,8 +58,8 @@
         run:
           path: gpupgrade_src/ci/main/scripts/prepare-installation.bash
           args:
-            - greengage-{{.Source}}
-            - greengage-{{.Target}}
+            - greengage-db-{{.Source}}
+            - greengage-db-{{.Target}}
     - task: multihost_gpupgrade_tests
       config:
         platform: linux
