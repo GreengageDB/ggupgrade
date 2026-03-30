@@ -14,6 +14,7 @@ import (
 
 	"github.com/GreengageDB/ggupgrade/cli/clistep"
 	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/step"
 	"github.com/GreengageDB/ggupgrade/upgrade"
