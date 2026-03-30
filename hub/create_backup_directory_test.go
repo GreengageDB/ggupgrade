@@ -12,6 +12,7 @@ import (
 	"github.com/golang/mock/gomock"
 
 	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/hub"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/idl/mock_idl"
