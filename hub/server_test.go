@@ -19,6 +19,7 @@ import (
 	"google.golang.org/grpc/connectivity"
 
 	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/hub"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/testutils"
