@@ -9,6 +9,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/testutils/exectest"
 	"github.com/GreengageDB/ggupgrade/utils/disk"
 	"github.com/GreengageDB/ggupgrade/utils/rsync"
