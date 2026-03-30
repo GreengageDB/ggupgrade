@@ -102,6 +102,6 @@ Optimize the review experience for others. The goal is to make reviewing PRs eas
 # Community
 
 Connect with Greengage on:
-- [Slack](https://greengage.slack.com/)
-- [gpdb-dev mailing list](https://groups.google.com/a/greengage.org/forum/#!forum/gpdb-dev/join)
+- [Slack](https://greenplum.slack.com/)
+- [gpdb-dev mailing list](https://groups.google.com/a/greenplum.org/forum/#!forum/gpdb-dev/join)
 
