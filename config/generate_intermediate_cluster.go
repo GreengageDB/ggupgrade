@@ -9,6 +9,7 @@ import (
 	"github.com/blang/semver/v4"
 	"github.com/pkg/errors"
 
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/upgrade"
 	"github.com/GreengageDB/ggupgrade/utils"
