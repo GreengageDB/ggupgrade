@@ -141,7 +141,7 @@ ssh -n cdw "
     export GPHOME=${GPHOME_TARGET}
     export PXF_BASE=/home/gpadmin/pxf
 
-    PGDATABASE=postgres /usr/local/pxf-gp6/bin/pxf-post-ggupgrade
+    PGDATABASE=postgres /usr/local/pxf-gp6/bin/pxf-post-gpupgrade
 
     /usr/local/pxf-gp6/bin/pxf cluster start
 "
