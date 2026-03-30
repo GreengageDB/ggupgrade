@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+
+	"github.com/GreengageDB/ggupgrade/greengage"
 )
 
 // finishMock is a defer function to make the sqlmock API a little bit more like
