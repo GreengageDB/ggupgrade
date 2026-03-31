@@ -36,7 +36,7 @@ verify_license_files() {
   [ -s "$license_file" ]
 
   [[ $(head -1 "$license_file") =~ open_source_licenses.txt ]]
-  [[ $(head -3 "$license_file" | tail -1) == *"VMware Greenplum Upgrade ${VERSION}"* ]]
+  [[ $(head -3 "$license_file" | tail -1) == *"Greengage Upgrade ${VERSION}"* ]]
   [[ $(tail -1 "$license_file") =~ "GREENGAGEUPGRADE" ]]
 }
 
