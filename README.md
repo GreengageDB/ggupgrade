@@ -1,4 +1,4 @@
-# ggupgrade [![Concourse Build Status](https://prod.ci.gpdb.pivotal.io/api/v1/teams/main/pipelines/ggupgrade/badge)](https://prod.ci.gpdb.pivotal.io/teams/main/pipelines/ggupgrade)
+# ggupgrade [![Concourse Build Status](https://prod.ci.gpdb.pivotal.io/api/v1/teams/main/pipelines/gpupgrade/badge)](https://prod.ci.gpdb.pivotal.io/teams/main/pipelines/gpupgrade)
 
 ggupgrade runs [pg_upgrade](https://www.postgresql.org/docs/current/static/pgupgrade.html)
 across all segments to upgrade a [Greengage cluster](https://github.com/GreengageDB/greengage)
