@@ -112,7 +112,7 @@ tarball:
 	rm -r tarball
 
 enterprise-rpm: RELEASE=Enterprise
-enterprise-rpm: NAME=VMware Greenplum Upgrade
+enterprise-rpm: NAME=Greengage Database Upgrade
 enterprise-rpm: LICENSE=VMware Software EULA
 enterprise-rpm: enterprise-tarball rpm
 

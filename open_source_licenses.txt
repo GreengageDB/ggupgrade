@@ -1,6 +1,6 @@
 open_source_licenses.txt
 
-Greengage Upgrade 1.8.0 GA
+Greengage Database Upgrade 1.8.0 GA
 ======================================================================
 
 The following copyright statements and licenses apply to various open
