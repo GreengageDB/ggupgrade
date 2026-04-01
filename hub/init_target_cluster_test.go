@@ -66,7 +66,7 @@ func TestCreateInitialInitsystemConfig(t *testing.T) {
 		}
 
 		expectedConfig := []string{
-			`ARRAY_NAME="gp_upgrade cluster"`,
+			`ARRAY_NAME="ggupgrade cluster"`,
 			"SEG_PREFIX=seg.AAAAAAAAAAA.",
 			"TRUSTED_SHELL=ssh",
 			"HBA_HOSTNAMES=1",

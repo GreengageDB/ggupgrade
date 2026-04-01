@@ -125,7 +125,7 @@ func GetCheckpointSegmentsAndEncoding(gpinitsystemConfig []string, version semve
 }
 
 func CreateInitialInitsystemConfig(targetCoordinatorDataDir string, useHbaHostnames bool) ([]string, error) {
-	gpinitsystemConfig := []string{`ARRAY_NAME="gp_upgrade cluster"`}
+	gpinitsystemConfig := []string{`ARRAY_NAME="ggupgrade cluster"`}
 
 	segPrefix, err := greengage.GetCoordinatorSegPrefix(targetCoordinatorDataDir)
 	if err != nil {
