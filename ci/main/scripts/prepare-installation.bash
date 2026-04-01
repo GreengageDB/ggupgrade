@@ -6,7 +6,7 @@
 # - Installs the target GPDB rpm if different from source GPDB version.
 # - Creates source and target GPHOME symlinks, to abstract the source and target
 #   locations for future tasks to not need to know the exact versions being used.
-# - Installs gpugprade RPM so future tasks have data migration scripts installed.
+# - Installs ggugprade RPM so future tasks have data migration scripts installed.
 #
 # Expected inputs are SOURCE_PACKAGE_NAME TARGET_PACKAGE_NAME such as
 # greengage-db-5, or greengage-db-6.

@@ -8,7 +8,7 @@ RPM=$1
 RELEASE=$2
 VERSION=$(git describe --tags --abbrev=0)
 
-verify_gpugprade_version_output() {
+verify_ggugprade_version_output() {
   [[ $(/usr/local/bin/ggupgrade version) == *"Version: ${VERSION}"* ]]
   [[ $(/usr/local/bin/ggupgrade version) == *"Release: ${RELEASE}"* ]]
 }
@@ -45,7 +45,7 @@ main() {
   [ "$RELEASE" = "Enterprise" ] || [ "$RELEASE" = "Open Source" ]
 
   rpm -ivh "$RPM"
-  verify_gpugprade_version_output
+  verify_ggugprade_version_output
   verify_rpm_info "$(rpm -qi ggupgrade)"
   verify_license_files
 

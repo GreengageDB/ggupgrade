@@ -2,7 +2,7 @@ Name: ggupgrade
 Version: %{ggupgrade_version}
 # Release is a way of versioning the spec file.
 # Only bump the Release if shipping ggupgrade without also bumping the
-# gpugprade_version (ie: VERSION).
+# ggugprade_version (ie: VERSION).
 Release: %{ggupgrade_rpm_release}%{?dist}
 Summary: %{summary}
 License: %{license}
