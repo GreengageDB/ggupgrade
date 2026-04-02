@@ -33,9 +33,9 @@ CREATE TABLE
 ---------------------------------------------------------------------------------
 --- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 ---------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
 (exited with code 1)
-! find $(ls -dt ~/gpAdminLogs/gpupgrade/pg_upgrade_*/ | head -1) -name "tables_using_sql_identifier.txt" -exec cat {} +;
+! find $(ls -dt ~/gpAdminLogs/ggupgrade/pg_upgrade_*/ | head -1) -name "tables_using_sql_identifier.txt" -exec cat {} +;
 In database: isolation2test
   public.table_using_sql_identifier.col1
   public.table_using_sql_identifier.col2

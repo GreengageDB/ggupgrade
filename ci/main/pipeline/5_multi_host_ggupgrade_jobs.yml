@@ -1,0 +1,88 @@
+{{range .MultihostAcceptanceJobs}}
+- name: {{ .Name }}
+  plan:
+    - in_parallel:
+        - get: enterprise_rpm
+          trigger: true
+          passed: [ build ]
+        - get: ggupgrade_src
+          passed: [ build ]
+        - get: rpm_gpdb_source
+          resource: gpdb{{.Source}}_{{.Platform}}_rpm
+          trigger: true
+        {{- if ne .Source .Target }}
+        - get: rpm_gpdb_target
+          resource: gpdb{{.Target}}_{{.Platform}}_rpm
+          trigger: true
+        {{- end }}
+        - get: ccp_src
+        - get: terraform.d
+          params:
+            unpack: true
+    - put: terraform
+      params:
+        <<: *ccp_default_params
+        vars:
+          standby_coordinator: true
+          instance_type: n1-standard-2
+          number_of_nodes: 4
+          PLATFORM: {{.Platform}}
+          # Decrease the reap time from the default of 8 hours now that there are
+          # both centos6 and centos7 jobs in order to not overload concourse.
+          ccp_reap_minutes: 180
+    - task: gen_source_cluster
+      file: ccp_src/ci/tasks/gen_cluster.yml
+      params:
+        <<: *ccp_gen_cluster_default_params
+        PLATFORM: {{.Platform}}
+        GPDB_RPM: true
+      input_mapping:
+        gpdb_rpm: rpm_gpdb_source
+    - task: gpinitsystem_source_cluster
+      file: ccp_src/ci/tasks/gpinitsystem.yml
+    - task: prepare_installation
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: registry.access.redhat.com/ubi8/ubi
+            tag: latest
+        inputs:
+          - name: ggupgrade_src
+          - name: cluster_env_files
+          - name: enterprise_rpm
+          {{- if ne .Source .Target }}
+          - name: rpm_gpdb_target
+          {{- end }}
+        run:
+          path: ggupgrade_src/ci/main/scripts/prepare-installation.bash
+          args:
+            - greengage-db-{{.Source}}
+            - greengage-db-{{.Target}}
+    - task: multihost_ggupgrade_tests
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
+            tag: latest
+        inputs:
+          - name: ccp_src
+          - name: cluster_env_files
+          - name: ggupgrade_src
+          - name: enterprise_rpm
+        run:
+          path: ggupgrade_src/ci/main/scripts/acceptance-multihost-tests.bash
+      params:
+  ensure:
+    do:
+      - <<: *set_failed
+  on_success:
+    do:
+      - <<: *ccp_destroy
+  on_failure:
+    do:
+      - <<: *slack_alert
+{{end -}}

@@ -10,12 +10,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
-func MustAddTablespace(t *testing.T, cluster greenplum.Cluster, tablespaceDir string) {
+func MustAddTablespace(t *testing.T, cluster greengage.Cluster, tablespaceDir string) {
 	t.Helper()
 
 	if cluster.Version.Major == 5 {
@@ -28,8 +28,8 @@ func MustAddTablespace(t *testing.T, cluster greenplum.Cluster, tablespaceDir st
 	}
 
 	// create databases in the tablespace
-	MustExecuteSQL(t, cluster.Connection(greenplum.Database("postgres")), `CREATE DATABASE foodb TABLESPACE test_tablespace;`)
-	MustExecuteSQL(t, cluster.Connection(greenplum.Database("postgres")), `CREATE DATABASE eatdb TABLESPACE test_tablespace;`)
+	MustExecuteSQL(t, cluster.Connection(greengage.Database("postgres")), `CREATE DATABASE foodb TABLESPACE test_tablespace;`)
+	MustExecuteSQL(t, cluster.Connection(greengage.Database("postgres")), `CREATE DATABASE eatdb TABLESPACE test_tablespace;`)
 
 	// create tables in the tablespace
 	sql := `
@@ -45,32 +45,32 @@ INSERT INTO public.tablespace_table_2 SELECT i from generate_series(1,100)i;
 CREATE TABLE  public.tablespace_table_3 (a int, b int) WITH(appendonly=true, orientation=column) TABLESPACE test_tablespace
 PARTITION BY RANGE(b) (START(1) END(4) EVERY(1));
 INSERT INTO public.tablespace_table_3 SELECT i, (i%3)+1 FROM generate_series(1,100)i;`
-	MustExecuteSQL(t, cluster.Connection(greenplum.Database("postgres")), sql)
+	MustExecuteSQL(t, cluster.Connection(greengage.Database("postgres")), sql)
 
 	// add a table to the database within the tablespace
 	sql = `
 CREATE TABLE public.tablespace_table_0 (a int);
 INSERT INTO public.tablespace_table_0 SELECT i from generate_series(1,100)i;`
-	conn := cluster.Connection(greenplum.Database("foodb"))
+	conn := cluster.Connection(greengage.Database("foodb"))
 	MustExecuteSQL(t, conn, sql)
 
 	// add a table to the database within the tablespace
 	sql = `
 CREATE TABLE public.tablespace_table_0 (a int);
 INSERT INTO public.tablespace_table_0 SELECT i from generate_series(1,100)i;`
-	conn = cluster.Connection(greenplum.Database("eatdb"))
+	conn = cluster.Connection(greengage.Database("eatdb"))
 	MustExecuteSQL(t, conn, sql)
 }
 
-func MustCreateTablespace(t *testing.T, cluster greenplum.Cluster, tablespaceDir string) {
+func MustCreateTablespace(t *testing.T, cluster greengage.Cluster, tablespaceDir string) {
 	t.Helper()
 
 	path := filepath.Join(tablespaceDir, "testfs")
 	MustCreateDir(t, path)
-	MustExecuteSQL(t, cluster.Connection(greenplum.Database("postgres")), fmt.Sprintf(`CREATE TABLESPACE test_tablespace LOCATION '%s';`, path))
+	MustExecuteSQL(t, cluster.Connection(greengage.Database("postgres")), fmt.Sprintf(`CREATE TABLESPACE test_tablespace LOCATION '%s';`, path))
 }
 
-func MustCreateFilespaceAndTablespace(t *testing.T, cluster greenplum.Cluster, tablespaceDir string) {
+func MustCreateFilespaceAndTablespace(t *testing.T, cluster greengage.Cluster, tablespaceDir string) {
 	t.Helper()
 
 	var sb strings.Builder
@@ -95,29 +95,29 @@ func MustCreateFilespaceAndTablespace(t *testing.T, cluster greenplum.Cluster, t
 	MustWriteToFile(t, config, sb.String())
 
 	// gpfilespace requires the HOME environment variable
-	err := cluster.RunGreenplumCmdWithEnvironment(step.NewLogStdStreams(false), "gpfilespace", []string{"--config", config}, utils.FilterEnv([]string{"HOME"}))
+	err := cluster.RunGreengageCmdWithEnvironment(step.NewLogStdStreams(false), "gpfilespace", []string{"--config", config}, utils.FilterEnv([]string{"HOME"}))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// create a tablespace in the filespace
-	MustExecuteSQL(t, cluster.Connection(greenplum.Database("postgres")), `CREATE TABLESPACE test_tablespace FILESPACE test_FS;`)
+	MustExecuteSQL(t, cluster.Connection(greengage.Database("postgres")), `CREATE TABLESPACE test_tablespace FILESPACE test_FS;`)
 }
 
 // MustDeleteTablespaces deletes tablespaces from the target cluster. However,
 // since we do not yet support upgrading tablespaces from version GPDB 6+ we do
 // not need to delete them as they do not exist.
-func MustDeleteTablespaces(t *testing.T, source greenplum.Cluster, target greenplum.Cluster) {
+func MustDeleteTablespaces(t *testing.T, source greengage.Cluster, target greengage.Cluster) {
 	t.Helper()
 
 	if source.Version.Major >= 6 {
 		return
 	}
 
-	conn := target.Connection(greenplum.Database("foodb"))
+	conn := target.Connection(greengage.Database("foodb"))
 	MustExecuteSQL(t, conn, `DROP TABLE IF EXISTS public.tablespace_table_0;`)
 
-	conn = target.Connection(greenplum.Database("eatdb"))
+	conn = target.Connection(greengage.Database("eatdb"))
 	MustExecuteSQL(t, conn, `DROP TABLE IF EXISTS public.tablespace_table_0;`)
 
 	MustExecuteSQL(t, target.Connection(), `DROP DATABASE foodb;`)
@@ -128,17 +128,17 @@ DROP TABLE IF EXISTS public.tablespace_table_0;
 DROP TABLE IF EXISTS public.tablespace_table_1;
 DROP TABLE IF EXISTS public.tablespace_table_2;
 DROP TABLE IF EXISTS public.tablespace_table_3;`
-	MustExecuteSQL(t, target.Connection(greenplum.Database("postgres")), sql)
+	MustExecuteSQL(t, target.Connection(greengage.Database("postgres")), sql)
 
 	sql = `DROP TABLESPACE IF EXISTS test_tablespace;`
 	if target.Version.Major == 5 {
 		sql += `DROP FILESPACE IF EXISTS test_FS;`
 	}
 
-	MustExecuteSQL(t, target.Connection(greenplum.Database("postgres")), sql)
+	MustExecuteSQL(t, target.Connection(greengage.Database("postgres")), sql)
 }
 
-func MustTruncateTablespaces(t *testing.T, cluster greenplum.Cluster) {
+func MustTruncateTablespaces(t *testing.T, cluster greengage.Cluster) {
 	t.Helper()
 
 	if cluster.Version.Major >= 6 {
@@ -150,16 +150,16 @@ TRUNCATE public.tablespace_table_0;
 TRUNCATE public.tablespace_table_1;
 TRUNCATE public.tablespace_table_2;
 TRUNCATE public.tablespace_table_3;`
-	MustExecuteSQL(t, cluster.Connection(greenplum.Database("postgres")), sql)
+	MustExecuteSQL(t, cluster.Connection(greengage.Database("postgres")), sql)
 
-	conn := cluster.Connection(greenplum.Database("foodb"))
+	conn := cluster.Connection(greengage.Database("foodb"))
 	MustExecuteSQL(t, conn, `TRUNCATE public.tablespace_table_0;`)
 
-	conn = cluster.Connection(greenplum.Database("eatdb"))
+	conn = cluster.Connection(greengage.Database("eatdb"))
 	MustExecuteSQL(t, conn, `TRUNCATE public.tablespace_table_0;`)
 }
 
-func VerifyTablespaceData(t *testing.T, cluster greenplum.Cluster) {
+func VerifyTablespaceData(t *testing.T, cluster greengage.Cluster) {
 	t.Helper()
 
 	if cluster.Version.Major >= 6 {
@@ -168,21 +168,21 @@ func VerifyTablespaceData(t *testing.T, cluster greenplum.Cluster) {
 
 	tables := []string{"public.tablespace_table_0", "public.tablespace_table_1", "public.tablespace_table_2", "public.tablespace_table_3"}
 	for _, table := range tables {
-		rows := MustQueryRow(t, cluster.Connection(greenplum.Database("postgres")), `SELECT COUNT(*) FROM `+table)
+		rows := MustQueryRow(t, cluster.Connection(greengage.Database("postgres")), `SELECT COUNT(*) FROM `+table)
 		expected := 100
 		if rows != expected {
 			t.Fatalf("got %v want %v rows", rows, expected)
 		}
 	}
 
-	conn := cluster.Connection(greenplum.Database("foodb"))
+	conn := cluster.Connection(greengage.Database("foodb"))
 	row := MustQueryRow(t, conn, `SELECT COUNT(*) FROM public.tablespace_table_0;`)
 	expectedCount := 100
 	if row != expectedCount {
 		t.Fatalf("got %d want %d rows", row, expectedCount)
 	}
 
-	conn = cluster.Connection(greenplum.Database("eatdb"))
+	conn = cluster.Connection(greengage.Database("eatdb"))
 	row = MustQueryRow(t, conn, `SELECT COUNT(*) FROM public.tablespace_table_0;`)
 	expectedCount = 100
 	if row != expectedCount {

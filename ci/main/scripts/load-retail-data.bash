@@ -4,7 +4,7 @@
 
 set -eux -o pipefail
 
-source gpupgrade_src/ci/main/scripts/environment.bash
+source ggupgrade_src/ci/main/scripts/environment.bash
 ./ccp_src/scripts/setup_ssh_to_cluster.sh
 
 # Cache our list of hosts to loop over below.
@@ -54,7 +54,7 @@ scp -qr retail_demo_src cdw:/home/gpadmin/industry_demo/
 ssh cdw <<EOF
     set -x
 
-    source ${GPHOME_SOURCE}/greenplum_path.sh
+    source ${GPHOME_SOURCE}/greengage_path.sh
     cd /home/gpadmin/industry_demo
     PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=1 --quiet -d template1 -e -f data_generation/prep_database.sql
     PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=1 --quiet -d gpdb_demo -e -f data_generation/prep_external_tables.sql
@@ -67,7 +67,7 @@ for host in "${hosts[@]}"; do
     ssh -n $host "
         set -eux -o pipefail
 
-        source ${GPHOME_SOURCE}/greenplum_path.sh
+        source ${GPHOME_SOURCE}/greengage_path.sh
         gpfdist -d /data/demo_data -p 8081 -l /data/demo_data/gpfdist.8081.log &
         gpfdist -d /data/demo_data -p 8082 -l /data/demo_data/gpfdist.8082.log &
     "
@@ -77,7 +77,7 @@ done
 time ssh cdw <<EOF
     set -eux -o pipefail
 
-    source ${GPHOME_SOURCE}/greenplum_path.sh
+    source ${GPHOME_SOURCE}/greengage_path.sh
     export PGPORT=${PGPORT}
     export MASTER_DATA_DIRECTORY=/data/gpdata/coordinator/gpseg-1
 
@@ -116,11 +116,11 @@ EOF
 ssh cdw "
     set -eux -o pipefail
 
-    source ${GPHOME_SOURCE}/greenplum_path.sh
+    source ${GPHOME_SOURCE}/greengage_path.sh
     export MASTER_DATA_DIRECTORY=/data/gpdata/coordinator/gpseg-1
 
-    gpupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --output-dir /home/gpadmin/gpupgrade
-    gpupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/gpupgrade --phase initialize
+    ggupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --output-dir /home/gpadmin/ggupgrade
+    ggupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/ggupgrade --phase initialize
 
     # match root/child partition schemas
     psql -v ON_ERROR_STOP=1 -d gpdb_demo <<SQL_EOF

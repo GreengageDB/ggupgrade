@@ -9,8 +9,8 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/testutils"
 )
 
 func TestCreateReplicationSlots(t *testing.T) {

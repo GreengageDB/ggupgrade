@@ -1,4 +1,4 @@
-module github.com/greenplum-db/gpupgrade
+module github.com/GreengageDB/ggupgrade
 
 go 1.21
 

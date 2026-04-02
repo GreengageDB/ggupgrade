@@ -1,9 +1,9 @@
 .idea
 /dev-bin/
 
-/gpupgrade
+/ggupgrade
 /.vagrant
-gpupgrade-*.tar.gz
+ggupgrade-*.tar.gz
 CHECKSUM
 /ci/main/generated/
 /ci/functional/generated/

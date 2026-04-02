@@ -1,21 +1,21 @@
-# gpupgrade [![Concourse Build Status](https://prod.ci.gpdb.pivotal.io/api/v1/teams/main/pipelines/gpupgrade/badge)](https://prod.ci.gpdb.pivotal.io/teams/main/pipelines/gpupgrade)
+# ggupgrade [![Concourse Build Status](https://prod.ci.gpdb.pivotal.io/api/v1/teams/main/pipelines/gpupgrade/badge)](https://prod.ci.gpdb.pivotal.io/teams/main/pipelines/gpupgrade)
 
-gpupgrade runs [pg_upgrade](https://www.postgresql.org/docs/current/static/pgupgrade.html)
-across all segments to upgrade a [Greenplum cluster](https://github.com/greenplum-db/gpdb)
-across major versions. For further details read the Greenplum Database Upgrade [documentation](https://gpdb.docs.pivotal.io/upgrade/) and [blog post](https://greenplum.org/greenplum-database-upgrade/). 
+ggupgrade runs [pg_upgrade](https://www.postgresql.org/docs/current/static/pgupgrade.html)
+across all segments to upgrade a [Greengage cluster](https://github.com/GreengageDB/greengage)
+across major versions. For further details read the Greengage Database Upgrade [documentation](https://gpdb.docs.pivotal.io/upgrade/) and [blog post](https://greenplum.org/greenplum-database-upgrade/). 
 We warmly welcome any feedback and
-[contributions](https://github.com/greenplum-db/gpupgrade/blob/main/CONTRIBUTING.md).
+[contributions](https://github.com/GreengageDB/ggupgrade/blob/main/CONTRIBUTING.md).
 
 **Purpose:**
 
-Greenplum has multiple ways of upgrading including backup & restore and gpcopy.
+Greengage has multiple ways of upgrading including backup & restore and gpcopy.
 These methods usually require additional diskspace for the required copy and 
-significant downtime. gpupgrade can do fast in-place upgrades without the need 
+significant downtime. ggupgrade can do fast in-place upgrades without the need 
 for additional hardware, disk space, and with less downtime. 
 
 Creating an easy upgrade path enables users to quickly and confidently upgrade. 
-This enables Greenplum to have faster release cycles with faster user feedback. 
-Most importantly it allows Greenplum to reduce its reliance on supporting legacy 
+This enables Greengage to have faster release cycles with faster user feedback. 
+Most importantly it allows Greengage to reduce its reliance on supporting legacy 
 versions.
 
 **Supported Versions:**
@@ -27,7 +27,7 @@ versions.
  
 **Architecture:**
 
-gpupgrade consists of three processes that communicate using gRPC and protocol buffers:
+ggupgrade consists of three processes that communicate using gRPC and protocol buffers:
 - CLI
   - Runs on the coordinator host
   - Consists of a gRPC client
@@ -54,26 +54,26 @@ gpupgrade consists of three processes that communicate using gRPC and protocol b
 
 **Steps:**
 
-Running gpupgrade consists of several steps (ie: commands):
-- gpupgrade initialize
+Running ggupgrade consists of several steps (ie: commands):
+- ggupgrade initialize
   - The source cluster can still be running. No downtime.
-  - Substeps include creating the gpupgrade state directory, starting the hub and agents, creating the target cluster, 
+  - Substeps include creating the ggupgrade state directory, starting the hub and agents, creating the target cluster, 
     and running pre-upgrade checks.
-- gpupgrade execute
+- ggupgrade execute
   - This step will stop the source cluster. Downtime is needed.
   - Substeps include upgrading the coordinator, copying the coordinator catalog to the segments, and upgrading the primaries.
   - The coordinator contains only catalog information and no data, and is used to upgrade the catalog of the primaries. 
     That is, after the target cluster coordinator is upgraded it's copied to each of the primary data directories on 
     the target cluster to upgrade their catalog. Next, the target cluster primaries data is upgraded using pg_upgrade.
-- gpupgrade finalize
+- ggupgrade finalize
   - After finalizing the upgrade cannot be reverted.
   - Substeps include updating the data directories and coordinator catalog, and upgrading the standby and mirrors.
 
 Optional steps (ie: commands):
-- gpupgrade revert
+- ggupgrade revert
   - To restore the cluster to the state before the upgrade.
   - Can be run after initialize or execute, but *not* finalize.
-  - Substeps include deleting the target cluster, archiving the gpupgrade log 
+  - Substeps include deleting the target cluster, archiving the ggupgrade log 
     directory, and restoring the source cluster.
   - Reverting in copy mode consists of simply removing the target cluster.
     However, due to a GPDB 5X bug gprecoverseg is needed.
@@ -113,7 +113,7 @@ or possibly check if the work has been done.
 
 **Link vs. Copy Mode:**
 
-gpupgrade inits a fresh target cluster "next to" the source cluster, and upgrades 
+ggupgrade inits a fresh target cluster "next to" the source cluster, and upgrades 
 "into it" in-place using pg_upgrade's copy or link mode.
 
 | Attribute | Copy Mode | Link Mode
@@ -180,9 +180,9 @@ Checkout [vim-go](https://github.com/fatih/vim-go) and [go-delve](https://github
 ### Build and Test
 
 ```
-make             # builds gpupgrade binary locally
+make             # builds ggupgrade binary locally
 make depend-dev  # initial one-time directive to install developer dependencies
-make install     # installs gpupgrade into $GOBIN
+make install     # installs ggupgrade into $GOBIN
 make lint        # runs linter
 make unit        # runs unit test
 ```
@@ -194,11 +194,11 @@ Cross-compile with:
 ### Running
 
 ```
-gpupgrade initialize --file ./gpupgrade_config
+ggupgrade initialize --file ./ggupgrade_config
 OR
-gpupgrade initialize --source-gphome "$GPHOME" --target-gphome "$GPHOME" --source-master-port 6000 --mode link --disk-free-ratio 0 --seed-dir ~/workspace/gpupgrade/data-migration-scripts
-gpupgrade execute
-gpupgrade finalize
+ggupgrade initialize --source-gphome "$GPHOME" --target-gphome "$GPHOME" --source-master-port 6000 --mode link --disk-free-ratio 0 --seed-dir ~/workspace/ggupgrade/data-migration-scripts
+ggupgrade execute
+ggupgrade finalize
 ```
 
 ### Running Tests
@@ -209,9 +209,9 @@ make unit
 ```
 
 #### Integration tests
-Tests that run against the gpupgrade binary to verify the interaction between 
+Tests that run against the ggupgrade binary to verify the interaction between 
 components. Before writing a new integration test please review the 
-[README](https://github.com/greenplum-db/gpupgrade/blob/main/test/integration/README.md).
+[README](https://github.com/GreengageDB/ggupgrade/blob/main/test/integration/README.md).
 ```
 make integration
 ```
@@ -219,7 +219,7 @@ make integration
 #### Acceptance tests
 Tests more end-to-end acceptance-level behavior between components. Tests are
 located in the `test` directory and use the isolation2 framework.
-Please review the [integration/README](https://github.com/greenplum-db/gpupgrade/blob/main/test/integration/README.md).
+Please review the [integration/README](https://github.com/GreengageDB/ggupgrade/blob/main/test/integration/README.md).
 ```
 # Requires a GPDB cluster installed and running
 make acceptance
@@ -228,12 +228,12 @@ make pg-upgrade-tests
 
 To run all tests in a suite:
 ```
-go test -v ./test/acceptance/gpupgrade -run TestFinalize
+go test -v ./test/acceptance/ggupgrade -run TestFinalize
 ```
 
 To run a single test or set of tests:
 ```
-go test -v ./test/acceptance/gpupgrade -run "gpupgrade finalize should"
+go test -v ./test/acceptance/ggupgrade -run "ggupgrade finalize should"
 ```
 
 #### All local tests
@@ -251,7 +251,7 @@ make pipeline
 
 #### Functional tests
 Creates a Concourse pipeline for testing metadata and _any_ other SQL dump file.
-See [ci/functional/README.md](https://github.com/greenplum-db/gpupgrade/blob/main/ci/functional/README.md) 
+See [ci/functional/README.md](https://github.com/GreengageDB/ggupgrade/blob/main/ci/functional/README.md) 
 for specifics. These cannot be run locally.
 ```
 make functional-pipeline
@@ -269,7 +269,7 @@ to create `ci/generated/pipeline.yml`. None of the generated files `template.yml
 or `pipeline.yml` are checked in.
 
 To update the production pipeline locally checkout main and be sure to pull 
-the latest code and fly with `PIPELINE_NAME=gpupgrade FLY_TARGET=prod make pipeline`
+the latest code and fly with `PIPELINE_NAME=ggupgrade FLY_TARGET=prod make pipeline`
 
 To make the pipeline publicly visible run `make expose-pipeline`. This will 
 allow anyone to see the pipeline and its status. However, the task details will 
@@ -296,19 +296,19 @@ To recompile proto files to generate gRPC client and server code run
 
 ## Bash Completion
 
-To enable tab completion of gpupgrade commands source the `cli/bash/gpupgrade.bash`
+To enable tab completion of ggupgrade commands source the `cli/bash/ggupgrade.bash`
 script from your `~/.bash_completion` config, or copy it into your system's 
 completions directory such as  `/etc/bash_completion.d`.
 
 ## Log Locations
 Logs are located on **_all hosts_**.
 
-- gpupgrade logs: `$HOME/gpAdminLogs/gpupgrade`
-  - After finalize the directory is archived with format `gpupgrade-<timestamp-upgradeID>`.
-- pg_upgrade logs: `$HOME/gpAdminLogs/gpupgrade/pg_upgrade`
-- greenplum utility logs: `$HOME/gpAdminLogs`
+- ggupgrade logs: `$HOME/gpAdminLogs/ggupgrade`
+  - After finalize the directory is archived with format `ggupgrade-<timestamp-upgradeID>`.
+- pg_upgrade logs: `$HOME/gpAdminLogs/ggupgrade/pg_upgrade`
+- greengage utility logs: `$HOME/gpAdminLogs`
 - source cluster pg_log: `$MASTER_DATA_DIRECTORY/pg_log`
-- target cluster pg_log: `$(gpupgrade config show --target-datadir)/pg_log`
+- target cluster pg_log: `$(ggupgrade config show --target-datadir)/pg_log`
   - The target cluster data directories are located next to the source cluster directories with the format `-<upgradeID>.<contentID>`
 
 ## Debugging
@@ -320,14 +320,14 @@ Logs are located on **_all hosts_**.
   - Did the Hub (coordinator) vs. Agent (segment) fail?
   - What specific host failed?
 - Identify the Failed Utility
-  - Did gpupgrade fail, or an underlying utility such as pg_upgrade, gpinitsystem, gpstart, etc.?
+  - Did ggupgrade fail, or an underlying utility such as pg_upgrade, gpinitsystem, gpstart, etc.?
 - Identify the Specific Failure
   - Based on the error context and logs what is the specific error?
 
 ### Debugging Hub and Agent Processes
 - Set a breakpoint in the CLI
   - For example in `cli/commands/initialize.go`, `execute.go`, or `finalize.go` right before the gRPC call to the hub.
-- Run gpupgrade to hit the breakpoint in the CLI and start the hub process.
+- Run ggupgrade to hit the breakpoint in the CLI and start the hub process.
 - When using intellij "Attach to Process" and select the hub and/or agent processes.
 - Set additional breakpoints in the hub or agent code to aid in debugging.
 - Continue execution on the CLI until the additional breakpoints in the hub or agent code are hit. Step through the code 
@@ -335,5 +335,5 @@ to debug.
 - For faster iterations:
   - Make any local changes in the code
   - Rebuild with `make && make install`
-  - Reload the new code with `gpupgrade restart-services` or manually stop and restart the hub.
+  - Reload the new code with `ggupgrade restart-services` or manually stop and restart the hub.
   - Repeat the above breakpoints and attaching to the new processes as their PIDs have changed.

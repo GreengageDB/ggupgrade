@@ -3,9 +3,9 @@ jobs:
   - name: generate-cluster
     plan:
       - in_parallel:
-          - get: gpupgrade_src
+          - get: ggupgrade_src
           - get: enterprise_rpm
-            resource: gpupgrade_rpm
+            resource: ggupgrade_rpm
           - get: rpm_gpdb_source
             resource: gpdb{{.Source}}_{{.Platform}}_rpm
           {{- if ne .Source .Target }}
@@ -55,17 +55,17 @@ jobs:
               repository: registry.access.redhat.com/ubi8/ubi
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
             - name: cluster_env_files
             - name: enterprise_rpm
             {{- if ne .Source .Target }}
             - name: rpm_gpdb_target
             {{- end }}
           run:
-            path: gpupgrade_src/ci/main/scripts/prepare-installation.bash
+            path: ggupgrade_src/ci/main/scripts/prepare-installation.bash
             args:
-              - greenplum-db-{{.Source}}
-              - greenplum-db-{{.Target}}
+              - greengage-db-{{.Source}}
+              - greengage-db-{{.Target}}
 {{- end}}
       - task: save_cluster_env_files
         config:
@@ -76,7 +76,7 @@ jobs:
               repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
             - name: ccp_src
             - name: cluster_env_files
           outputs:
@@ -102,7 +102,7 @@ jobs:
               repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
               tag: latest
           inputs:
-            - name: gpupgrade_src
+            - name: ggupgrade_src
           outputs:
             - name: dummy_resource_file
           run:

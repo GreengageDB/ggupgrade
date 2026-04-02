@@ -12,12 +12,12 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func TestTempDataDir(t *testing.T) {

@@ -20,13 +20,13 @@ import (
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func gpinitsystem_Exits1() {
@@ -66,7 +66,7 @@ func TestCreateInitialInitsystemConfig(t *testing.T) {
 		}
 
 		expectedConfig := []string{
-			`ARRAY_NAME="gp_upgrade cluster"`,
+			`ARRAY_NAME="ggupgrade cluster"`,
 			"SEG_PREFIX=seg.AAAAAAAAAAA.",
 			"TRUSTED_SHELL=ssh",
 			"HBA_HOSTNAMES=1",
@@ -160,7 +160,7 @@ func TestGetCheckpointSegmentsAndEncoding(t *testing.T) {
 }
 
 func TestWriteSegmentArray(t *testing.T) {
-	test := func(t *testing.T, intermediate *greenplum.Cluster, expected []string) {
+	test := func(t *testing.T, intermediate *greengage.Cluster, expected []string) {
 		t.Helper()
 
 		actual, err := hub.WriteSegmentArray([]string{}, intermediate)
@@ -188,10 +188,10 @@ func TestWriteSegmentArray(t *testing.T) {
 	}
 
 	t.Run("renders the config file as expected", func(t *testing.T) {
-		config := hub.MustCreateCluster(t, greenplum.SegConfigs{
-			{ContentID: -1, DbID: 1, Hostname: "mdw", Address: "mdw-1", DataDir: "/data/qddir_upgrade/seg-1", Role: greenplum.PrimaryRole, Port: 15433},
-			{ContentID: 0, DbID: 2, Hostname: "sdw1", Address: "sdw1-1", DataDir: "/data/dbfast1_upgrade/seg1", Role: greenplum.PrimaryRole, Port: 15434},
-			{ContentID: 1, DbID: 3, Hostname: "sdw2", Address: "sdw2-2", DataDir: "/data/dbfast2_upgrade/seg2", Role: greenplum.PrimaryRole, Port: 15434},
+		config := hub.MustCreateCluster(t, greengage.SegConfigs{
+			{ContentID: -1, DbID: 1, Hostname: "mdw", Address: "mdw-1", DataDir: "/data/qddir_upgrade/seg-1", Role: greengage.PrimaryRole, Port: 15433},
+			{ContentID: 0, DbID: 2, Hostname: "sdw1", Address: "sdw1-1", DataDir: "/data/dbfast1_upgrade/seg1", Role: greengage.PrimaryRole, Port: 15434},
+			{ContentID: 1, DbID: 3, Hostname: "sdw2", Address: "sdw2-2", DataDir: "/data/dbfast2_upgrade/seg2", Role: greengage.PrimaryRole, Port: 15434},
 		})
 
 		test(t, config, []string{
@@ -210,13 +210,13 @@ func TestRunInitsystemForTargetCluster(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
-	intermediate := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, DbID: 1, Hostname: "mdw", DataDir: "/data/qddir_upgrade/seg-1", Role: greenplum.PrimaryRole, Port: 15433},
+	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Hostname: "mdw", DataDir: "/data/qddir_upgrade/seg-1", Role: greengage.PrimaryRole, Port: 15433},
 	})
-	intermediate.GPHome = "/usr/local/greenplum-db"
+	intermediate.GPHome = "/usr/local/greengage-db"
 
 	t.Run("does not use --ignore-warnings when upgrading to GPDB7 or higher", func(t *testing.T) {
 		hub.ExecCommand = exectest.NewCommandWithVerifier(hub.Success, func(path string, args ...string) {
@@ -224,15 +224,15 @@ func TestRunInitsystemForTargetCluster(t *testing.T) {
 				t.Errorf("executed %q, want bash", path)
 			}
 
-			expected := []string{"-c", "source /usr/local/greenplum-db/greenplum_path.sh && " +
-				"/usr/local/greenplum-db/bin/gpinitsystem " +
+			expected := []string{"-c", "source /usr/local/greengage-db/greengage_path.sh && " +
+				"/usr/local/greengage-db/bin/gpinitsystem " +
 				"-a -I " + utils.GetInitsystemConfig()}
 			if !reflect.DeepEqual(args, expected) {
 				t.Errorf("args %q, want %q", args, expected)
 			}
 		})
-		greenplum.SetGreenplumCommand(hub.ExecCommand)
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(hub.ExecCommand)
+		defer greengage.ResetGreengageCommand()
 
 		intermediate.Version = semver.MustParse("7.0.0")
 		err := hub.InitTargetCluster(step.DevNullStream, intermediate)
@@ -247,15 +247,15 @@ func TestRunInitsystemForTargetCluster(t *testing.T) {
 				t.Errorf("executed %q, want bash", path)
 			}
 
-			expected := []string{"-c", "source /usr/local/greenplum-db/greenplum_path.sh && " +
-				"/usr/local/greenplum-db/bin/gpinitsystem " +
+			expected := []string{"-c", "source /usr/local/greengage-db/greengage_path.sh && " +
+				"/usr/local/greengage-db/bin/gpinitsystem " +
 				"-a -I " + utils.GetInitsystemConfig() + " --ignore-warnings"}
 			if !reflect.DeepEqual(args, expected) {
 				t.Errorf("args %q, want %q", args, expected)
 			}
 		})
-		greenplum.SetGreenplumCommand(hub.ExecCommand)
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(hub.ExecCommand)
+		defer greengage.ResetGreengageCommand()
 
 		intermediate.Version = semver.MustParse("6.0.0")
 		err := hub.InitTargetCluster(step.DevNullStream, intermediate)
@@ -265,8 +265,8 @@ func TestRunInitsystemForTargetCluster(t *testing.T) {
 	})
 
 	t.Run("returns an error when gpinitsystem fails with --ignore-warnings when upgrading to GPDB6", func(t *testing.T) {
-		greenplum.SetGreenplumCommand(exectest.NewCommand(gpinitsystem_Exits1))
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(exectest.NewCommand(gpinitsystem_Exits1))
+		defer greengage.ResetGreengageCommand()
 
 		intermediate.Version = semver.MustParse("6.0.0")
 		err := hub.InitTargetCluster(step.DevNullStream, intermediate)
@@ -281,8 +281,8 @@ func TestRunInitsystemForTargetCluster(t *testing.T) {
 	})
 
 	t.Run("returns an error when gpinitsystem errors when upgrading to GPDB7 or higher", func(t *testing.T) {
-		greenplum.SetGreenplumCommand(exectest.NewCommand(gpinitsystem_Exits1))
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(exectest.NewCommand(gpinitsystem_Exits1))
+		defer greengage.ResetGreengageCommand()
 
 		intermediate.Version = semver.MustParse("7.0.0")
 		err := hub.InitTargetCluster(step.DevNullStream, intermediate)
@@ -323,8 +323,8 @@ func TestRunInitsystemForTargetCluster(t *testing.T) {
 		}
 
 		// Capture the actual environment received by the gpinitsystem process.
-		greenplum.SetGreenplumCommand(exectest.NewCommand(hub.EnvironmentMain))
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(exectest.NewCommand(hub.EnvironmentMain))
+		defer greengage.ResetGreengageCommand()
 
 		out := &stdoutBuffer{}
 		err := hub.InitTargetCluster(step.DevNullStream, intermediate)
@@ -368,13 +368,13 @@ func TestRunInitsystemForTargetCluster(t *testing.T) {
 func TestGetCatalogVersion(t *testing.T) {
 	testlog.SetupTestLogger()
 
-	intermediate := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, DbID: 1, Hostname: "mdw", DataDir: "/data/qddir_upgrade/seg-1", Role: greenplum.PrimaryRole, Port: 15433},
+	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Hostname: "mdw", DataDir: "/data/qddir_upgrade/seg-1", Role: greengage.PrimaryRole, Port: 15433},
 	})
 
 	t.Run("returns catalog version", func(t *testing.T) {
-		greenplum.SetGreenplumCommand(exectest.NewCommand(pg_controldata))
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(exectest.NewCommand(pg_controldata))
+		defer greengage.ResetGreengageCommand()
 
 		version, err := hub.GetCatalogVersion(intermediate)
 		if err != nil {
@@ -388,8 +388,8 @@ func TestGetCatalogVersion(t *testing.T) {
 	})
 
 	t.Run("errors when pg_controldata fails", func(t *testing.T) {
-		greenplum.SetGreenplumCommand(exectest.NewCommand(hub.Failure))
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(exectest.NewCommand(hub.Failure))
+		defer greengage.ResetGreengageCommand()
 
 		version, err := hub.GetCatalogVersion(intermediate)
 		var exitErr *exec.ExitError
@@ -407,8 +407,8 @@ func TestGetCatalogVersion(t *testing.T) {
 	})
 
 	t.Run("errors when catalog version is not found", func(t *testing.T) {
-		greenplum.SetGreenplumCommand(exectest.NewCommand(hub.Success))
-		defer greenplum.ResetGreenplumCommand()
+		greengage.SetGreengageCommand(exectest.NewCommand(hub.Success))
+		defer greengage.ResetGreengageCommand()
 
 		version, err := hub.GetCatalogVersion(intermediate)
 		if !errors.Is(err, hub.ErrUnknownCatalogVersion) {

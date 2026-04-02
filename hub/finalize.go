@@ -7,10 +7,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func (s *Server) Finalize(req *idl.FinalizeRequest, stream idl.CliToHub_FinalizeServer) (err error) {
@@ -19,7 +19,7 @@ func (s *Server) Finalize(req *idl.FinalizeRequest, stream idl.CliToHub_Finalize
 		return err
 	}
 
-	st.AlwaysRun(idl.Substep_ensure_gpupgrade_agents_are_running, func(_ step.OutStreams) error {
+	st.AlwaysRun(idl.Substep_ensure_ggupgrade_agents_are_running, func(_ step.OutStreams) error {
 		_, err := RestartAgents(context.Background(), nil, AgentHosts(s.Source), s.AgentPort, utils.GetStateDir())
 		if err != nil {
 			return err

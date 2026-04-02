@@ -22,8 +22,8 @@ CREATE VIEW lead_view_2 AS SELECT lead(b, 1::bigint) OVER (ORDER BY b) as lag FR
 --------------------------------------------------------------------------------
 -- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 --------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
-! cat ~/gpAdminLogs/gpupgrade/pg_upgrade/p-1/view_lead_lag_functions.txt | LC_ALL=C sort -b;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+! cat ~/gpAdminLogs/ggupgrade/pg_upgrade/p-1/view_lead_lag_functions.txt | LC_ALL=C sort -b;
 
 --------------------------------------------------------------------------------
 -- Workaround to unblock upgrade

@@ -1,6 +1,6 @@
 # Contributing
 
-We warmly welcome and appreciate contributions from the community! By participating you agree to the [code of conduct](https://github.com/greenplum-db/gpupgrade/blob/main/CODE-OF-CONDUCT.md).
+We warmly welcome and appreciate contributions from the community! By participating you agree to the [code of conduct](https://github.com/GreengageDB/ggupgrade/blob/main/CODE-OF-CONDUCT.md).
 
 ## Development
 - Gather input early and often rather than waiting until the end. 
@@ -42,7 +42,7 @@ Optimize the review experience for others. The goal is to make reviewing PRs eas
 
 - Sign our [Contributor License Agreement](https://cla.vmware.com/cla/1/preview).
 
-- Fork the gpupgrade repository on GitHub.
+- Fork the ggupgrade repository on GitHub.
 
 - Clone the repository.
 
@@ -101,7 +101,7 @@ Optimize the review experience for others. The goal is to make reviewing PRs eas
 
 # Community
 
-Connect with Greenplum on:
+Connect with Greengage on:
 - [Slack](https://greenplum.slack.com/)
 - [gpdb-dev mailing list](https://groups.google.com/a/greenplum.org/forum/#!forum/gpdb-dev/join)
 

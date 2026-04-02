@@ -13,13 +13,13 @@ import (
 	"github.com/blang/semver/v4"
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
-func UpdateConfFiles(agentConns []*idl.Connection, _ step.OutStreams, version semver.Version, intermediate *greenplum.Cluster, target *greenplum.Cluster) error {
+func UpdateConfFiles(agentConns []*idl.Connection, _ step.OutStreams, version semver.Version, intermediate *greengage.Cluster, target *greengage.Cluster) error {
 	if version.Major < 7 {
 		// update gpperfmon.conf on coordinator
 		err := UpdateConfigurationFile([]*idl.UpdateFileConfOptions{{
@@ -53,7 +53,7 @@ func UpdateConfFiles(agentConns []*idl.Connection, _ step.OutStreams, version se
 	return nil
 }
 
-func UpdatePostgresqlConfOnSegments(agentConns []*idl.Connection, intermediate *greenplum.Cluster, target *greenplum.Cluster) error {
+func UpdatePostgresqlConfOnSegments(agentConns []*idl.Connection, intermediate *greengage.Cluster, target *greengage.Cluster) error {
 	pattern := `(^port[ \t]*=[ \t]*)%d([^0-9]|$)`
 	replacement := `\1%d\2`
 
@@ -72,7 +72,7 @@ func UpdatePostgresqlConfOnSegments(agentConns []*idl.Connection, intermediate *
 		}
 
 		// add mirrors
-		mirrors := target.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		mirrors := target.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && seg.IsMirror()
 		})
 
@@ -87,7 +87,7 @@ func UpdatePostgresqlConfOnSegments(agentConns []*idl.Connection, intermediate *
 		}
 
 		// add primaries
-		primaries := target.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		primaries := target.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && seg.IsPrimary()
 		})
 
@@ -109,7 +109,7 @@ func UpdatePostgresqlConfOnSegments(agentConns []*idl.Connection, intermediate *
 	return ExecuteRPC(agentConns, request)
 }
 
-func UpdateRecoveryConfOnSegments(agentConns []*idl.Connection, version semver.Version, intermediateCluster *greenplum.Cluster, target *greenplum.Cluster) error {
+func UpdateRecoveryConfOnSegments(agentConns []*idl.Connection, version semver.Version, intermediateCluster *greengage.Cluster, target *greengage.Cluster) error {
 	file := "postgresql.auto.conf"
 	if version.Major == 6 {
 		file = "recovery.conf"
@@ -133,7 +133,7 @@ func UpdateRecoveryConfOnSegments(agentConns []*idl.Connection, version semver.V
 		}
 
 		// add mirrors
-		mirrors := target.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		mirrors := target.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && seg.IsMirror()
 		})
 
@@ -155,12 +155,12 @@ func UpdateRecoveryConfOnSegments(agentConns []*idl.Connection, version semver.V
 	return ExecuteRPC(agentConns, request)
 }
 
-func UpdateInternalAutoConfOnMirrors(agentConns []*idl.Connection, intermediate *greenplum.Cluster) error {
+func UpdateInternalAutoConfOnMirrors(agentConns []*idl.Connection, intermediate *greengage.Cluster) error {
 	pattern := `(^gp_dbid=)%d([^0-9]|$)`
 	replacement := `\1%d\2`
 
 	request := func(conn *idl.Connection) error {
-		intermediateMirrors := intermediate.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		intermediateMirrors := intermediate.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && !seg.IsStandby() && seg.IsMirror()
 		})
 

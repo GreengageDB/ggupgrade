@@ -10,10 +10,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/cli/clistep"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/clistep"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func TestStepStore(t *testing.T) {
@@ -27,7 +27,7 @@ func TestStepStore(t *testing.T) {
 		}
 	}()
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	stepStore, err := clistep.NewStepFileStore()
@@ -53,7 +53,7 @@ func TestStepStore(t *testing.T) {
 	})
 
 	t.Run("cannot create a new step store if state directory does not exist", func(t *testing.T) {
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", "/does/not/exist")
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", "/does/not/exist")
 		defer resetEnv()
 
 		stepStore, err := clistep.NewStepFileStore()
@@ -79,7 +79,7 @@ func TestStepStore(t *testing.T) {
 			}
 		}()
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 		defer resetEnv()
 
 		stepStore, err := clistep.NewStepFileStore()
@@ -120,7 +120,7 @@ func TestStepStore(t *testing.T) {
 			}
 		}()
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 		defer resetEnv()
 
 		stepStore, err := clistep.NewStepFileStore()
@@ -231,7 +231,7 @@ func TestValidateStep(t *testing.T) {
 		}
 	}()
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	stepStore, err := clistep.NewStepFileStore()

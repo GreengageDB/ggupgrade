@@ -8,16 +8,16 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/upgrade"
 )
 
 var RenameDirectories = upgrade.RenameDirectories
 
 type RenameMap = map[string][]*idl.RenameDirectories
 
-func RenameDataDirectories(agentConns []*idl.Connection, source *greenplum.Cluster, intermediate *greenplum.Cluster) error {
+func RenameDataDirectories(agentConns []*idl.Connection, source *greengage.Cluster, intermediate *greengage.Cluster) error {
 	src := source.CoordinatorDataDir()
 	dst := intermediate.CoordinatorDataDir()
 	if err := RenameDirectories(src, dst); err != nil {
@@ -37,7 +37,7 @@ func RenameDataDirectories(agentConns []*idl.Connection, source *greenplum.Clust
 // the mirrors have been deleted to save disk space, so exclude them from the map.
 // Since the upgraded mirrors will be added later to the correct directory there
 // is no need to rename target to source, so only archive the source directory.
-func getRenameMap(source *greenplum.Cluster, intermediate *greenplum.Cluster) RenameMap {
+func getRenameMap(source *greengage.Cluster, intermediate *greengage.Cluster) RenameMap {
 	m := make(RenameMap)
 
 	for _, seg := range source.Primaries {

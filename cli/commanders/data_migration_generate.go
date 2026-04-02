@@ -21,17 +21,17 @@ import (
 	"github.com/vbauerster/mpb/v8/decor"
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/greenplum/connection"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/greengage/connection"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, gphome string, port int, seedDir string, outputDir string, outputDirFS fs.FS) error {
-	version, err := greenplum.Version(gphome)
+	version, err := greengage.Version(gphome)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 		// seedDir = filepath.Join(seedDir, "7-to-8-seed-scripts")
 		return nil // TODO: Remove once there are 7 > 8 data migration scripts
 	default:
-		return fmt.Errorf("failed to find seed scripts for Greenplum version %s under %q", version, seedDir)
+		return fmt.Errorf("failed to find seed scripts for Greengage version %s under %q", version, seedDir)
 	}
 
 	db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port)
@@ -249,7 +249,7 @@ func GenerateScriptsPerDatabase(streams step.OutStreams, database DatabaseInfo, 
 	// Create a schema to use while generating the scripts. However, the generated scripts cannot depend on this
 	// schema as its dropped at the end of the generation process. If necessary, the generated scripts can use their
 	// own temporary schema.
-	output, err = executeSQLCommand(gphome, port, database.Datname, `DROP SCHEMA IF EXISTS __gpupgrade_tmp_generator CASCADE; CREATE SCHEMA __gpupgrade_tmp_generator;`)
+	output, err = executeSQLCommand(gphome, port, database.Datname, `DROP SCHEMA IF EXISTS __ggupgrade_tmp_generator CASCADE; CREATE SCHEMA __ggupgrade_tmp_generator;`)
 	if err != nil {
 		return err
 	}
@@ -296,7 +296,7 @@ func GenerateScriptsPerDatabase(streams step.OutStreams, database DatabaseInfo, 
 		return errs
 	}
 
-	output, err = executeSQLCommand(gphome, port, database.Datname, `DROP TABLE IF EXISTS __gpupgrade_tmp_generator.__temp_views_list; DROP SCHEMA IF EXISTS __gpupgrade_tmp_generator CASCADE;`)
+	output, err = executeSQLCommand(gphome, port, database.Datname, `DROP TABLE IF EXISTS __ggupgrade_tmp_generator.__temp_views_list; DROP SCHEMA IF EXISTS __ggupgrade_tmp_generator CASCADE;`)
 	if err != nil {
 		return err
 	}

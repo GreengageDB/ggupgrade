@@ -7,14 +7,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils"
 )
 
-const GPUPGRADE_CONFIG = "../../gpupgrade_config"
+const GGUPGRADE_CONFIG = "../../ggupgrade_config"
 
 func TestInitializeConfirmationText(t *testing.T) {
 	t.Run("contains all names defined in the example config file", func(t *testing.T) {
-		config := testutils.MustReadFile(t, GPUPGRADE_CONFIG)
+		config := testutils.MustReadFile(t, GGUPGRADE_CONFIG)
 
 		names, err := parseParams(strings.NewReader(config))
 		if err != nil {

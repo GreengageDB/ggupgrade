@@ -14,12 +14,12 @@ import (
 	sigar "github.com/cloudfoundry/gosigar"
 	"golang.org/x/sys/unix"
 
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/utils"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/utils/disk"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils/disk"
 )
 
 func TestCheckUsage(t *testing.T) {
@@ -295,7 +295,7 @@ func TestCheckUsage(t *testing.T) {
 				{DirName: "/"},
 				{DirName: "/tmp"},
 				{DirName: "/data"},
-				{DirName: "/secret"}, // gpupgrade user does not have access to /secret
+				{DirName: "/secret"}, // ggupgrade user does not have access to /secret
 			}}, nil
 		}
 

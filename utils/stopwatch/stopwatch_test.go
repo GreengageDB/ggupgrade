@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/greenplum-db/gpupgrade/utils/stopwatch"
+	"github.com/GreengageDB/ggupgrade/utils/stopwatch"
 )
 
 // The internal implementation calls round to minimize test flakes. For

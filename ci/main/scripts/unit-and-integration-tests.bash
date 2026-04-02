@@ -5,14 +5,14 @@
 set -eux -o pipefail
 
 function run_tests() {
-    chown -R gpadmin:gpadmin gpupgrade_src
+    chown -R gpadmin:gpadmin ggupgrade_src
     su gpadmin -c '
         set -eux -o pipefail
 
         export TERM=linux
         export GOFLAGS="-mod=readonly" # do not update dependencies during build
 
-        cd gpupgrade_src
+        cd ggupgrade_src
         make
         make unit integration --keep-going
     '

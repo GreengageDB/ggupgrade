@@ -7,13 +7,15 @@ set -eux -o pipefail
 is_GPDB5() {
     local gphome=$1
     version=$(ssh cdw "$gphome"/bin/postgres --gp-version)
-    [[ $version =~ ^"postgres (Greenplum Database) 5." ]]
+    pattern="^postgres \(Green\w+ Database\) 5\."
+    [[ $version =~ $pattern ]]
 }
 
 is_GPDB6() {
     local gphome=$1
     version=$(ssh cdw "$gphome"/bin/postgres --gp-version)
-    [[ $version =~ ^"postgres (Greenplum Database) 6." ]]
+    pattern="^postgres \(Green\w+ Database\) 6\."
+    [[ $version =~ $pattern ]]
 }
 
 # set the database gucs
@@ -24,7 +26,7 @@ configure_gpdb_gucs() {
     ssh -n cdw "
         set -eux -o pipefail
 
-        source ${gphome}/greenplum_path.sh
+        source ${gphome}/greengage_path.sh
         export MASTER_DATA_DIRECTORY=/data/gpdata/coordinator/gpseg-1
         gpconfig -c bytea_output -v escape
         gpstop -u
@@ -36,7 +38,7 @@ reindex_all_dbs() {
     ssh -n cdw "
         set -eux -o pipefail
 
-        source ${gphome}/greenplum_path.sh
+        source ${gphome}/greengage_path.sh
         export MASTER_DATA_DIRECTORY=/data/gpdata/coordinator/gpseg-1
         reindexdb -a
 "
@@ -51,7 +53,7 @@ dump_sql() {
     ssh -n cdw "
         set -eux -o pipefail
 
-        source ${GPHOME_TARGET}/greenplum_path.sh
+        source ${GPHOME_TARGET}/greengage_path.sh
         pg_dumpall -p ${port} -f '$dumpfile'
     "
 }
@@ -62,7 +64,7 @@ compare_dumps() {
 
     echo "Comparing dumps at ${source_dump} and ${target_dump}..."
 
-    pushd gpupgrade_src
+    pushd ggupgrade_src
         # 5 to 6 requires some massaging of the diff due to expected changes.
         if (( $FILTER_DIFF )); then
             go build ./ci/main/scripts/filters/filter
@@ -104,13 +106,13 @@ install_source_GPDB_rpm_and_symlink() {
     yum install -y rpm_gpdb_source/*.rpm
 
     version=$(rpm -q --qf '%{version}' "$SOURCE_PACKAGE" | tr _ -)
-    ln -s /usr/local/greenplum-db-${version} "$GPHOME_SOURCE"
+    ln -s /usr/local/greengage-db-${version} "$GPHOME_SOURCE"
 
     chown -R gpadmin:gpadmin "$GPHOME_SOURCE"
-    chown -R gpadmin:gpadmin /usr/local/greenplum-db-${version}
+    chown -R gpadmin:gpadmin /usr/local/greengage-db-${version}
 }
 
-# XXX: Setup target cluster before sourcing greenplum_path otherwise there are
+# XXX: Setup target cluster before sourcing greengage_path otherwise there are
 # yum errors due to python issues.
 # XXX: When source equals target then yum will fail when trying to re-install.
 install_target_GPDB_rpm_and_symlink() {
@@ -119,14 +121,14 @@ install_target_GPDB_rpm_and_symlink() {
     fi
 
     version=$(rpm -q --qf '%{version}' "$TARGET_PACKAGE" | tr _ -)
-    ln -s /usr/local/greenplum-db-${version} "$GPHOME_TARGET"
+    ln -s /usr/local/greengage-db-${version} "$GPHOME_TARGET"
 
     chown -R gpadmin:gpadmin "$GPHOME_TARGET"
-    chown -R gpadmin:gpadmin /usr/local/greenplum-db-${version}
+    chown -R gpadmin:gpadmin /usr/local/greengage-db-${version}
 }
 
 create_source_cluster() {
-    source "$GPHOME_SOURCE"/greenplum_path.sh
+    source "$GPHOME_SOURCE"/greengage_path.sh
 
     chown -R gpadmin:gpadmin gpdb_src_source/gpAux/gpdemo
     su gpadmin -c "make -j $(nproc) -C gpdb_src_source/gpAux/gpdemo create-demo-cluster"

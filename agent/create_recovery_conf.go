@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func (s *Server) CreateRecoveryConf(ctx context.Context, req *idl.CreateRecoveryConfRequest) (*idl.CreateRecoveryConfReply, error) {

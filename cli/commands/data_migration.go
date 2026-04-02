@@ -10,10 +10,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func dataMigrationGenerate() *cobra.Command {
@@ -43,9 +43,9 @@ func dataMigrationGenerate() *cobra.Command {
 
 	dataMigrationGenerator.Flags().BoolVar(&nonInteractive, "non-interactive", false, "do not prompt to proceed")
 	dataMigrationGenerator.Flags().MarkHidden("non-interactive") //nolint
-	dataMigrationGenerator.Flags().StringVar(&gphome, "gphome", "", "path to the Greenplum installation")
-	dataMigrationGenerator.Flags().IntVar(&port, "port", 0, "master port for Greenplum cluster")
-	dataMigrationGenerator.Flags().StringVar(&outputDir, "output-dir", outputDir, "output path to the current generated data migration SQL files. Defaults to $HOME/gpAdminLogs/gpupgrade/data-migration-scripts")
+	dataMigrationGenerator.Flags().StringVar(&gphome, "gphome", "", "path to the Greengage installation")
+	dataMigrationGenerator.Flags().IntVar(&port, "port", 0, "master port for Greengage cluster")
+	dataMigrationGenerator.Flags().StringVar(&outputDir, "output-dir", outputDir, "output path to the current generated data migration SQL files. Defaults to $HOME/gpAdminLogs/ggupgrade/data-migration-scripts")
 	// seed-dir is a hidden flag used for internal testing.
 	dataMigrationGenerator.Flags().StringVar(&seedDir, "seed-dir", utils.GetDataMigrationSeedDir(), "path to the seed scripts")
 	dataMigrationGenerator.Flags().MarkHidden("seed-dir") //nolint
@@ -89,9 +89,9 @@ func dataMigrationApply() *cobra.Command {
 
 	dataMigrationExecutor.Flags().BoolVar(&nonInteractive, "non-interactive", false, "do not prompt to proceed")
 	dataMigrationExecutor.Flags().MarkHidden("non-interactive") //nolint
-	dataMigrationExecutor.Flags().StringVar(&gphome, "gphome", "", "path to the Greenplum installation")
-	dataMigrationExecutor.Flags().IntVar(&port, "port", 0, "master port for Greenplum cluster")
-	dataMigrationExecutor.Flags().StringVar(&inputDir, "input-dir", inputDir, "path to the generated data migration SQL files. Defaults to $HOME/gpAdminLogs/gpupgrade/data-migration-scripts")
+	dataMigrationExecutor.Flags().StringVar(&gphome, "gphome", "", "path to the Greengage installation")
+	dataMigrationExecutor.Flags().IntVar(&port, "port", 0, "master port for Greengage cluster")
+	dataMigrationExecutor.Flags().StringVar(&inputDir, "input-dir", inputDir, "path to the generated data migration SQL files. Defaults to $HOME/gpAdminLogs/ggupgrade/data-migration-scripts")
 	dataMigrationExecutor.Flags().StringVar(&phase, "phase", "", `data migration phase. Either "pre-initialize", "post-finalize", "post-revert", or "stats".`)
 
 	return addHelpToCommand(dataMigrationExecutor, applyHelp)

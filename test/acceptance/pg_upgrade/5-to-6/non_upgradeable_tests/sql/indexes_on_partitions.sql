@@ -29,8 +29,8 @@ CREATE INDEX p_aoco_first_name_index ON p_aoco_table(first_name);
 --------------------------------------------------------------------------------
 -- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 --------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
-! cat ~/gpAdminLogs/gpupgrade/pg_upgrade/p-1/partitioned_tables_indexes.txt | LC_ALL=C sort -b;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+! cat ~/gpAdminLogs/ggupgrade/pg_upgrade/p-1/partitioned_tables_indexes.txt | LC_ALL=C sort -b;
 
 --------------------------------------------------------------------------------
 -- Workaround to unblock upgrade

@@ -15,18 +15,18 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/substeps"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/stopwatch"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/substeps"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/stopwatch"
 )
 
 const StepsFileName = "steps.json"
 
-const nextActionRunRevertText = "If you would like to return the cluster to its original state, please run \"gpupgrade revert\".\n"
+const nextActionRunRevertText = "If you would like to return the cluster to its original state, please run \"ggupgrade revert\".\n"
 
 var additionalNextActions = map[idl.Step]string{
 	idl.Step_initialize: nextActionRunRevertText,
@@ -67,7 +67,7 @@ func Begin(currentStep idl.Step, verbose bool, nonInteractive bool, confirmation
 
 	stepStore, err := NewStepFileStore()
 	if err != nil {
-		context := fmt.Sprintf("Note: If commands were issued in order, ensure gpupgrade can write to %s", utils.GetStateDir())
+		context := fmt.Sprintf("Note: If commands were issued in order, ensure ggupgrade can write to %s", utils.GetStateDir())
 		wrappedErr := xerrors.Errorf("%v\n\n%v", StepErr, context)
 		return &Step{}, utils.NewNextActionErr(wrappedErr, RunInitialize)
 	}
@@ -82,7 +82,7 @@ func Begin(currentStep idl.Step, verbose bool, nonInteractive bool, confirmation
 	if !nonInteractive {
 		fmt.Print(confirmationText)
 
-		prompt := fmt.Sprintf("Continue with gpupgrade %s?  Yy|Nn: ", currentStep)
+		prompt := fmt.Sprintf("Continue with ggupgrade %s?  Yy|Nn: ", currentStep)
 		err := Prompt(utils.StdinReader, prompt)
 		if err != nil {
 			return &Step{}, err
@@ -260,7 +260,7 @@ func (s *Step) Complete(completedText string) error {
 			return s.Err()
 		}
 
-		genericNextAction := fmt.Sprintf("Please address the above issue and run \"gpupgrade %s\" again.\n"+additionalNextActions[s.step], strings.ToLower(s.stepName))
+		genericNextAction := fmt.Sprintf("Please address the above issue and run \"ggupgrade %s\" again.\n"+additionalNextActions[s.step], strings.ToLower(s.stepName))
 
 		var nextActionErr utils.NextActionErr
 		if errors.As(s.Err(), &nextActionErr) {

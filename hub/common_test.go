@@ -9,10 +9,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/utils/disk"
-	"github.com/greenplum-db/gpupgrade/utils/rsync"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/utils/disk"
+	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
 // Set it to nil so we don't accidentally execute a command for real during tests
@@ -86,10 +86,10 @@ func ResetCheckDiskUsage() {
 
 // MustCreateCluster creates a utils.Cluster and calls t.Fatalf() if there is
 // any error.
-func MustCreateCluster(t *testing.T, segments greenplum.SegConfigs) *greenplum.Cluster {
+func MustCreateCluster(t *testing.T, segments greengage.SegConfigs) *greengage.Cluster {
 	t.Helper()
 
-	cluster, err := greenplum.NewCluster(segments)
+	cluster, err := greengage.NewCluster(segments)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}

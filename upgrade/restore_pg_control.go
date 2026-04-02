@@ -8,8 +8,8 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 // RestorePgControl renames pg_control.old to pg_control so that

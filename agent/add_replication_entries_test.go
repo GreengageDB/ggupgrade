@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/agent"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/agent"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
 )
 
 func TestAddReplicationEntriesToPgHbaConf(t *testing.T) {

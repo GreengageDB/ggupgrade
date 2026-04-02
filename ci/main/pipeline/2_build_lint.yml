@@ -1,7 +1,7 @@
 jobs:
 - name: build
   plan:
-    - get: gpupgrade_src
+    - get: ggupgrade_src
       trigger: true
     - task: build
       config:
@@ -12,26 +12,26 @@ jobs:
             repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
             tag: latest
         inputs:
-          - name: gpupgrade_src
+          - name: ggupgrade_src
         outputs:
           - name: built_oss
           - name: built_enterprise
         run:
-          path: gpupgrade_src/ci/main/scripts/build.bash
+          path: ggupgrade_src/ci/main/scripts/build.bash
     - in_parallel:
         - put: oss_rpm
           params:
-            file: built_oss/gpupgrade-*.rpm
+            file: built_oss/ggupgrade-*.rpm
         - put: enterprise_rpm
           params:
-            file: built_enterprise/gpupgrade-*.rpm
+            file: built_enterprise/ggupgrade-*.rpm
   on_failure:
     do:
       - <<: *slack_alert
 
 - name: lint
   plan:
-    - get: gpupgrade_src
+    - get: ggupgrade_src
       trigger: true
     - task: lint
       config:
@@ -41,7 +41,7 @@ jobs:
           source:
             repository: golangci/golangci-lint
         inputs:
-          - name: gpupgrade_src
+          - name: ggupgrade_src
         run:
           path: bash
           args:
@@ -49,7 +49,7 @@ jobs:
             - |
               set -eux -o pipefail
 
-              cd gpupgrade_src
+              cd ggupgrade_src
               make lint
   on_failure:
     do:

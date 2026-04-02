@@ -12,14 +12,14 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/idl/mock_idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl/mock_idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/upgrade"
 )
 
 func TestRenameSegmentDataDirs(t *testing.T) {
@@ -133,34 +133,34 @@ func TestUpdateDataDirectories(t *testing.T) {
 
 	conf := new(config.Config)
 
-	conf.Source = hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, Hostname: "sdw1", DataDir: "/data/qddir/seg-1", Role: greenplum.PrimaryRole},
-		{ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greenplum.MirrorRole},
+	conf.Source = hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, Hostname: "sdw1", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole},
+		{ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greengage.MirrorRole},
 
-		{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greenplum.PrimaryRole},
-		{ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greenplum.PrimaryRole},
-		{ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast1/seg3", Role: greenplum.PrimaryRole},
-		{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast2/seg4", Role: greenplum.PrimaryRole},
+		{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+		{ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
+		{ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast1/seg3", Role: greengage.PrimaryRole},
+		{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast2/seg4", Role: greengage.PrimaryRole},
 
-		{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greenplum.MirrorRole},
-		{ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast_mirror2/seg2", Role: greenplum.MirrorRole},
-		{ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast_mirror1/seg3", Role: greenplum.MirrorRole},
-		{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast_mirror2/seg4", Role: greenplum.MirrorRole},
+		{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+		{ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
+		{ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast_mirror1/seg3", Role: greengage.MirrorRole},
+		{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast_mirror2/seg4", Role: greengage.MirrorRole},
 	})
 
-	conf.Intermediate = hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, Hostname: "sdw1", DataDir: "/data/qddir/seg-1_123ABC-1", Role: greenplum.PrimaryRole},
-		{ContentID: -1, Hostname: "standby", DataDir: "/data/standby_123ABC", Role: greenplum.MirrorRole},
+	conf.Intermediate = hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, Hostname: "sdw1", DataDir: "/data/qddir/seg-1_123ABC-1", Role: greengage.PrimaryRole},
+		{ContentID: -1, Hostname: "standby", DataDir: "/data/standby_123ABC", Role: greengage.MirrorRole},
 
-		{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1_123ABC", Role: greenplum.PrimaryRole},
-		{ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2_123ABC", Role: greenplum.PrimaryRole},
-		{ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast1/seg3_123ABC", Role: greenplum.PrimaryRole},
-		{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast2/seg4_123ABC", Role: greenplum.PrimaryRole},
+		{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1_123ABC", Role: greengage.PrimaryRole},
+		{ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2_123ABC", Role: greengage.PrimaryRole},
+		{ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast1/seg3_123ABC", Role: greengage.PrimaryRole},
+		{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast2/seg4_123ABC", Role: greengage.PrimaryRole},
 
-		{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast_mirror1/seg1_123ABC", Role: greenplum.MirrorRole},
-		{ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast_mirror2/seg2_123ABC", Role: greenplum.MirrorRole},
-		{ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast_mirror1/seg3_123ABC", Role: greenplum.MirrorRole},
-		{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast_mirror2/seg4_123ABC", Role: greenplum.MirrorRole},
+		{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast_mirror1/seg1_123ABC", Role: greengage.MirrorRole},
+		{ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast_mirror2/seg2_123ABC", Role: greengage.MirrorRole},
+		{ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast_mirror1/seg3_123ABC", Role: greengage.MirrorRole},
+		{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast_mirror2/seg4_123ABC", Role: greengage.MirrorRole},
 	})
 
 	hub.RenameDirectories = func(source, target string) error {
@@ -173,12 +173,12 @@ func TestUpdateDataDirectories(t *testing.T) {
 		sourceDataDir, targetDataDir, cleanup := testutils.MustCreateDataDirs(t)
 		defer cleanup(t)
 
-		conf.Source = hub.MustCreateCluster(t, greenplum.SegConfigs{
-			{ContentID: -1, Hostname: "sdw1", DataDir: sourceDataDir, Role: greenplum.PrimaryRole},
+		conf.Source = hub.MustCreateCluster(t, greengage.SegConfigs{
+			{ContentID: -1, Hostname: "sdw1", DataDir: sourceDataDir, Role: greengage.PrimaryRole},
 		})
 
-		conf.Intermediate = hub.MustCreateCluster(t, greenplum.SegConfigs{
-			{ContentID: -1, Hostname: "sdw1", DataDir: targetDataDir, Role: greenplum.PrimaryRole},
+		conf.Intermediate = hub.MustCreateCluster(t, greengage.SegConfigs{
+			{ContentID: -1, Hostname: "sdw1", DataDir: targetDataDir, Role: greengage.PrimaryRole},
 		})
 
 		hub.RenameDirectories = upgrade.RenameDirectories

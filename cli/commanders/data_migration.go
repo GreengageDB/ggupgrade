@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
 )
 
 var MigrationScriptPhases = []idl.Step{idl.Step_initialize, idl.Step_finalize, idl.Step_revert, idl.Step_stats}

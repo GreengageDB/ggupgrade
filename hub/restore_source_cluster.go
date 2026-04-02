@@ -8,15 +8,15 @@ import (
 	"os"
 	"sync"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/rsync"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
-func RsyncCoordinatorAndPrimaries(stream step.OutStreams, agentConns []*idl.Connection, source *greenplum.Cluster) error {
+func RsyncCoordinatorAndPrimaries(stream step.OutStreams, agentConns []*idl.Connection, source *greengage.Cluster) error {
 	var wg sync.WaitGroup
 	errs := make(chan error, 2)
 
@@ -39,7 +39,7 @@ func RsyncCoordinatorAndPrimaries(stream step.OutStreams, agentConns []*idl.Conn
 	return err
 }
 
-func RsyncCoordinatorAndPrimariesTablespaces(stream step.OutStreams, agentConns []*idl.Connection, source *greenplum.Cluster) error {
+func RsyncCoordinatorAndPrimariesTablespaces(stream step.OutStreams, agentConns []*idl.Connection, source *greengage.Cluster) error {
 	var wg sync.WaitGroup
 	errs := make(chan error, 2)
 
@@ -62,16 +62,16 @@ func RsyncCoordinatorAndPrimariesTablespaces(stream step.OutStreams, agentConns 
 	return err
 }
 
-func Recoverseg(stream step.OutStreams, cluster *greenplum.Cluster, useHbaHostnames bool) error {
+func Recoverseg(stream step.OutStreams, cluster *greengage.Cluster, useHbaHostnames bool) error {
 	args := []string{"-a"}
 	if useHbaHostnames {
 		args = append(args, "--hba-hostnames")
 	}
 
-	return cluster.RunGreenplumCmd(stream, "gprecoverseg", args...)
+	return cluster.RunGreengageCmd(stream, "gprecoverseg", args...)
 }
 
-func RsyncCoordinator(stream step.OutStreams, standby greenplum.SegConfig, coordinator greenplum.SegConfig) error {
+func RsyncCoordinator(stream step.OutStreams, standby greengage.SegConfig, coordinator greengage.SegConfig) error {
 	opts := []rsync.Option{
 		rsync.WithSources(standby.DataDir + string(os.PathSeparator)),
 		rsync.WithSourceHost(standby.Hostname),
@@ -84,7 +84,7 @@ func RsyncCoordinator(stream step.OutStreams, standby greenplum.SegConfig, coord
 	return rsync.Rsync(opts...)
 }
 
-func RsyncCoordinatorTablespaces(stream step.OutStreams, standbyHostname string, coordinatorTablespaces greenplum.SegmentTablespaces, standbyTablespaces greenplum.SegmentTablespaces) error {
+func RsyncCoordinatorTablespaces(stream step.OutStreams, standbyHostname string, coordinatorTablespaces greengage.SegmentTablespaces, standbyTablespaces greengage.SegmentTablespaces) error {
 	for oid, coordinatorTsInfo := range coordinatorTablespaces {
 		if !coordinatorTsInfo.GetUserDefined() {
 			continue
@@ -107,9 +107,9 @@ func RsyncCoordinatorTablespaces(stream step.OutStreams, standbyHostname string,
 	return nil
 }
 
-func RsyncPrimaries(agentConns []*idl.Connection, source *greenplum.Cluster) error {
+func RsyncPrimaries(agentConns []*idl.Connection, source *greengage.Cluster) error {
 	request := func(conn *idl.Connection) error {
-		mirrors := source.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		mirrors := source.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && !seg.IsStandby() && seg.IsMirror()
 		})
 
@@ -137,9 +137,9 @@ func RsyncPrimaries(agentConns []*idl.Connection, source *greenplum.Cluster) err
 	return ExecuteRPC(agentConns, request)
 }
 
-func RsyncPrimariesTablespaces(agentConns []*idl.Connection, source *greenplum.Cluster, tablespaces greenplum.Tablespaces) error {
+func RsyncPrimariesTablespaces(agentConns []*idl.Connection, source *greengage.Cluster, tablespaces greengage.Tablespaces) error {
 	request := func(conn *idl.Connection) error {
-		mirrors := source.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		mirrors := source.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && !seg.IsStandby() && seg.IsMirror()
 		})
 
@@ -177,7 +177,7 @@ func RsyncPrimariesTablespaces(agentConns []*idl.Connection, source *greenplum.C
 	return ExecuteRPC(agentConns, request)
 }
 
-func RestoreCoordinatorAndPrimariesPgControl(streams step.OutStreams, agentConns []*idl.Connection, source *greenplum.Cluster) error {
+func RestoreCoordinatorAndPrimariesPgControl(streams step.OutStreams, agentConns []*idl.Connection, source *greengage.Cluster) error {
 	var wg sync.WaitGroup
 	errs := make(chan error, 2)
 
@@ -200,9 +200,9 @@ func RestoreCoordinatorAndPrimariesPgControl(streams step.OutStreams, agentConns
 	return err
 }
 
-func restorePrimariesPgControl(agentConns []*idl.Connection, source *greenplum.Cluster) error {
+func restorePrimariesPgControl(agentConns []*idl.Connection, source *greengage.Cluster) error {
 	request := func(conn *idl.Connection) error {
-		primaries := source.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		primaries := source.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && !seg.IsStandby() && seg.IsPrimary()
 		})
 

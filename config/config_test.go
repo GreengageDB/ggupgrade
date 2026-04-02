@@ -11,12 +11,12 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/cli/commands"
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/cli/commands"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
 )
 
 func TestConfig(t *testing.T) {
@@ -24,7 +24,7 @@ func TestConfig(t *testing.T) {
 	conf := &config.Config{
 		Source:       source,
 		Target:       target,
-		Intermediate: &greenplum.Cluster{},
+		Intermediate: &greengage.Cluster{},
 		HubPort:      12345,
 		AgentPort:    54321,
 		Mode:         idl.Mode_copy,
@@ -35,7 +35,7 @@ func TestConfig(t *testing.T) {
 		stateDir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, stateDir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 		defer resetEnv()
 
 		if err := conf.Write(); err != nil {
@@ -57,19 +57,19 @@ func TestCreate(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
-	greenplum.SetVersionCommand(exectest.NewCommand(PostgresGPVersion_5_29_10))
-	defer greenplum.ResetVersionCommand()
+	greengage.SetVersionCommand(exectest.NewCommand(PostgresGPVersion_5_29_10))
+	defer greengage.ResetVersionCommand()
 
-	source := MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg-1", Port: 15432, Role: greenplum.PrimaryRole},
-		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Port: 16432, Role: greenplum.MirrorRole},
-		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Port: 25433, Role: greenplum.PrimaryRole},
-		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg1", Port: 25434, Role: greenplum.MirrorRole},
-		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Port: 25435, Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Port: 25436, Role: greenplum.MirrorRole},
+	source := MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg-1", Port: 15432, Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Port: 16432, Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Port: 25433, Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg1", Port: 25434, Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Port: 25435, Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Port: 25436, Role: greengage.MirrorRole},
 	})
 	source.GPHome = "/usr/local/source"
 	targetGPHome := "/usr/local/target"
@@ -220,7 +220,7 @@ func TestCreate(t *testing.T) {
 	})
 }
 
-func expectGpSegmentConfigurationToReturnCluster(mock sqlmock.Sqlmock, cluster *greenplum.Cluster) {
+func expectGpSegmentConfigurationToReturnCluster(mock sqlmock.Sqlmock, cluster *greengage.Cluster) {
 	rows := sqlmock.NewRows([]string{"dbid", "contentid", "port", "hostname", "address", "datadir", "role"})
 	for _, seg := range cluster.Primaries {
 		rows.AddRow(seg.DbID, seg.ContentID, seg.Port, seg.Hostname, seg.Address, seg.DataDir, seg.Role)
@@ -233,7 +233,7 @@ func expectGpSegmentConfigurationToReturnCluster(mock sqlmock.Sqlmock, cluster *
 	mock.ExpectQuery(`SELECT.*dbid.*FROM gp_segment_configuration`).
 		WillReturnRows(rows)
 }
-func expectGpSegmentConfigurationCount(mock sqlmock.Sqlmock, cluster *greenplum.Cluster) {
+func expectGpSegmentConfigurationCount(mock sqlmock.Sqlmock, cluster *greengage.Cluster) {
 	mock.ExpectQuery(`SELECT COUNT\(\*\) FROM gp_segment_configuration 
 WHERE content > -1 AND status = 'u' AND \(role = preferred_role\) AND mode = 's'`).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(len(cluster.ExcludingCoordinatorOrStandby())))

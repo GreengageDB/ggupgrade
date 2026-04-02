@@ -1,0 +1,194 @@
+// Copyright (c) 2017-2023 VMware, Inc. or its affiliates
+// SPDX-License-Identifier: Apache-2.0
+
+package ggupgrade_test
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"os/exec"
+	"regexp"
+	"strings"
+	"testing"
+
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+)
+
+func TestServices(t *testing.T) {
+	stateDir := testutils.GetTempDir(t, "")
+	defer testutils.MustRemoveAll(t, stateDir)
+
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
+	defer resetEnv()
+
+	acceptance.Initialize_stopBeforeClusterCreation(t)
+	defer acceptance.Revert(t)
+
+	// TODO: Move to integration/hub_test.go
+	t.Run("hub daemonizes and prints the PID when passed the --daemonize option", func(t *testing.T) {
+		acceptance.KillServices(t)
+
+		cmd := exec.Command("ggupgrade", "hub", "--daemonize")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("unexpected err: %#v stderr %q", err, output)
+		}
+
+		hubOutput := strings.TrimSpace(string(output))
+		expected := regexp.MustCompile(fmt.Sprintf(`Hub started on port %d with pid \d`, upgrade.DefaultHubPort))
+		if !expected.MatchString(hubOutput) {
+			t.Fatalf("got %q want %q", hubOutput, expected)
+		}
+
+		acceptance.KillServices(t)
+	})
+
+	// TODO: Move to integration/hub_test.go
+	t.Run("hub does not start if the configuration hasn't been initialized", func(t *testing.T) {
+		acceptance.KillServices(t)
+
+		testutils.MustRename(t, config.GetConfigFile(), config.GetConfigFile()+".old")
+		defer testutils.MustRename(t, config.GetConfigFile()+".old", config.GetConfigFile())
+
+		cmd := exec.Command("ggupgrade", "hub", "--daemonize")
+		output, err := cmd.CombinedOutput()
+		expected := fmt.Sprintf("Error: open %s: no such file or directory\n", config.GetConfigFile())
+		if string(output) != expected {
+			t.Fatalf("got %q want %q", err, expected)
+		}
+	})
+
+	// TODO: Move to integration/hub_test.go
+	t.Run("subcommands return an error if the hub is not started", func(t *testing.T) {
+		acceptance.KillServices(t)
+
+		commands := [][]string{
+			{"config", "show"},
+			{"execute", "--non-interactive"},
+			{"revert", "--non-interactive"},
+		}
+
+		for _, command := range commands {
+			cmd := exec.Command("ggupgrade", command...)
+			cmd.Env = append(os.Environ(), "GGUPGRADE_CONNECTION_TIMEOUT=0")
+			output, err := cmd.CombinedOutput()
+			expected := `Try restarting the hub with "ggupgrade restart-services".`
+			if !strings.Contains(string(output), expected) {
+				t.Fatalf("got %q want %q", err, expected)
+			}
+		}
+	})
+
+	t.Run("kill-services stops hub and agents", func(t *testing.T) {
+		acceptance.RestartServices(t)
+		processMustBeRunning(t, "ggupgrade hub")
+		processMustBeRunning(t, "ggupgrade agent")
+
+		acceptance.KillServices(t)
+		processMustNotBeRunning(t, "ggupgrade hub")
+		processMustNotBeRunning(t, "ggupgrade agent")
+	})
+
+	t.Run("kill-services stops hub and agents on default port if config file does not exist", func(t *testing.T) {
+		acceptance.RestartServices(t)
+		processMustBeRunning(t, "ggupgrade hub")
+		processMustBeRunning(t, "ggupgrade agent")
+
+		// move the ggupgrade state dir so that kill-services will use the default port
+		tempStateDir := stateDir + ".bak"
+		err := os.Rename(stateDir, tempStateDir)
+		if err != nil {
+			t.Fatalf("unexpected error: %#v", err)
+		}
+		defer func() {
+			err = os.Rename(tempStateDir, stateDir)
+			if err != nil {
+				t.Fatalf("unexpected error: %#v", err)
+			}
+		}()
+
+		acceptance.KillServices(t)
+		processMustNotBeRunning(t, "ggupgrade hub")
+		processMustNotBeRunning(t, "ggupgrade agent")
+	})
+
+	t.Run("restart-services actually starts hub and agents", func(t *testing.T) {
+		acceptance.KillServices(t)
+		processMustNotBeRunning(t, "ggupgrade hub")
+		processMustNotBeRunning(t, "ggupgrade agent")
+
+		acceptance.RestartServices(t)
+		processMustBeRunning(t, "ggupgrade hub")
+		processMustBeRunning(t, "ggupgrade agent")
+	})
+
+	t.Run("kill services can be run multiple times without issue", func(t *testing.T) {
+		acceptance.KillServices(t)
+		processMustNotBeRunning(t, "ggupgrade hub")
+		processMustNotBeRunning(t, "ggupgrade agent")
+
+		acceptance.KillServices(t)
+		processMustNotBeRunning(t, "ggupgrade hub")
+		processMustNotBeRunning(t, "ggupgrade agent")
+	})
+
+	t.Run("restart services can be run multiple times without issue", func(t *testing.T) {
+		acceptance.RestartServices(t)
+		processMustBeRunning(t, "ggupgrade hub")
+		processMustBeRunning(t, "ggupgrade agent")
+
+		acceptance.RestartServices(t)
+		processMustBeRunning(t, "ggupgrade hub")
+		processMustBeRunning(t, "ggupgrade agent")
+	})
+}
+
+func processRunning(t *testing.T, process string) (bool, error) {
+	t.Helper()
+
+	cmd := exec.Command("pgrep", "-f", process)
+	err := cmd.Run()
+	var exitErr *exec.ExitError
+	if errors.As(err, &exitErr) {
+		if exitErr.ExitCode() == 1 {
+			// No processes were matched
+			return false, nil
+		}
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func processMustBeRunning(t *testing.T, process string) {
+	t.Helper()
+
+	isRunning, err := processRunning(t, process)
+	if err != nil {
+		t.Fatalf("unexpected err: %#v", err)
+	}
+
+	if !isRunning {
+		t.Fatalf("expected %q to be running", process)
+	}
+}
+
+func processMustNotBeRunning(t *testing.T, process string) {
+	t.Helper()
+
+	isRunning, err := processRunning(t, process)
+	if err != nil {
+		t.Fatalf("unexpected err: %#v", err)
+	}
+
+	if isRunning {
+		t.Fatalf("expected %q to not be running", process)
+	}
+}

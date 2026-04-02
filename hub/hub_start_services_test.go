@@ -18,27 +18,27 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
 
-	"github.com/greenplum-db/gpupgrade/agent"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/agent"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
-func gpupgrade_agent() {
+func ggupgrade_agent() {
 }
 
-func gpupgrade_agent_Errors() {
+func ggupgrade_agent_Errors() {
 	os.Stderr.WriteString("could not find state-directory")
 	os.Exit(1)
 }
 
 func init() {
 	exectest.RegisterMains(
-		gpupgrade_agent,
-		gpupgrade_agent_Errors,
+		ggupgrade_agent,
+		ggupgrade_agent_Errors,
 	)
 }
 
@@ -60,7 +60,7 @@ func TestRestartAgent(t *testing.T) {
 	stateDir := "/not/existent/directory"
 	ctx := context.Background()
 
-	hub.SetExecCommand(exectest.NewCommand(gpupgrade_agent))
+	hub.SetExecCommand(exectest.NewCommand(ggupgrade_agent))
 	defer hub.ResetExecCommand()
 
 	t.Run("does not start running agents", func(t *testing.T) {
@@ -102,11 +102,11 @@ func TestRestartAgent(t *testing.T) {
 		}
 	})
 
-	t.Run("returns an error when gpupgrade agent fails", func(t *testing.T) {
-		hub.SetExecCommand(exectest.NewCommand(gpupgrade_agent_Errors))
+	t.Run("returns an error when ggupgrade agent fails", func(t *testing.T) {
+		hub.SetExecCommand(exectest.NewCommand(ggupgrade_agent_Errors))
 
 		// we fail all connections here so that RestartAgents will run the
-		//  (error producing) gpupgrade_agent_Errors
+		//  (error producing) ggupgrade_agent_Errors
 		dialer := func(ctx context.Context, address string) (net.Conn, error) {
 			return nil, immediateFailure{}
 		}
@@ -140,12 +140,12 @@ func TestRestartAgent(t *testing.T) {
 	t.Run("starts agents with correct args including specified port and state directory", func(t *testing.T) {
 		host := "host1"
 
-		execCmd := exectest.NewCommandWithVerifier(gpupgrade_agent, func(name string, args ...string) {
+		execCmd := exectest.NewCommandWithVerifier(ggupgrade_agent, func(name string, args ...string) {
 			if name != "ssh" {
 				t.Errorf("RestartAgents invoked with %q want ssh", name)
 			}
 
-			cmd := fmt.Sprintf("bash -c \"%s/gpupgrade agent --daemonize --port %d --state-directory %s\"", testutils.MustGetExecutablePath(t), port, stateDir)
+			cmd := fmt.Sprintf("bash -c \"%s/ggupgrade agent --daemonize --port %d --state-directory %s\"", testutils.MustGetExecutablePath(t), port, stateDir)
 			expected := []string{host, cmd}
 			if !reflect.DeepEqual(args, expected) {
 				t.Errorf("got %q want %q", args, expected)

@@ -4,8 +4,8 @@
 
 set -eux -o pipefail
 
-source gpupgrade_src/ci/main/scripts/environment.bash
-source gpupgrade_src/ci/main/scripts/ci-helpers.bash
+source ggupgrade_src/ci/main/scripts/environment.bash
+source ggupgrade_src/ci/main/scripts/ci-helpers.bash
 ./ccp_src/scripts/setup_ssh_to_cluster.sh
 
 MODE=${MODE:-"copy"}
@@ -38,7 +38,7 @@ ssh -n cdw "
     export GPHOME=${GPHOME_SOURCE}
     export PXF_BASE=/home/gpadmin/pxf
 
-    PGDATABASE=postgres /usr/local/pxf-gp5/bin/pxf-pre-gpupgrade
+    PGDATABASE=postgres /usr/local/pxf-gp5/bin/pxf-pre-ggupgrade
 "
 
 if ! is_GPDB5 ${GPHOME_SOURCE}; then
@@ -49,30 +49,30 @@ fi
 echo "Dumping the source cluster for comparing after upgrade..."
 dump_sql $PGPORT /tmp/source.sql
 
-echo "Performing gpupgrade..."
+echo "Performing ggupgrade..."
 time ssh -n cdw "
     set -ex -o pipefail
 
     echo 'Running initialize to create target cluster....'
     echo 'Initialize expected to fail as target extension is not yet installed since target cluster is needed...'
     set +e
-    gpupgrade initialize \
+    ggupgrade initialize \
               --non-interactive \
               --target-gphome $GPHOME_TARGET \
               --source-gphome $GPHOME_SOURCE \
               --source-master-port $PGPORT \
               --mode $MODE \
               --temp-port-range 6020-6040 \
-              --dynamic-library-path ${GPHOME_TARGET}/madlib/Current/ports/greenplum/6/lib:/usr/local/greenplum-db-text/lib/gpdb6:/usr/local/pxf-gp6/gpextable
+              --dynamic-library-path ${GPHOME_TARGET}/madlib/Current/ports/greengage/6/lib:/usr/local/greengage-db-text/lib/gpdb6:/usr/local/pxf-gp6/gpextable
     set -e
 
     # Remove the expected failure logs such that any legitimate errors can easily be identified.
-    rm -rf /home/gpadmin/gpAdminLogs/gpupgrade/pg_upgrade/*
+    rm -rf /home/gpadmin/gpAdminLogs/ggupgrade/pg_upgrade/*
 
     echo 'Installing extensions on the target cluster...'
-    source /usr/local/greenplum-db-target/greenplum_path.sh
-    export MASTER_DATA_DIRECTORY=\$(gpupgrade config show --target-datadir)
-    export PGPORT=\$(gpupgrade config show --target-port)
+    source /usr/local/greengage-db-target/greengage_path.sh
+    export MASTER_DATA_DIRECTORY=\$(ggupgrade config show --target-datadir)
+    export PGPORT=\$(ggupgrade config show --target-port)
 
     gpstart -a
 
@@ -90,24 +90,24 @@ time ssh -n cdw "
     # Extension data belongs in the extension directory and 'not' in the server
     # data directories. Do not mix them!
     # Since these files are required by the gptext .so file they need to be in
-    # the target cluster. Since gpupgrade initialize is re-run and idempotent
+    # the target cluster. Since ggupgrade initialize is re-run and idempotent
     # place them in the backup of the coordinator data directory.
-    cp $MASTER_DATA_DIRECTORY/{gptext.conf,gptxtenvs.conf,zoo_cluster.conf} /data/gpdata/coordinator/.gpupgrade/coordinator-pre-upgrade-backup/
+    cp $MASTER_DATA_DIRECTORY/{gptext.conf,gptxtenvs.conf,zoo_cluster.conf} /data/gpdata/coordinator/.ggupgrade/coordinator-pre-upgrade-backup/
 
     gpstop -a
 
     echo 'Finishing the upgrade...'
-    gpupgrade initialize \
+    ggupgrade initialize \
               --non-interactive \
               --target-gphome $GPHOME_TARGET \
               --source-gphome $GPHOME_SOURCE \
               --source-master-port $PGPORT \
               --mode $MODE \
               --temp-port-range 6020-6040 \
-              --dynamic-library-path ${GPHOME_TARGET}/madlib/Current/ports/greenplum/6/lib:/usr/local/greenplum-db-text/lib/gpdb6:/usr/local/pxf-gp6/gpextable
+              --dynamic-library-path ${GPHOME_TARGET}/madlib/Current/ports/greengage/6/lib:/usr/local/greengage-db-text/lib/gpdb6:/usr/local/pxf-gp6/gpextable
 
-    gpupgrade execute --non-interactive --skip-pg-upgrade-checks
-    gpupgrade finalize --non-interactive
+    ggupgrade execute --non-interactive --skip-pg-upgrade-checks
+    ggupgrade finalize --non-interactive
 "
 
 if ! is_GPDB5 ${GPHOME_TARGET}; then
@@ -131,11 +131,11 @@ echo "Applying post-upgrade extension fixups after comparing dumps..."
 ssh -n cdw "
     set -eux -o pipefail
 
-    source /usr/local/greenplum-db-target/greenplum_path.sh
+    source /usr/local/greengage-db-target/greengage_path.sh
 
     echo 'Dropping operator dependent objects in order to successfully drop and recreate postgis operators...'
     psql -v ON_ERROR_STOP=1 -d postgres -c 'DROP INDEX wmstest_geomidx CASCADE;'
-    psql -v ON_ERROR_STOP=1 -d postgres -f /usr/local/greenplum-db-target/share/postgresql/contrib/postgis-*/postgis_enable_operators.sql
+    psql -v ON_ERROR_STOP=1 -d postgres -f /usr/local/greengage-db-target/share/postgresql/contrib/postgis-*/postgis_enable_operators.sql
 
     echo 'Starting pxf...'
     export GPHOME=${GPHOME_TARGET}

@@ -8,13 +8,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/daemon"
-	"github.com/greenplum-db/gpupgrade/utils/logger"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/daemon"
+	"github.com/GreengageDB/ggupgrade/utils/logger"
 )
 
 func Hub() *cobra.Command {
@@ -37,8 +37,8 @@ func Hub() *cobra.Command {
 			}
 
 			if !exist {
-				nextAction := fmt.Sprintf(`Run "gpupgrade %s" to start the hub.`, idl.Step_initialize)
-				err = fmt.Errorf("gpupgrade state directory %q does not exist", utils.GetStateDir())
+				nextAction := fmt.Sprintf(`Run "ggupgrade %s" to start the hub.`, idl.Step_initialize)
+				err = fmt.Errorf("ggupgrade state directory %q does not exist", utils.GetStateDir())
 				return utils.NewNextActionErr(err, nextAction)
 			}
 

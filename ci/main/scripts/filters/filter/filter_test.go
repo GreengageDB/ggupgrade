@@ -87,7 +87,7 @@ RESET allow_system_table_mods;
 		in.WriteString(`
 
 --
--- Greenplum Database database dump complete
+-- Greengage Database database dump complete
 --
 
 --
@@ -101,7 +101,7 @@ RESET allow_system_table_mods;
 		expected := `
 
 --
--- Greenplum Database database dump complete
+-- Greengage Database database dump complete
 --
 
 --

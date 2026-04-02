@@ -9,7 +9,7 @@
         - get: enterprise_rpm
           trigger: true
           passed: [ build ]
-        - get: gpupgrade_src
+        - get: ggupgrade_src
           passed: [ build ]
         - get: rpm_gpdb_source
           resource: gpdb{{.Source}}_{{.Platform}}_rpm
@@ -99,17 +99,17 @@
             repository: registry.access.redhat.com/ubi8/ubi
             tag: latest
         inputs:
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: cluster_env_files
           - name: enterprise_rpm
           {{- if ne .Source .Target }}
           - name: rpm_gpdb_target
           {{- end }}
         run:
-          path: gpupgrade_src/ci/main/scripts/prepare-installation.bash
+          path: ggupgrade_src/ci/main/scripts/prepare-installation.bash
           args:
-            - greenplum-db-{{.Source}}
-            - greenplum-db-{{.Target}}
+            - greengage-db-{{.Source}}
+            - greengage-db-{{.Target}}
     {{- if .RetailDemo }}
     - task: load_retail_data
       config:
@@ -120,12 +120,12 @@
             repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test
             tag: latest
         inputs:
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: retail_demo_src
           - name: ccp_src
           - name: cluster_env_files
         run:
-          path: gpupgrade_src/ci/main/scripts/load-retail-data.bash
+          path: ggupgrade_src/ci/main/scripts/load-retail-data.bash
     {{- else if .TestExtensions }}
     - task: load_extensions
       config:
@@ -141,7 +141,7 @@
         inputs:
           - name: ccp_src
           - name: cluster_env_files
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: gptext_targz_source
           - name: postgis_gppkg_source
           - name: madlib_gppkg_source
@@ -152,7 +152,7 @@
           - name: plcontainer_gppkg_source
           {{- end }}
         run:
-          path: gpupgrade_src/ci/main/scripts/load-extensions.bash
+          path: ggupgrade_src/ci/main/scripts/load-extensions.bash
     {{- else }}
     - task: load_dump
       config:
@@ -165,10 +165,10 @@
         inputs:
           - name: ccp_src
           - name: cluster_env_files
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: sqldump
         run:
-          path: gpupgrade_src/ci/main/scripts/load-dump.bash
+          path: ggupgrade_src/ci/main/scripts/load-dump.bash
     {{- end }}
     {{- if .TestExtensions }}
     - task: upgrade_extensions
@@ -184,7 +184,7 @@
         inputs:
           - name: ccp_src
           - name: cluster_env_files
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: postgis_gppkg_target
           - name: madlib_gppkg_target
           - name: plr_gppkg_target
@@ -193,7 +193,7 @@
           - name: plcontainer_gppkg_target
           {{- end }}
         run:
-          path: gpupgrade_src/ci/main/scripts/upgrade-extensions.bash
+          path: ggupgrade_src/ci/main/scripts/upgrade-extensions.bash
       params:
         MODE: link
         FILTER_DIFF: 1
@@ -210,9 +210,9 @@
         inputs:
           - name: ccp_src
           - name: cluster_env_files
-          - name: gpupgrade_src
+          - name: ggupgrade_src
         run:
-          path: gpupgrade_src/ci/main/scripts/upgrade-cluster.bash
+          path: ggupgrade_src/ci/main/scripts/upgrade-cluster.bash
       params:
         {{- if ne .Source .Target }}
         FILTER_DIFF: 1
@@ -231,7 +231,7 @@
             repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
             tag: latest
         inputs:
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: ccp_src
           - name: cluster_env_files
         run:
@@ -241,14 +241,14 @@
             - |
               set -eux -o pipefail
 
-              source gpupgrade_src/ci/main/scripts/environment.bash
+              source ggupgrade_src/ci/main/scripts/environment.bash
               ./ccp_src/scripts/setup_ssh_to_cluster.sh
 
               echo "Running gpcheckcat..."
               time ssh -n cdw "
                   set -eux -o pipefail
 
-                  source /usr/local/greenplum-db-target/greenplum_path.sh
+                  source /usr/local/greengage-db-target/greengage_path.sh
                   export MASTER_DATA_DIRECTORY=$MASTER_DATA_DIRECTORY
                   export PGPORT=$PGPORT
 
@@ -265,7 +265,7 @@
             repository: gcr.io/data-gpdb-public-images/gpdb6-centos7-test-golang
             tag: latest
         inputs:
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: ccp_src
           - name: cluster_env_files
         run:
@@ -278,8 +278,8 @@
               ./ccp_src/scripts/setup_ssh_to_cluster.sh
 
               echo 'Doing failover tests of mirrors and standby...'
-              source gpupgrade_src/testutils/validate_mirrors_and_standby/validate_mirrors_and_standby.bash
-              validate_mirrors_and_standby /usr/local/greenplum-db-target cdw 5432
+              source ggupgrade_src/testutils/validate_mirrors_and_standby/validate_mirrors_and_standby.bash
+              validate_mirrors_and_standby /usr/local/greengage-db-target cdw 5432
     {{- end -}}
     {{- end }}
   ensure:

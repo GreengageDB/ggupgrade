@@ -7,5 +7,5 @@
 
 -- We should be able to scan all tuples from this table without encountering
 -- CLOG lookup failures, which proves that no CLOG was inadvertently truncated
--- during gpupgrade execute.
+-- during ggupgrade execute.
 SELECT count(*) FROM foo;

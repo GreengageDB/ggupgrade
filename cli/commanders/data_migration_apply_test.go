@@ -19,19 +19,19 @@ import (
 
 	"github.com/vbauerster/mpb/v8"
 
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func TestApplyDataMigrationScripts(t *testing.T) {
 	logDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, logDir)
 
-	currentScriptDir := "/home/gpupgrade/data-migration/current"
+	currentScriptDir := "/home/ggupgrade/data-migration/current"
 
 	currentDirFS := fstest.MapFS{
 		idl.Step_stats.String():                                  {Mode: os.ModeDir},
@@ -161,7 +161,7 @@ func TestApplyDataMigrationScripts(t *testing.T) {
 }
 
 func TestApplyDataMigrationScriptSubDir(t *testing.T) {
-	scriptSubDir := "/home/gpupgrade/data-migration/current/initialize/unique_primary_foreign_key_constraint"
+	scriptSubDir := "/home/ggupgrade/data-migration/current/initialize/unique_primary_foreign_key_constraint"
 	progressBar := mpb.New()
 	bar := progressBar.AddBar(int64(100))
 
@@ -234,7 +234,7 @@ func TestApplyDataMigrationScriptSubDir(t *testing.T) {
 }
 
 func TestApplyDataMigrationScriptsPrompt(t *testing.T) {
-	currentScriptDir := "/home/gpupgrade/data-migration/current"
+	currentScriptDir := "/home/ggupgrade/data-migration/current"
 	phase := idl.Step_initialize
 
 	fsys := fstest.MapFS{
@@ -267,7 +267,7 @@ func TestApplyDataMigrationScriptsPrompt(t *testing.T) {
 			t.Errorf("unexpected err %#v", err)
 		}
 
-		expectedScriptDirs := []string{"/home/gpupgrade/data-migration/current/initialize/parent_partitions_with_seg_entries", "/home/gpupgrade/data-migration/current/initialize/unique_primary_foreign_key_constraint"}
+		expectedScriptDirs := []string{"/home/ggupgrade/data-migration/current/initialize/parent_partitions_with_seg_entries", "/home/ggupgrade/data-migration/current/initialize/unique_primary_foreign_key_constraint"}
 		if !reflect.DeepEqual(actualScriptDirs, expectedScriptDirs) {
 			t.Errorf("got %s, want %s", actualScriptDirs, expectedScriptDirs)
 		}
@@ -294,7 +294,7 @@ func TestApplyDataMigrationScriptsPrompt(t *testing.T) {
 			t.Errorf("unexpected err %#v", err)
 		}
 
-		expectedScriptDirs := []string{"/home/gpupgrade/data-migration/current/initialize/parent_partitions_with_seg_entries", "/home/gpupgrade/data-migration/current/initialize/unique_primary_foreign_key_constraint"}
+		expectedScriptDirs := []string{"/home/ggupgrade/data-migration/current/initialize/parent_partitions_with_seg_entries", "/home/ggupgrade/data-migration/current/initialize/unique_primary_foreign_key_constraint"}
 		if !reflect.DeepEqual(actualScriptDirs, expectedScriptDirs) {
 			t.Errorf("got %s, want %s", actualScriptDirs, expectedScriptDirs)
 		}
@@ -486,7 +486,7 @@ func TestApplyDataMigrationScriptsPrompt(t *testing.T) {
 	})
 
 	t.Run("when phase is 'not' initialize it does 'not' display a warning or additional text", func(t *testing.T) {
-		currentScriptDir := "/home/gpupgrade/data-migration/current"
+		currentScriptDir := "/home/ggupgrade/data-migration/current"
 		phase := idl.Step_finalize
 
 		fsys := fstest.MapFS{
@@ -535,7 +535,7 @@ func TestApplyDataMigrationScriptsPrompt(t *testing.T) {
 }
 
 func TestSelectDataMigrationScriptsPrompt(t *testing.T) {
-	currentScriptDir := "/home/gpupgrade/data-migration/current"
+	currentScriptDir := "/home/ggupgrade/data-migration/current"
 	phase := idl.Step_initialize
 
 	fsys := fstest.MapFS{
@@ -639,13 +639,13 @@ func TestSelectDataMigrationScriptsPrompt(t *testing.T) {
 		d := BufferStandardDescriptors(t)
 
 		reader := bufio.NewReader(strings.NewReader("0\ne\n1\nc\n"))
-		currentScriptDir := "/home/gpupgrade/data-migration/current"
+		currentScriptDir := "/home/ggupgrade/data-migration/current"
 		actualScriptDirs, err := commanders.SelectDataMigrationScriptsPrompt(reader, currentScriptDir, fsys, phase)
 		if err != nil {
 			t.Errorf("unexpected err %#v", err)
 		}
 
-		expectedScriptDirs := []string{"/home/gpupgrade/data-migration/current/initialize/unique_primary_foreign_key_constraint"}
+		expectedScriptDirs := []string{"/home/ggupgrade/data-migration/current/initialize/unique_primary_foreign_key_constraint"}
 		if !reflect.DeepEqual(actualScriptDirs, expectedScriptDirs) {
 			t.Errorf("got %s, want %s", actualScriptDirs, expectedScriptDirs)
 		}

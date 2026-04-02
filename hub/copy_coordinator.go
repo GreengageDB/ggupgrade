@@ -13,12 +13,12 @@ import (
 	"github.com/blang/semver/v4"
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/config/backupdir"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/rsync"
+	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
 type Result struct {
@@ -95,7 +95,7 @@ func CopyCoordinatorDataDir(streams step.OutStreams, coordinatorDataDir string, 
 	return Copy(streams, source, destinationHostToBackupDir)
 }
 
-func CopyCoordinatorTablespaces(streams step.OutStreams, sourceVersion semver.Version, tablespaces greenplum.Tablespaces, agentHostsToBackupDir backupdir.AgentHostsToBackupDir) error {
+func CopyCoordinatorTablespaces(streams step.OutStreams, sourceVersion semver.Version, tablespaces greengage.Tablespaces, agentHostsToBackupDir backupdir.AgentHostsToBackupDir) error {
 	if tablespaces == nil && sourceVersion.Major != 5 {
 		return nil
 	}

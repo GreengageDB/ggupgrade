@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func Initialize(process string) {
@@ -52,6 +52,6 @@ func prefix() string {
 	currentUser, _ := user.Current()
 	host, _ := os.Hostname()
 
-	return fmt.Sprintf("gpupgrade:%s:%s:%06d [INFO]: ",
+	return fmt.Sprintf("ggupgrade:%s:%s:%06d [INFO]: ",
 		currentUser.Username, host, os.Getpid())
 }

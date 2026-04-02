@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
 )
 
 func TestMain(m *testing.M) {

@@ -8,16 +8,16 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils/disk"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils/disk"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 var checkDiskUsage = disk.CheckUsage
 
-func CheckDiskSpace(streams step.OutStreams, agentConns []*idl.Connection, diskFreeRatio float64, source *greenplum.Cluster, sourceTablespaces greenplum.Tablespaces) error {
+func CheckDiskSpace(streams step.OutStreams, agentConns []*idl.Connection, diskFreeRatio float64, source *greengage.Cluster, sourceTablespaces greengage.Tablespaces) error {
 	var wg sync.WaitGroup
 	errs := make(chan error, len(agentConns)+1)
 	usagesChan := make(chan disk.FileSystemDiskUsage, len(agentConns)+1)
@@ -66,13 +66,13 @@ func CheckDiskSpace(streams step.OutStreams, agentConns []*idl.Connection, diskF
 	return nil
 }
 
-func checkDiskSpaceOnStandbyAndSegments(agentConns []*idl.Connection, errs chan<- error, usages chan<- disk.FileSystemDiskUsage, diskFreeRatio float64, source *greenplum.Cluster, sourceTablespaces greenplum.Tablespaces) {
+func checkDiskSpaceOnStandbyAndSegments(agentConns []*idl.Connection, errs chan<- error, usages chan<- disk.FileSystemDiskUsage, diskFreeRatio float64, source *greengage.Cluster, sourceTablespaces greengage.Tablespaces) {
 	var wg sync.WaitGroup
 
 	for _, conn := range agentConns {
 		conn := conn
 
-		segmentsExcludingCoordinator := source.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		segmentsExcludingCoordinator := source.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && !seg.IsCoordinator()
 		})
 		sort.Sort(segmentsExcludingCoordinator)

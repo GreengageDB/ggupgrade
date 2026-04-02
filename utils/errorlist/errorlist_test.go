@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func TestAppend(t *testing.T) {

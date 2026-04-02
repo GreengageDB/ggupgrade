@@ -2,7 +2,7 @@
 # Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 # SPDX-License-Identifier: Apache-2.0
 
-DIR="github.com/greenplum-db/gpupgrade"
+DIR="github.com/GreengageDB/ggupgrade"
 
 # Generate code coverage statistics for one package, write the coverage
 # statistics to a file, and print the coverage percentage to the shell

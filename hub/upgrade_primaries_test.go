@@ -15,45 +15,45 @@ import (
 	"github.com/blang/semver/v4"
 	"github.com/golang/mock/gomock"
 
-	"github.com/greenplum-db/gpupgrade/config/backupdir"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/idl/mock_idl"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl/mock_idl"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func TestUpgradePrimaries(t *testing.T) {
 
-	source := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg-1", Port: 15432, Role: greenplum.PrimaryRole},
-		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Port: 16432, Role: greenplum.MirrorRole},
+	source := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg-1", Port: 15432, Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Port: 16432, Role: greengage.MirrorRole},
 
-		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Port: 25433, Role: greenplum.PrimaryRole},
-		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg1", Port: 25434, Role: greenplum.MirrorRole},
-		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Port: 25435, Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Port: 25436, Role: greenplum.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Port: 25433, Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg1", Port: 25434, Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Port: 25435, Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Port: 25436, Role: greengage.MirrorRole},
 
-		{DbID: 7, ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast3/seg3", Port: 25437, Role: greenplum.PrimaryRole},
-		{DbID: 8, ContentID: 2, Hostname: "sdw2", DataDir: "/data/dbfast_mirror3/seg3", Port: 25438, Role: greenplum.MirrorRole},
-		{DbID: 9, ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast4/seg4", Port: 25439, Role: greenplum.PrimaryRole},
-		{DbID: 10, ContentID: 3, Hostname: "sdw1", DataDir: "/data/dbfast_mirror4/seg4", Port: 25440, Role: greenplum.MirrorRole},
+		{DbID: 7, ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast3/seg3", Port: 25437, Role: greengage.PrimaryRole},
+		{DbID: 8, ContentID: 2, Hostname: "sdw2", DataDir: "/data/dbfast_mirror3/seg3", Port: 25438, Role: greengage.MirrorRole},
+		{DbID: 9, ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast4/seg4", Port: 25439, Role: greengage.PrimaryRole},
+		{DbID: 10, ContentID: 3, Hostname: "sdw1", DataDir: "/data/dbfast_mirror4/seg4", Port: 25440, Role: greengage.MirrorRole},
 	})
 	source.GPHome = "/usr/local/gpdb5"
 
-	intermediate := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg.HqtFHX54y0o.-1", Port: 60432, Role: greenplum.PrimaryRole},
-		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby.HqtFHX54y0o", Port: 60433, Role: greenplum.MirrorRole},
+	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg.HqtFHX54y0o.-1", Port: 60432, Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby.HqtFHX54y0o", Port: 60433, Role: greengage.MirrorRole},
 
-		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg.HqtFHX54y0o.1", Port: 60434, Role: greenplum.PrimaryRole},
-		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg.HqtFHX54y0o.1", Port: 60435, Role: greenplum.MirrorRole},
-		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg.HqtFHX54y0o.2", Port: 60436, Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg.HqtFHX54y0o.2", Port: 60437, Role: greenplum.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg.HqtFHX54y0o.1", Port: 60434, Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg.HqtFHX54y0o.1", Port: 60435, Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg.HqtFHX54y0o.2", Port: 60436, Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg.HqtFHX54y0o.2", Port: 60437, Role: greengage.MirrorRole},
 
-		{DbID: 7, ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast3/seg.HqtFHX54y0o.3", Port: 60438, Role: greenplum.PrimaryRole},
-		{DbID: 8, ContentID: 2, Hostname: "sdw2", DataDir: "/data/dbfast_mirror3/seg.HqtFHX54y0o.3", Port: 60439, Role: greenplum.MirrorRole},
-		{DbID: 9, ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast4/seg.HqtFHX54y0o.4", Port: 60440, Role: greenplum.PrimaryRole},
-		{DbID: 10, ContentID: 3, Hostname: "sdw1", DataDir: "/data/dbfast_mirror4/seg.HqtFHX54y0o.4", Port: 60441, Role: greenplum.MirrorRole},
+		{DbID: 7, ContentID: 2, Hostname: "sdw1", DataDir: "/data/dbfast3/seg.HqtFHX54y0o.3", Port: 60438, Role: greengage.PrimaryRole},
+		{DbID: 8, ContentID: 2, Hostname: "sdw2", DataDir: "/data/dbfast_mirror3/seg.HqtFHX54y0o.3", Port: 60439, Role: greengage.MirrorRole},
+		{DbID: 9, ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast4/seg.HqtFHX54y0o.4", Port: 60440, Role: greengage.PrimaryRole},
+		{DbID: 10, ContentID: 3, Hostname: "sdw1", DataDir: "/data/dbfast_mirror4/seg.HqtFHX54y0o.4", Port: 60441, Role: greengage.MirrorRole},
 	})
 	intermediate.GPHome = "/usr/local/gpdb6"
 	intermediate.Version = semver.MustParse("6.0.0")
@@ -82,7 +82,7 @@ func TestUpgradePrimaries(t *testing.T) {
 						SkipPgUpgradeChecks: true,
 						PgUpgradeJobs:       "1",
 						Action:              idl.PgOptions_check,
-						Role:                greenplum.PrimaryRole,
+						Role:                greengage.PrimaryRole,
 						ContentID:           0,
 						PgUpgradeMode:       idl.PgOptions_segment,
 						Mode:                idl.Mode_copy,
@@ -104,7 +104,7 @@ func TestUpgradePrimaries(t *testing.T) {
 						SkipPgUpgradeChecks: true,
 						PgUpgradeJobs:       "1",
 						Action:              idl.PgOptions_check,
-						Role:                greenplum.PrimaryRole,
+						Role:                greengage.PrimaryRole,
 						ContentID:           2,
 						PgUpgradeMode:       idl.PgOptions_segment,
 						Mode:                idl.Mode_copy,
@@ -136,7 +136,7 @@ func TestUpgradePrimaries(t *testing.T) {
 						SkipPgUpgradeChecks: true,
 						PgUpgradeJobs:       "1",
 						Action:              idl.PgOptions_check,
-						Role:                greenplum.PrimaryRole,
+						Role:                greengage.PrimaryRole,
 						ContentID:           1,
 						PgUpgradeMode:       idl.PgOptions_segment,
 						Mode:                idl.Mode_copy,
@@ -158,7 +158,7 @@ func TestUpgradePrimaries(t *testing.T) {
 						SkipPgUpgradeChecks: true,
 						PgUpgradeJobs:       "1",
 						Action:              idl.PgOptions_check,
-						Role:                greenplum.PrimaryRole,
+						Role:                greengage.PrimaryRole,
 						ContentID:           3,
 						PgUpgradeMode:       idl.PgOptions_segment,
 						Mode:                idl.Mode_copy,

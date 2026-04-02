@@ -12,7 +12,7 @@ check_synchronized_cluster() {
     for i in {1..10}; do
         local synced
         synced=$(ssh -n "$coordinator_host" "
-            source ${GPHOME_NEW}/greenplum_path.sh
+            source ${GPHOME_NEW}/greengage_path.sh
             psql -v ON_ERROR_STOP=1 -X -p $coordinator_port -At -d postgres << EOF
                 SELECT gp_request_fts_probe_scan();
                 SELECT EVERY(state='streaming' AND state IS NOT NULL)
@@ -35,7 +35,7 @@ check_replication_connections() {
 
     local rows
     rows=$(ssh -n "${host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         psql -v ON_ERROR_STOP=1 -X -p $port -d postgres -AtF$'\t' -c \"
             SELECT primaries.address, primaries.port, mirrors.hostname
             FROM gp_segment_configuration AS primaries
@@ -47,7 +47,7 @@ check_replication_connections() {
 
     echo "${rows}" | while read -r primary_address primary_port mirror_host; do
         ssh -n "${mirror_host}" "
-            source ${GPHOME_NEW}/greenplum_path.sh
+            source ${GPHOME_NEW}/greengage_path.sh
             PGOPTIONS=\"-c gp_session_role=utility\" psql -v ON_ERROR_STOP=1 -h $primary_address -p $primary_port \"dbname=postgres replication=database\" -c \"
                 IDENTIFY_SYSTEM;
             \"
@@ -61,7 +61,7 @@ wait_can_start_transactions() {
 
     for i in {1..10}; do
         ssh -n "${host}" "
-            source ${GPHOME_NEW}/greenplum_path.sh
+            source ${GPHOME_NEW}/greengage_path.sh
             psql -v ON_ERROR_STOP=1 -X -p $port -At -d postgres << EOF
                 SELECT gp_request_fts_probe_scan();
                 BEGIN; CREATE TEMP TABLE temp_test(a int) DISTRIBUTED RANDOMLY; COMMIT;
@@ -84,7 +84,7 @@ stop_segments_with_contents() {
 
     local contents
     contents=$(ssh -n "$host" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         psql -v ON_ERROR_STOP=1 -X -AtF$'\t' -p $port -d postgres -c \"
             SELECT hostname, port, datadir FROM gp_segment_configuration
             WHERE $filter AND role = 'p'
@@ -93,7 +93,7 @@ stop_segments_with_contents() {
 
     echo "${contents}" | while read -r host port dir; do
         ssh -n "${host}" "
-            source ${GPHOME_NEW}/greenplum_path.sh
+            source ${GPHOME_NEW}/greengage_path.sh
             pg_ctl stop -p $port -m immediate -D $dir -w
         "
     done
@@ -107,7 +107,7 @@ create_table_with_name() {
     local port=$4
 
     ssh -n "${host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         # -q suppresses all output from this command
         psql -v ON_ERROR_STOP=1 -X -q -p $port -d postgres <<EOF
             CREATE TABLE ${table_name} (a int) DISTRIBUTED BY (a);
@@ -123,7 +123,7 @@ _get_data_distribution() {
     local table_name=$3
 
     ssh -n "${host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         psql -v ON_ERROR_STOP=1 -t -A -p $port -d postgres -c \"
             SELECT gp_segment_id,count(*) FROM ${table_name}
             GROUP BY gp_segment_id ORDER BY gp_segment_id;
@@ -151,7 +151,7 @@ contents_without_mirror() {
     local port=$3
 
     ssh -n "$host" "
-        source ${gphome}/greenplum_path.sh
+        source ${gphome}/greengage_path.sh
         psql -v ON_ERROR_STOP=1 -X -p $port -At -d postgres -c \"
             SELECT content
             FROM gp_segment_configuration
@@ -192,7 +192,7 @@ validate_mirrors_and_standby() {
 
     local coordinator_data_dir
     coordinator_data_dir=$(ssh -n "${coordinator_host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         psql -v ON_ERROR_STOP=1 -X -p $coordinator_port -At -d postgres -c \"
             SELECT datadir FROM gp_segment_configuration
             WHERE content = -1 AND role = 'p'
@@ -201,7 +201,7 @@ validate_mirrors_and_standby() {
 
     local standby_info
     standby_info=$(ssh -n "${coordinator_host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         psql -v ON_ERROR_STOP=1 -X -p $coordinator_port -AtF$'\t' -d postgres -c \"
             SELECT hostname, port, datadir FROM gp_segment_configuration
             WHERE content = -1 AND role = 'm'
@@ -229,7 +229,7 @@ validate_mirrors_and_standby() {
 
     # step 2b: failover promote...
     ssh -n "${standby_host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         export PGPORT=$standby_port
         gpactivatestandby -a -d $standby_data_dir
     "
@@ -241,7 +241,7 @@ validate_mirrors_and_standby() {
 
     # step 3:  restore mirrors and standby
     ssh -n "${standby_host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         export MASTER_DATA_DIRECTORY=${standby_data_dir}
         export PGPORT=$standby_port
         gprecoverseg -a       # TODO..why is PGPORT not actually needed here?
@@ -256,7 +256,7 @@ validate_mirrors_and_standby() {
     ssh -n "${coordinator_host}" "rm -r ${coordinator_data_dir}"
 
     ssh -n "${standby_host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         export PGPORT=$standby_port; gpinitstandby -a -s $coordinator_host -P $coordinator_port -S $coordinator_data_dir
     "
     check_replication_connections "${standby_host}" "${standby_port}"
@@ -269,7 +269,7 @@ validate_mirrors_and_standby() {
 
     # 4a: rebalance mirrors
     ssh -n "${standby_host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         export MASTER_DATA_DIRECTORY=${standby_data_dir}
         export PGPORT=$standby_port
         gprecoverseg -ra
@@ -283,7 +283,7 @@ validate_mirrors_and_standby() {
 
     # 4c: rebalance standby
     ssh -n "${coordinator_host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         export PGPORT=$coordinator_port
         gpactivatestandby -a -d $coordinator_data_dir
     "
@@ -298,7 +298,7 @@ validate_mirrors_and_standby() {
     ssh -n "${standby_host}" "rm -r $standby_data_dir"
 
     ssh -n "${coordinator_host}" "
-        source ${GPHOME_NEW}/greenplum_path.sh
+        source ${GPHOME_NEW}/greengage_path.sh
         export PGPORT=$coordinator_port; gpinitstandby -a -s $standby_host -P $standby_port -S $standby_data_dir
     "
     check_replication_connections "${coordinator_host}" "${coordinator_port}"

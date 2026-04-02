@@ -7,20 +7,20 @@ import (
 	"context"
 	"sync"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
-func DeleteCoordinatorAndPrimaryDataDirectories(streams step.OutStreams, agentConns []*idl.Connection, intermediate *greenplum.Cluster) error {
+func DeleteCoordinatorAndPrimaryDataDirectories(streams step.OutStreams, agentConns []*idl.Connection, intermediate *greengage.Cluster) error {
 	coordinatorErr := make(chan error)
 	go func() {
 		coordinatorErr <- upgrade.DeleteDirectories([]string{intermediate.CoordinatorDataDir()}, upgrade.PostgresFiles, streams)
 	}()
 
-	intermediateSegs := intermediate.SelectSegments(func(seg *greenplum.SegConfig) bool {
+	intermediateSegs := intermediate.SelectSegments(func(seg *greengage.SegConfig) bool {
 		return seg.IsPrimary()
 	})
 	err := deleteDataDirectories(agentConns, intermediateSegs)
@@ -29,10 +29,10 @@ func DeleteCoordinatorAndPrimaryDataDirectories(streams step.OutStreams, agentCo
 	return err
 }
 
-func deleteDataDirectories(agentConns []*idl.Connection, segConfigs greenplum.SegConfigs) error {
+func deleteDataDirectories(agentConns []*idl.Connection, segConfigs greengage.SegConfigs) error {
 	request := func(conn *idl.Connection) error {
 
-		segs := segConfigs.Select(func(seg *greenplum.SegConfig) bool {
+		segs := segConfigs.Select(func(seg *greengage.SegConfig) bool {
 			return seg.Hostname == conn.Hostname
 		})
 
@@ -54,7 +54,7 @@ func deleteDataDirectories(agentConns []*idl.Connection, segConfigs greenplum.Se
 	return ExecuteRPC(agentConns, request)
 }
 
-func DeleteTargetTablespaces(streams step.OutStreams, agentConns []*idl.Connection, target *greenplum.Cluster, intermediateCatalogVersion string, sourceTablespaces greenplum.Tablespaces) error {
+func DeleteTargetTablespaces(streams step.OutStreams, agentConns []*idl.Connection, target *greengage.Cluster, intermediateCatalogVersion string, sourceTablespaces greengage.Tablespaces) error {
 	var wg sync.WaitGroup
 	errs := make(chan error, 2)
 
@@ -77,7 +77,7 @@ func DeleteTargetTablespaces(streams step.OutStreams, agentConns []*idl.Connecti
 	return err
 }
 
-func DeleteTargetTablespacesOnCoordinator(streams step.OutStreams, target *greenplum.Cluster, coordinatorTablespaces greenplum.SegmentTablespaces, catalogVersion string) error {
+func DeleteTargetTablespacesOnCoordinator(streams step.OutStreams, target *greengage.Cluster, coordinatorTablespaces greengage.SegmentTablespaces, catalogVersion string) error {
 	var dirs []string
 	for _, tsInfo := range coordinatorTablespaces {
 		if !tsInfo.GetUserDefined() {
@@ -91,13 +91,13 @@ func DeleteTargetTablespacesOnCoordinator(streams step.OutStreams, target *green
 	return upgrade.DeleteTablespaceDirectories(streams, dirs)
 }
 
-func DeleteTargetTablespacesOnPrimaries(agentConns []*idl.Connection, target *greenplum.Cluster, tablespaces greenplum.Tablespaces, catalogVersion string) error {
+func DeleteTargetTablespacesOnPrimaries(agentConns []*idl.Connection, target *greengage.Cluster, tablespaces greengage.Tablespaces, catalogVersion string) error {
 	request := func(conn *idl.Connection) error {
 		if target == nil {
 			return nil
 		}
 
-		primaries := target.SelectSegments(func(seg *greenplum.SegConfig) bool {
+		primaries := target.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && seg.IsPrimary() && !seg.IsCoordinator()
 		})
 

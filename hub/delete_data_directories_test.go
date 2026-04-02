@@ -14,22 +14,22 @@ import (
 	"github.com/blang/semver/v4"
 	"github.com/golang/mock/gomock"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/idl/mock_idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl/mock_idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
 )
 
 func TestDeleteSegmentDataDirs(t *testing.T) {
-	primarySegConfigs := greenplum.SegConfigs{
-		{ContentID: -1, DbID: 0, Port: 25431, Hostname: "coordinator", DataDir: "/data/qddir", Role: greenplum.PrimaryRole},
-		{ContentID: 0, DbID: 2, Port: 25432, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greenplum.PrimaryRole},
-		{ContentID: 1, DbID: 3, Port: 25433, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greenplum.PrimaryRole},
-		{ContentID: 2, DbID: 4, Port: 25434, Hostname: "sdw1", DataDir: "/data/dbfast1/seg3", Role: greenplum.PrimaryRole},
-		{ContentID: 3, DbID: 5, Port: 25435, Hostname: "sdw2", DataDir: "/data/dbfast2/seg4", Role: greenplum.PrimaryRole},
+	primarySegConfigs := greengage.SegConfigs{
+		{ContentID: -1, DbID: 0, Port: 25431, Hostname: "coordinator", DataDir: "/data/qddir", Role: greengage.PrimaryRole},
+		{ContentID: 0, DbID: 2, Port: 25432, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+		{ContentID: 1, DbID: 3, Port: 25433, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
+		{ContentID: 2, DbID: 4, Port: 25434, Hostname: "sdw1", DataDir: "/data/dbfast1/seg3", Role: greengage.PrimaryRole},
+		{ContentID: 3, DbID: 5, Port: 25435, Hostname: "sdw2", DataDir: "/data/dbfast2/seg4", Role: greengage.PrimaryRole},
 	}
 
 	testlog.SetupTestLogger()
@@ -66,7 +66,7 @@ func TestDeleteSegmentDataDirs(t *testing.T) {
 				{AgentClient: standbyClient, Hostname: "standby"},
 			}
 
-			intermediate := hub.MustCreateCluster(t, append(primarySegConfigs, greenplum.SegConfig{ContentID: -1, DbID: 0, Port: 25431, Hostname: "coordinator", DataDir: "/data/qddir", Role: greenplum.PrimaryRole}))
+			intermediate := hub.MustCreateCluster(t, append(primarySegConfigs, greengage.SegConfig{ContentID: -1, DbID: 0, Port: 25431, Hostname: "coordinator", DataDir: "/data/qddir", Role: greengage.PrimaryRole}))
 
 			err := hub.DeleteCoordinatorAndPrimaryDataDirectories(step.DevNullStream, agentConns, intermediate)
 			if err != nil {
@@ -96,7 +96,7 @@ func TestDeleteSegmentDataDirs(t *testing.T) {
 				{AgentClient: sdw2ClientFailed, Hostname: "sdw2"},
 			}
 
-			intermediate := hub.MustCreateCluster(t, append(primarySegConfigs, greenplum.SegConfig{ContentID: -1, DbID: 0, Port: 25431, Hostname: "coordinator", DataDir: "/data/qddir", Role: greenplum.PrimaryRole}))
+			intermediate := hub.MustCreateCluster(t, append(primarySegConfigs, greengage.SegConfig{ContentID: -1, DbID: 0, Port: 25431, Hostname: "coordinator", DataDir: "/data/qddir", Role: greengage.PrimaryRole}))
 
 			err := hub.DeleteCoordinatorAndPrimaryDataDirectories(step.DevNullStream, agentConns, intermediate)
 
@@ -108,13 +108,13 @@ func TestDeleteSegmentDataDirs(t *testing.T) {
 }
 
 func TestDeleteTablespaceDirectories(t *testing.T) {
-	target := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir", Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greenplum.MirrorRole},
-		{DbID: 2, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greenplum.PrimaryRole},
-		{DbID: 3, ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greenplum.MirrorRole},
-		{DbID: 4, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greenplum.PrimaryRole},
-		{DbID: 5, ContentID: 1, Hostname: "msdw2", DataDir: "/data/dbfast_mirror2/seg2", Role: greenplum.MirrorRole},
+	target := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir", Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greengage.MirrorRole},
+		{DbID: 2, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+		{DbID: 3, ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+		{DbID: 4, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
+		{DbID: 5, ContentID: 1, Hostname: "msdw2", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
 	})
 	target.Version = semver.MustParse("6.1.0")
 
@@ -128,7 +128,7 @@ func TestDeleteTablespaceDirectories(t *testing.T) {
 		systemTsDir, systemDbIdDir, systemTsLocation := testutils.MustMakeTablespaceDir(t, 1700)
 		defer testutils.MustRemoveAll(t, systemTsLocation)
 
-		coordinatorTablespaces := greenplum.SegmentTablespaces{
+		coordinatorTablespaces := greengage.SegmentTablespaces{
 			16386: {
 				Location:    tsLocation1,
 				UserDefined: true,
@@ -167,7 +167,7 @@ func TestDeleteTablespaceDirectories(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		tablespaces := map[int32]greenplum.SegmentTablespaces{
+		tablespaces := map[int32]greengage.SegmentTablespaces{
 			1: {
 				16386: {
 					Location:    "/tmp/testfs/coordinator/demoDataDir-1/16386",

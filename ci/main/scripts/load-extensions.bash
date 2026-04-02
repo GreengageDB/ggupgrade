@@ -4,12 +4,12 @@
 
 set -eux -o pipefail
 
-source gpupgrade_src/ci/main/scripts/environment.bash
-source gpupgrade_src/ci/main/scripts/ci-helpers.bash
+source ggupgrade_src/ci/main/scripts/environment.bash
+source ggupgrade_src/ci/main/scripts/ci-helpers.bash
 ./ccp_src/scripts/setup_ssh_to_cluster.sh
 
 echo "Copying extensions to the source cluster..."
-scp gptext_targz_source/greenplum-text*.tar.gz gpadmin@cdw:/tmp/gptext_source.tar.gz
+scp gptext_targz_source/greengage-text*.tar.gz gpadmin@cdw:/tmp/gptext_source.tar.gz
 scp postgis_gppkg_source/postgis*.gppkg gpadmin@cdw:/tmp/postgis_source.gppkg
 scp sqldump/*.sql gpadmin@cdw:/tmp/postgis_dump.sql
 scp madlib_gppkg_source/madlib*.gppkg gpadmin@cdw:/tmp/madlib_source.gppkg
@@ -39,47 +39,47 @@ for host in "${hosts[@]}"; do
 
         sudo yum install -y R # needed for plr
 
-        sudo mkdir /usr/local/greenplum-db-text
-        sudo chown gpadmin:gpadmin /usr/local/greenplum-db-text
+        sudo mkdir /usr/local/greengage-db-text
+        sudo chown gpadmin:gpadmin /usr/local/greengage-db-text
 
-        sudo mkdir /usr/local/greenplum-solr
-        sudo chown gpadmin:gpadmin /usr/local/greenplum-solr
+        sudo mkdir /usr/local/greengage-solr
+        sudo chown gpadmin:gpadmin /usr/local/greengage-solr
     "
 done
 
 echo "Installing GPDB extensions and sample data on source cluster..."
 time ssh -n cdw "
     set -eux -o pipefail
-    source /usr/local/greenplum-db-source/greenplum_path.sh
+    source /usr/local/greengage-db-source/greengage_path.sh
     export MASTER_DATA_DIRECTORY=$MASTER_DATA_DIRECTORY
 
     echo 'Installing gptext...'
     tar -xzvf /tmp/gptext_source.tar.gz -C /tmp/
-    chmod +x /tmp/greenplum-text*.bin
+    chmod +x /tmp/greengage-text*.bin
     sed -i -r 's/GPTEXT_HOSTS\=\(localhost\)/GPTEXT_HOSTS\=\"ALLSEGHOSTS\"/' /tmp/gptext_install_config
     sed -i -r 's/ZOO_HOSTS.*/ZOO_HOSTS\=\(cdw cdw cdw\)/' /tmp/gptext_install_config
 
-    /tmp/greenplum-text*.bin -c /tmp/gptext_install_config -d /usr/local/greenplum-db-text
-    source /usr/local/greenplum-db-text/greenplum-text_path.sh
+    /tmp/greengage-text*.bin -c /tmp/gptext_install_config -d /usr/local/greengage-db-text
+    source /usr/local/greengage-db-text/greengage-text_path.sh
     createdb gptext_db
     gptext-installsql gptext_db
     gptext-start
 
     psql -v ON_ERROR_STOP=1 -d gptext_db <<SQL_EOF
         CREATE TABLE gptext_test(id INT PRIMARY KEY, content TEXT);
-        INSERT INTO gptext_test VALUES (1, 'Greenplum Database balabalabala');
-        INSERT INTO gptext_test VALUES (2, 'VMware Greenplum balabala');
+        INSERT INTO gptext_test VALUES (1, 'Greengage Database balabalabala');
+        INSERT INTO gptext_test VALUES (2, 'Greengage balabala');
 
         SELECT * FROM gptext.create_index('public', 'gptext_test', 'id', 'content');
         SELECT * FROM gptext.index(table(SELECT * FROM gptext_test), 'gptext_db.public.gptext_test');
         SELECT * FROM gptext.commit_index('gptext_db.public.gptext_test');
 
-        CREATE VIEW gptext_test_view AS SELECT * FROM gptext.search(table(SELECT 1 SCATTER BY 1), 'gptext_db.public.gptext_test', 'greenplum', NULL);
+        CREATE VIEW gptext_test_view AS SELECT * FROM gptext.search(table(SELECT 1 SCATTER BY 1), 'gptext_db.public.gptext_test', 'greengage', NULL);
 SQL_EOF
 
     echo 'Installing PostGIS...'
     gppkg -i /tmp/postgis_source.gppkg
-    /usr/local/greenplum-db-source/share/postgresql/contrib/postgis-*/postgis_manager.sh postgres install
+    /usr/local/greengage-db-source/share/postgresql/contrib/postgis-*/postgis_manager.sh postgres install
     # Some of the syntax in this postgis_dump.sql file is not valid for a 5X
     # cluster due to deprication on 6X. Disabling ON_ERROR_STOP until this is
     # fixed.
@@ -97,7 +97,7 @@ SQL_EOF
 
     echo 'Installing MADlib...'
     gppkg -i /tmp/madlib_source.gppkg
-    /usr/local/greenplum-db-source/madlib/bin/madpack -p greenplum -c /postgres install
+    /usr/local/greengage-db-source/madlib/bin/madpack -p greengage -c /postgres install
     psql -v ON_ERROR_STOP=1 -d postgres <<SQL_EOF
         DROP TABLE IF EXISTS madlib_test_type;
         CREATE TABLE madlib_test_type(id int, value madlib.svec);
@@ -165,7 +165,7 @@ SQL_EOF
                                             b BOOLEAN, tm TIMESTAMP WITHOUT TIME ZONE, bg BIGINT, bin BYTEA,
                                             sml SMALLINT, r REAL, vc1 CHARACTER VARYING(5), c1 CHARACTER(3),
                                             dec1 NUMERIC, dec2 NUMERIC(5,2), dec3 NUMERIC(13,5), num1 INTEGER)
-            LOCATION ('pxf://gpupgrade-intermediates/extensions/pxf_parquet_types.parquet?PROFILE=gs:parquet&SERVER=google')
+            LOCATION ('pxf://ggupgrade-intermediates/extensions/pxf_parquet_types.parquet?PROFILE=gs:parquet&SERVER=google')
             FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
         CREATE TABLE pxf_parquet_read_materialized AS SELECT * FROM pxf_parquet_read;
 SQL_EOF
@@ -177,7 +177,7 @@ echo "Installing postgres native extensions and sample data on source cluster...
 time ssh -n cdw "
     set -eux -o pipefail
 
-    source /usr/local/greenplum-db-source/greenplum_path.sh
+    source /usr/local/greengage-db-source/greengage_path.sh
 
     echo 'Installing amcheck...'
     psql -v ON_ERROR_STOP=1 -d postgres <<SQL_EOF
@@ -198,7 +198,7 @@ SQL_EOF
 
     echo 'Installing dblink...'
     psql -v ON_ERROR_STOP=1 -d postgres <<SQL_EOF
-        \i /usr/local/greenplum-db-source/share/postgresql/contrib/dblink.sql
+        \i /usr/local/greengage-db-source/share/postgresql/contrib/dblink.sql
 
         CREATE TABLE foo(f1 int, f2 text, primary key (f1,f2));
         INSERT INTO foo VALUES (0,'a');
@@ -209,7 +209,7 @@ SQL_EOF
 
     echo 'Installing hstore...'
     psql -v ON_ERROR_STOP=1 -d postgres <<SQL_EOF
-        \i /usr/local/greenplum-db-source/share/postgresql/contrib/hstore.sql
+        \i /usr/local/greengage-db-source/share/postgresql/contrib/hstore.sql
 
         CREATE TABLE hstore_test_type AS SELECT 'a=>1,a=>2'::hstore as c1;
         CREATE VIEW hstore_test_view AS SELECT c1 -> 'a' as c2 FROM hstore_test_type;
@@ -223,7 +223,7 @@ SQL_EOF
 SQL_EOF
 
     echo 'Installing Fuzzy String Match...'
-    PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=1 --quiet -d postgres -f /usr/local/greenplum-db-source/share/postgresql/contrib/fuzzystrmatch.sql
+    PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=1 --quiet -d postgres -f /usr/local/greengage-db-source/share/postgresql/contrib/fuzzystrmatch.sql
     psql -v ON_ERROR_STOP=1 -d postgres <<SQL_EOF
         CREATE VIEW fuzzystrmatch_test_view AS SELECT soundex('a'::text);
 SQL_EOF
@@ -231,7 +231,7 @@ SQL_EOF
     echo 'Installing citext...'
     echo 'Create a new db to avoid potential function overlaps with postgis to simplify the diff when comparing before and after upgrade.'
     createdb citext_db
-    PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=1 --quiet -d citext_db -f /usr/local/greenplum-db-source/share/postgresql/contrib/citext.sql
+    PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=1 --quiet -d citext_db -f /usr/local/greengage-db-source/share/postgresql/contrib/citext.sql
     psql -v ON_ERROR_STOP=1 -d citext_db <<SQL_EOF
         CREATE TABLE citext_test_type (
             id bigint PRIMARY KEY,
@@ -247,8 +247,8 @@ echo "Running the data migration scripts on the source cluster..."
 ssh -n cdw "
     set -eux -o pipefail
 
-    source /usr/local/greenplum-db-source/greenplum_path.sh
+    source /usr/local/greengage-db-source/greengage_path.sh
 
-    gpupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --output-dir /home/gpadmin/gpupgrade
-    gpupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/gpupgrade --phase initialize
+    ggupgrade generate --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --output-dir /home/gpadmin/ggupgrade
+    ggupgrade apply    --non-interactive --gphome "$GPHOME_SOURCE" --port "$PGPORT" --input-dir /home/gpadmin/ggupgrade --phase initialize
 "

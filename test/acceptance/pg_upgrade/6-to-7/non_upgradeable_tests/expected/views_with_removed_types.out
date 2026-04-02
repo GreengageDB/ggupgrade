@@ -48,9 +48,9 @@ CREATE VIEW
 ---------------------------------------------------------------------------------
 --- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 ---------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
 (exited with code 1)
-! find $(ls -dt ~/gpAdminLogs/gpupgrade/pg_upgrade_*/ | head -1) -name "views_with_removed_types.txt" -exec cat {} +;
+! find $(ls -dt ~/gpAdminLogs/ggupgrade/pg_upgrade_*/ | head -1) -name "views_with_removed_types.txt" -exec cat {} +;
 Database: isolation2test
   removed_types.v01
   removed_types.v02

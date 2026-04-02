@@ -22,18 +22,18 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/vbauerster/mpb/v8"
 
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func PostgresGPVersion_6_7_1() {
-	fmt.Println("postgres (Greenplum Database) 6.7.1 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
+	fmt.Println("postgres (Greengage Database) 6.7.1 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
 }
 
 func init() {
@@ -43,8 +43,8 @@ func init() {
 }
 
 func TestGenerateDataMigrationScripts(t *testing.T) {
-	greenplum.SetVersionCommand(exectest.NewCommand(PostgresGPVersion_6_7_1))
-	defer greenplum.ResetVersionCommand()
+	greengage.SetVersionCommand(exectest.NewCommand(PostgresGPVersion_6_7_1))
+	defer greengage.ResetVersionCommand()
 
 	t.Run("errors when failing to create output directory", func(t *testing.T) {
 		expected := os.ErrPermission
@@ -235,8 +235,8 @@ func TestArchiveDataMigrationScriptsPrompt(t *testing.T) {
 }
 
 func TestGenerateScriptsPerDatabase(t *testing.T) {
-	greenplum.SetVersionCommand(exectest.NewCommand(PostgresGPVersion_6_7_1))
-	defer greenplum.ResetVersionCommand()
+	greengage.SetVersionCommand(exectest.NewCommand(PostgresGPVersion_6_7_1))
+	defer greengage.ResetVersionCommand()
 
 	t.Run("does not error when plpythonu is present", func(t *testing.T) {
 		db, mock, err := sqlmock.New()
@@ -275,7 +275,7 @@ func TestGenerateScriptsPerDatabase(t *testing.T) {
 			}
 
 			if numCalls == 2 {
-				expected := []string{"DROP SCHEMA IF EXISTS __gpupgrade_tmp_generator CASCADE; CREATE SCHEMA __gpupgrade_tmp_generator;"}
+				expected := []string{"DROP SCHEMA IF EXISTS __ggupgrade_tmp_generator CASCADE; CREATE SCHEMA __ggupgrade_tmp_generator;"}
 				if !reflect.DeepEqual(actualSql, expected) {
 					t.Errorf("got sql %q, want %q", actualSql, expected)
 				}
@@ -438,8 +438,8 @@ func TestGenerateScriptsPerPhase(t *testing.T) {
 	gphome := "/usr/local/gpdb5"
 	port := 123
 	database := commanders.DatabaseInfo{Datname: "postgres", QuotedDatname: "postgres"}
-	seedDir := "/usr/local/bin/greenplum/gpupgrade/data-migration-scripts/5-to-6-seed-scripts"
-	outputDir := "/home/gpupgrade/data-migration"
+	seedDir := "/usr/local/bin/greengage/ggupgrade/data-migration-scripts/5-to-6-seed-scripts"
+	outputDir := "/home/ggupgrade/data-migration"
 
 	fsys := fstest.MapFS{
 		idl.Step_initialize.String():                                                                      {Mode: os.ModeDir},

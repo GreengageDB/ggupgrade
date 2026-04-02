@@ -12,13 +12,13 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/idl/mock_idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/utils/disk"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl/mock_idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/utils/disk"
 )
 
 func CoordinatorHostCheckDiskUsagePasses(streams step.OutStreams, d disk.Disk, requiredRatio float64, paths ...string) (disk.FileSystemDiskUsage, error) {
@@ -38,11 +38,11 @@ func CoordinatorHostReturnsUsage(expected disk.FileSystemDiskUsage) disk.CheckUs
 }
 
 func TestCheckDiskSpace_OnCoordinator(t *testing.T) {
-	source := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greenplum.PrimaryRole},
+	source := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole},
 	})
 
-	tablespaces := greenplum.Tablespaces{}
+	tablespaces := greengage.Tablespaces{}
 
 	t.Run("does not return disk usage or any errors when checking disk usage on coordinator succeeds", func(t *testing.T) {
 		hub.SetCheckDiskUsage(CoordinatorHostCheckDiskUsagePasses)
@@ -84,13 +84,13 @@ func TestCheckDiskSpace_OnCoordinator(t *testing.T) {
 }
 
 func TestCheckDiskSpace_OnSegments(t *testing.T) {
-	source := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greenplum.PrimaryRole},
-		{DbID: 2, ContentID: -1, Hostname: "smdw", DataDir: "/data/standby", Role: greenplum.MirrorRole},
-		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast/seg1", Role: greenplum.PrimaryRole},
-		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg1", Role: greenplum.MirrorRole},
-		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast/seg2", Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Role: greenplum.MirrorRole},
+	source := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "smdw", DataDir: "/data/standby", Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast/seg1", Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast/seg2", Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
 	})
 
 	tablespaces := testutils.CreateTablespaces()
@@ -237,13 +237,13 @@ func TestCheckDiskSpace_OnSegments(t *testing.T) {
 			{AgentClient: mirror, Hostname: "mirror"},
 		}
 
-		sourceCluster := hub.MustCreateCluster(t, greenplum.SegConfigs{
-			{DbID: 1, ContentID: -1, Hostname: "primary", DataDir: "/data/qddir/seg-1", Role: greenplum.PrimaryRole},
-			{DbID: 2, ContentID: -1, Hostname: "mirror", DataDir: "/data/standby", Role: greenplum.MirrorRole},
-			{DbID: 3, ContentID: 0, Hostname: "primary", DataDir: "/data/dbfast/seg1", Role: greenplum.PrimaryRole},
-			{DbID: 4, ContentID: 0, Hostname: "mirror", DataDir: "/data/dbfast_mirror1/seg1", Role: greenplum.MirrorRole},
-			{DbID: 5, ContentID: 1, Hostname: "primary", DataDir: "/data/dbfast/seg2", Role: greenplum.PrimaryRole},
-			{DbID: 6, ContentID: 1, Hostname: "mirror", DataDir: "/data/dbfast_mirror2/seg2", Role: greenplum.MirrorRole},
+		sourceCluster := hub.MustCreateCluster(t, greengage.SegConfigs{
+			{DbID: 1, ContentID: -1, Hostname: "primary", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole},
+			{DbID: 2, ContentID: -1, Hostname: "mirror", DataDir: "/data/standby", Role: greengage.MirrorRole},
+			{DbID: 3, ContentID: 0, Hostname: "primary", DataDir: "/data/dbfast/seg1", Role: greengage.PrimaryRole},
+			{DbID: 4, ContentID: 0, Hostname: "mirror", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+			{DbID: 5, ContentID: 1, Hostname: "primary", DataDir: "/data/dbfast/seg2", Role: greengage.PrimaryRole},
+			{DbID: 6, ContentID: 1, Hostname: "mirror", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
 		})
 
 		err := hub.CheckDiskSpace(step.DevNullStream, agentConns, 0, sourceCluster, tablespaces)
@@ -278,8 +278,8 @@ func TestCheckDiskSpace_OnSegments(t *testing.T) {
 			{AgentClient: sdw2, Hostname: "sdw2"},
 		}
 
-		coordinatorOnlyCluster := hub.MustCreateCluster(t, greenplum.SegConfigs{
-			{ContentID: -1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greenplum.PrimaryRole},
+		coordinatorOnlyCluster := hub.MustCreateCluster(t, greengage.SegConfigs{
+			{ContentID: -1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole},
 		})
 
 		err := hub.CheckDiskSpace(step.DevNullStream, agentConns, 0, coordinatorOnlyCluster, tablespaces)

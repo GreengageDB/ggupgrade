@@ -11,8 +11,8 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
 )
 
 func Success() {}
@@ -43,10 +43,10 @@ func init() {
 	)
 }
 
-func MustCreateCluster(t *testing.T, segments greenplum.SegConfigs) *greenplum.Cluster {
+func MustCreateCluster(t *testing.T, segments greengage.SegConfigs) *greengage.Cluster {
 	t.Helper()
 
-	cluster, err := greenplum.NewCluster(segments)
+	cluster, err := greengage.NewCluster(segments)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -54,7 +54,7 @@ func MustCreateCluster(t *testing.T, segments greenplum.SegConfigs) *greenplum.C
 	return &cluster
 }
 
-func MustEncodeCluster(t *testing.T, cluster *greenplum.Cluster) []byte {
+func MustEncodeCluster(t *testing.T, cluster *greengage.Cluster) []byte {
 	encodedCluster, err := cluster.Encode()
 	if err != nil {
 		t.Fatalf("encoding cluster: %+v", err)
@@ -63,8 +63,8 @@ func MustEncodeCluster(t *testing.T, cluster *greenplum.Cluster) []byte {
 	return encodedCluster
 }
 
-func MustDecodeCluster(t *testing.T, input []byte) *greenplum.Cluster {
-	decodedCluster, err := greenplum.DecodeCluster(input)
+func MustDecodeCluster(t *testing.T, input []byte) *greengage.Cluster {
+	decodedCluster, err := greengage.DecodeCluster(input)
 	if err != nil {
 		t.Fatalf("decoding cluster: %+v", err)
 	}

@@ -1,0 +1,155 @@
+// Copyright (c) 2017-2023 VMware, Inc. or its affiliates
+// SPDX-License-Identifier: Apache-2.0
+
+package ggupgrade_test
+
+import (
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"testing"
+
+	"github.com/GreengageDB/ggupgrade/cli/commands"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
+)
+
+func TestArgs(t *testing.T) {
+	stateDir := testutils.GetTempDir(t, "")
+	defer testutils.MustRemoveAll(t, stateDir)
+
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
+	defer resetEnv()
+
+	t.Run("ggupgrade initialize fails when passed insufficient arguments", func(t *testing.T) {
+		cmd := exec.Command("ggupgrade", "initialize",
+			"--non-interactive",
+		)
+		output, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Errorf("expected error got nil")
+		}
+
+		expected := commands.InitializeHelp + "\n"
+		if string(output) != expected {
+			t.Errorf("got %q want %q", string(output), expected)
+		}
+	})
+
+	t.Run("ggupgrade initialize fails when other flags are used with --file", func(t *testing.T) {
+		cmd := exec.Command("ggupgrade", "initialize",
+			"--non-interactive",
+			"--file", "/some/config",
+			"--source-gphome", "/usr/local/gpdb5",
+		)
+		output, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Errorf("expected error got nil")
+		}
+
+		expected := "Error: The file flag cannot be used with any other flag except verbose and non-interactive.\n"
+		if string(output) != expected {
+			t.Errorf("got %q want %q", string(output), expected)
+		}
+	})
+
+	t.Run("ggupgrade initialize fails when --pg-upgrade-verbose is used without --verbose", func(t *testing.T) {
+		cmd := exec.Command("ggupgrade", "initialize",
+			"--non-interactive",
+			"--source-gphome", acceptance.GPHOME_SOURCE,
+			"--target-gphome", acceptance.GPHOME_TARGET,
+			"--source-master-port", acceptance.PGPORT,
+			"--stop-before-cluster-creation",
+			"--disk-free-ratio", "0",
+			"--pg-upgrade-verbose",
+		)
+		output, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Errorf("expected error got nil")
+		}
+
+		expected := "Error: expected --verbose when using --pg-upgrade-verbose\n"
+		if string(output) != expected {
+			t.Errorf("got %q want %q", string(output), expected)
+		}
+	})
+
+	t.Run("ggupgrade initialize --file with verbose uses the configured values", func(t *testing.T) {
+		configFile := filepath.Join(stateDir, "ggupgrade_config")
+		contents := fmt.Sprintf(`source-gphome = %s
+target-gphome = %s
+source-master-port = %s
+disk-free-ratio = 0
+stop-before-cluster-creation = true
+`, acceptance.GPHOME_SOURCE, acceptance.GPHOME_TARGET, acceptance.PGPORT)
+		testutils.MustWriteToFile(t, configFile, contents)
+
+		cmd := exec.Command("ggupgrade", "initialize",
+			"--non-interactive",
+			"--verbose",
+			"--pg-upgrade-verbose",
+			"--file", configFile,
+		)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("unexpected err: %v stderr: %q", err, output)
+		}
+		defer acceptance.Revert(t)
+
+		actual := configShow(t, "--source-gphome")
+		if actual != acceptance.GPHOME_SOURCE {
+			t.Errorf("got %q want %q", actual, acceptance.GPHOME_SOURCE)
+		}
+
+		actual = configShow(t, "--target-gphome")
+		if actual != acceptance.GPHOME_TARGET {
+			t.Errorf("got %q want %q", actual, acceptance.GPHOME_TARGET)
+		}
+	})
+
+	t.Run("initialize sanitizes source-gphome and target-gphome", func(t *testing.T) {
+		cmd := exec.Command("ggupgrade", "initialize",
+			"--non-interactive",
+			"--source-gphome", acceptance.GPHOME_SOURCE+string(os.PathSeparator),
+			"--target-gphome", acceptance.GPHOME_TARGET+string(os.PathSeparator)+string(os.PathSeparator),
+			"--source-master-port", acceptance.PGPORT,
+			"--stop-before-cluster-creation",
+			"--disk-free-ratio", "0",
+		)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("unexpected err: %v stderr: %q", err, output)
+		}
+		defer acceptance.Revert(t)
+
+		actual := configShow(t, "--source-gphome")
+		if actual != acceptance.GPHOME_SOURCE {
+			t.Errorf("got %q want %q", actual, acceptance.GPHOME_SOURCE)
+		}
+
+		actual = configShow(t, "--target-gphome")
+		if actual != acceptance.GPHOME_TARGET {
+			t.Errorf("got %q want %q", actual, acceptance.GPHOME_TARGET)
+		}
+	})
+
+	t.Run("ggupgrade execute fails when --pg-upgrade-verbose is used without --verbose", func(t *testing.T) {
+		acceptance.Initialize_stopBeforeClusterCreation(t)
+
+		cmd := exec.Command("ggupgrade", "execute",
+			"--non-interactive",
+			"--pg-upgrade-verbose",
+		)
+		output, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Errorf("expected error got nil")
+		}
+		defer acceptance.Revert(t)
+
+		expected := "Error: expected --verbose when using --pg-upgrade-verbose\n"
+		if string(output) != expected {
+			t.Errorf("got %q want %q", string(output), expected)
+		}
+	})
+}

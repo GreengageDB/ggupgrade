@@ -16,13 +16,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 // Prints the strings "stdout" and "stderr" to the respective streams.
@@ -65,7 +65,7 @@ func TestRun(t *testing.T) {
 		utils.System.MkdirAll = func(path string, perms os.FileMode) error {
 			called = true
 
-			expected, err := utils.GetPgUpgradeDir(greenplum.MirrorRole, 3, "RandomTimestamp", "6.20.0")
+			expected, err := utils.GetPgUpgradeDir(greengage.MirrorRole, 3, "RandomTimestamp", "6.20.0")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -83,7 +83,7 @@ func TestRun(t *testing.T) {
 		defer upgrade.ResetPgUpgradeCommand()
 
 		opts := &idl.PgOptions{
-			Role:               greenplum.MirrorRole,
+			Role:               greengage.MirrorRole,
 			ContentID:          3,
 			TargetVersion:      "6.20.0",
 			PgUpgradeTimestamp: "RandomTimestamp",
@@ -100,7 +100,7 @@ func TestRun(t *testing.T) {
 	})
 
 	t.Run("does not fail if the pg_upgrade working directory already exists", func(t *testing.T) {
-		expected, err := utils.GetPgUpgradeDir(greenplum.MirrorRole, 3, "RandomTimestamp", "6.20.0")
+		expected, err := utils.GetPgUpgradeDir(greengage.MirrorRole, 3, "RandomTimestamp", "6.20.0")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -111,7 +111,7 @@ func TestRun(t *testing.T) {
 		defer upgrade.ResetPgUpgradeCommand()
 
 		opts := &idl.PgOptions{
-			Role:               greenplum.MirrorRole,
+			Role:               greengage.MirrorRole,
 			ContentID:          3,
 			TargetVersion:      "6.20.0",
 			PgUpgradeTimestamp: "RandomTimestamp",
@@ -163,7 +163,7 @@ func TestRun(t *testing.T) {
 		stderr := new(bytes.Buffer)
 
 		opts := &idl.PgOptions{
-			Role:               greenplum.MirrorRole,
+			Role:               greengage.MirrorRole,
 			ContentID:          3,
 			TargetVersion:      "6.20.0",
 			PgUpgradeTimestamp: "RandomTimestamp",
@@ -192,7 +192,7 @@ func TestRun(t *testing.T) {
 		stdout := new(bytes.Buffer)
 
 		opts := &idl.PgOptions{
-			Role:               greenplum.MirrorRole,
+			Role:               greengage.MirrorRole,
 			ContentID:          3,
 			TargetVersion:      "6.20.0",
 			PgUpgradeTimestamp: "RandomTimestamp",
@@ -202,7 +202,7 @@ func TestRun(t *testing.T) {
 			t.Fatalf("unexpected error %+v", err)
 		}
 
-		expected, err := utils.GetPgUpgradeDir(greenplum.MirrorRole, 3, "RandomTimestamp", "6.20.0")
+		expected, err := utils.GetPgUpgradeDir(greengage.MirrorRole, 3, "RandomTimestamp", "6.20.0")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -228,7 +228,7 @@ func TestRun(t *testing.T) {
 		stdout := new(bytes.Buffer)
 
 		opts := &idl.PgOptions{
-			Role:               greenplum.MirrorRole,
+			Role:               greengage.MirrorRole,
 			ContentID:          3,
 			TargetVersion:      "6.20.0",
 			PgUpgradeTimestamp: "RandomTimestamp",
@@ -259,7 +259,7 @@ func TestRun(t *testing.T) {
 		defer upgrade.ResetPgUpgradeCommand()
 
 		opts := &idl.PgOptions{
-			Role:               greenplum.MirrorRole,
+			Role:               greengage.MirrorRole,
 			ContentID:          3,
 			TargetVersion:      "6.20.0",
 			PgUpgradeTimestamp: "RandomTimestamp",
@@ -276,7 +276,7 @@ func TestRun(t *testing.T) {
 		}
 	})
 
-	backupDir := "/data/.gpupgrade"
+	backupDir := "/data/.ggupgrade"
 	logDir, err := utils.GetLogDir()
 	if err != nil {
 		t.Errorf("got error when retrieving log directory: %s", err)
@@ -310,7 +310,7 @@ func TestRun(t *testing.T) {
 			opts: &idl.PgOptions{
 				BackupDir:        backupDir,
 				PgUpgradeVerbose: true,
-				Role:             greenplum.PrimaryRole,
+				Role:             greengage.PrimaryRole,
 				ContentID:        3,
 				PgUpgradeMode:    idl.PgOptions_dispatcher,
 				OldOptions:       "-x 2",
@@ -351,7 +351,7 @@ func TestRun(t *testing.T) {
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
 				PgUpgradeVerbose:   true,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				TargetVersion:      "6.20.0",
 				PgUpgradeTimestamp: "RandomTimestamp",
@@ -375,7 +375,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				TargetVersion:      "6.20.0",
 				PgUpgradeTimestamp: "RandomTimestamp",
@@ -400,7 +400,7 @@ func TestRun(t *testing.T) {
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
 				PgUpgradeVerbose:   false,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				TargetVersion:      "6.20.0",
 				PgUpgradeTimestamp: "RandomTimestamp",
@@ -428,7 +428,7 @@ func TestRun(t *testing.T) {
 				BackupDir:           backupDir,
 				PgUpgradeVerbose:    true,
 				SkipPgUpgradeChecks: true,
-				Role:                greenplum.PrimaryRole,
+				Role:                greengage.PrimaryRole,
 				ContentID:           3,
 				TargetVersion:       "6.20.0",
 				PgUpgradeTimestamp:  "RandomTimestamp",
@@ -452,7 +452,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				TargetVersion:      "6.20.0",
 				PgUpgradeTimestamp: "RandomTimestamp",
@@ -478,7 +478,7 @@ func TestRun(t *testing.T) {
 				BackupDir:           backupDir,
 				PgUpgradeVerbose:    false,
 				SkipPgUpgradeChecks: false,
-				Role:                greenplum.PrimaryRole,
+				Role:                greengage.PrimaryRole,
 				ContentID:           3,
 				TargetVersion:       "6.20.0",
 				PgUpgradeTimestamp:  "RandomTimestamp",
@@ -502,7 +502,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				Action:             idl.PgOptions_check,
 				TargetVersion:      "6.20.0",
@@ -527,7 +527,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				Action:             idl.PgOptions_upgrade,
 				TargetVersion:      "6.20.0",
@@ -553,7 +553,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				Mode:               idl.Mode_link,
 				TargetVersion:      "6.20.0",
@@ -578,7 +578,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				Mode:               idl.Mode_copy,
 				TargetVersion:      "6.20.0",
@@ -603,7 +603,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          -1,
 				Action:             idl.PgOptions_check,
 				TargetVersion:      "6.20.0",
@@ -628,7 +628,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				Action:             idl.PgOptions_upgrade,
 				TargetVersion:      "6.20.0",
@@ -653,7 +653,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				Mode:               idl.Mode_copy,
 				TargetVersion:      "6.20.0",
@@ -678,7 +678,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				Mode:               idl.Mode_copy,
 				TargetVersion:      "7.1.0",
@@ -705,7 +705,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				TargetVersion:      "6.20.0",
 				PgUpgradeTimestamp: "RandomTimestamp",
@@ -729,7 +729,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				TargetVersion:      "6.20.0",
 				PgUpgradeJobs:      "123",
@@ -754,7 +754,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				TargetVersion:      "6.20.0",
 				PgUpgradeTimestamp: "RandomTimestamp",
@@ -776,7 +776,7 @@ func TestRun(t *testing.T) {
 			},
 			opts: &idl.PgOptions{
 				BackupDir:          backupDir,
-				Role:               greenplum.PrimaryRole,
+				Role:               greengage.PrimaryRole,
 				ContentID:          3,
 				TargetVersion:      "7.1.0",
 				PgUpgradeTimestamp: "RandomTimestamp",

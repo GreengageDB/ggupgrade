@@ -12,45 +12,45 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 const localVersion = `Version: 1.0.0 Commit: 83aaa4 Release: Enterprise`
 const remoteVersion = `Version: 1.1.0 Commit: 63cc21 Release: Enterprise`
 const versionStdErr = `
-Error: unknown command "\/ersion" for "gpupgrade"
-Run 'gpupgrade --help' for usage.
+Error: unknown command "\/ersion" for "ggupgrade"
+Run 'ggupgrade --help' for usage.
 `
 
-func gpupgrade_local_version() {
+func ggupgrade_local_version() {
 	fmt.Print(localVersion)
 }
 
-func gpupgrade_remote_version() {
+func ggupgrade_remote_version() {
 	fmt.Print(remoteVersion)
 }
 
-func gpupgrade_version_fails() {
+func ggupgrade_version_fails() {
 	os.Stderr.WriteString("oops")
 	os.Exit(1)
 }
 
 func init() {
 	exectest.RegisterMains(
-		gpupgrade_local_version,
-		gpupgrade_remote_version,
-		gpupgrade_version_fails,
+		ggupgrade_local_version,
+		ggupgrade_remote_version,
+		ggupgrade_version_fails,
 	)
 }
 
-func TestGpupgradeVersion(t *testing.T) {
+func TestGgupgradeVersion(t *testing.T) {
 	testlog.SetupTestLogger()
 
 	t.Run("returns the version", func(t *testing.T) {
-		upgrade.SetLocalVersionCommand(exectest.NewCommand(gpupgrade_local_version))
+		upgrade.SetLocalVersionCommand(exectest.NewCommand(ggupgrade_local_version))
 		defer upgrade.ResetLocalVersionCommand()
 
 		version, err := upgrade.LocalVersion()
@@ -64,7 +64,7 @@ func TestGpupgradeVersion(t *testing.T) {
 	})
 
 	t.Run("returns error when command fails", func(t *testing.T) {
-		upgrade.SetLocalVersionCommand(exectest.NewCommand(gpupgrade_version_fails))
+		upgrade.SetLocalVersionCommand(exectest.NewCommand(ggupgrade_version_fails))
 		defer upgrade.ResetLocalVersionCommand()
 
 		version, err := upgrade.LocalVersion()
@@ -87,13 +87,13 @@ func TestGpupgradeVersion(t *testing.T) {
 	})
 }
 
-func TestGpupgradeVersionOnHost(t *testing.T) {
+func TestGgupgradeVersionOnHost(t *testing.T) {
 	testlog.SetupTestLogger()
 	host := "sdw1"
 
 	t.Run("returns remote version using -q to suppress motd banner messages from polluting the version output", func(t *testing.T) {
 
-		upgrade.SetRemoteVersionCommand(exectest.NewCommand(gpupgrade_remote_version))
+		upgrade.SetRemoteVersionCommand(exectest.NewCommand(ggupgrade_remote_version))
 		defer upgrade.ResetRemoteVersionCommand()
 
 		version, err := upgrade.RemoteVersion(host)
@@ -107,7 +107,7 @@ func TestGpupgradeVersionOnHost(t *testing.T) {
 	})
 
 	t.Run("returns error when command fails", func(t *testing.T) {
-		upgrade.SetRemoteVersionCommand(exectest.NewCommand(gpupgrade_version_fails))
+		upgrade.SetRemoteVersionCommand(exectest.NewCommand(ggupgrade_version_fails))
 		defer upgrade.ResetRemoteVersionCommand()
 
 		version, err := upgrade.RemoteVersion(host)
@@ -134,20 +134,20 @@ func TestEnsureVersionsMatch(t *testing.T) {
 	testlog.SetupTestLogger()
 
 	t.Run("versions match", func(t *testing.T) {
-		upgrade.SetLocalVersionCommand(exectest.NewCommand(gpupgrade_local_version))
+		upgrade.SetLocalVersionCommand(exectest.NewCommand(ggupgrade_local_version))
 		defer upgrade.ResetLocalVersionCommand()
 
-		err := upgrade.EnsureGpupgradeVersionsMatch([]string{""})
+		err := upgrade.EnsureGgupgradeVersionsMatch([]string{""})
 		if err != nil {
 			t.Errorf("unexpected err %#v", err)
 		}
 	})
 
 	t.Run("errors when failing to get version on the hub", func(t *testing.T) {
-		upgrade.SetLocalVersionCommand(exectest.NewCommand(gpupgrade_version_fails))
+		upgrade.SetLocalVersionCommand(exectest.NewCommand(ggupgrade_version_fails))
 		defer upgrade.ResetLocalVersionCommand()
 
-		err := upgrade.EnsureGpupgradeVersionsMatch([]string{""})
+		err := upgrade.EnsureGgupgradeVersionsMatch([]string{""})
 		expected := `failed with "oops": exit status 1`
 		if !strings.HasSuffix(err.Error(), expected) {
 			t.Errorf("got %v want %v", err, expected)
@@ -155,14 +155,14 @@ func TestEnsureVersionsMatch(t *testing.T) {
 	})
 
 	t.Run("errors when failing to get version on the agents", func(t *testing.T) {
-		upgrade.SetLocalVersionCommand(exectest.NewCommand(gpupgrade_local_version))
+		upgrade.SetLocalVersionCommand(exectest.NewCommand(ggupgrade_local_version))
 		defer upgrade.ResetLocalVersionCommand()
 
-		upgrade.SetRemoteVersionCommand(exectest.NewCommand(gpupgrade_version_fails))
+		upgrade.SetRemoteVersionCommand(exectest.NewCommand(ggupgrade_version_fails))
 		defer upgrade.ResetRemoteVersionCommand()
 
 		hosts := []string{"sdw1", "sdw2"}
-		err := upgrade.EnsureGpupgradeVersionsMatch(hosts)
+		err := upgrade.EnsureGgupgradeVersionsMatch(hosts)
 		var expected errorlist.Errors
 		if !errors.As(err, &expected) {
 			t.Fatalf("got type %T, want type %T", err, expected)
@@ -174,14 +174,14 @@ func TestEnsureVersionsMatch(t *testing.T) {
 	})
 
 	t.Run("errors when hub version does not match agent versions", func(t *testing.T) {
-		upgrade.SetLocalVersionCommand(exectest.NewCommand(gpupgrade_local_version))
+		upgrade.SetLocalVersionCommand(exectest.NewCommand(ggupgrade_local_version))
 		defer upgrade.ResetLocalVersionCommand()
 
-		upgrade.SetRemoteVersionCommand(exectest.NewCommand(gpupgrade_remote_version))
+		upgrade.SetRemoteVersionCommand(exectest.NewCommand(ggupgrade_remote_version))
 		defer upgrade.ResetRemoteVersionCommand()
 
 		hosts := []string{"sdw1"}
-		err := upgrade.EnsureGpupgradeVersionsMatch(hosts)
+		err := upgrade.EnsureGgupgradeVersionsMatch(hosts)
 		expected := upgrade.MismatchedVersions{remoteVersion: hosts}
 		if !strings.HasSuffix(err.Error(), expected.String()) {
 			t.Error("expected error to contain mismatched agents")

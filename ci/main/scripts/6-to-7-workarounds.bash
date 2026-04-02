@@ -4,8 +4,8 @@
 
 set -eux -o pipefail
 
-source gpupgrade_src/ci/main/scripts/environment.bash
-source gpupgrade_src/ci/main/scripts/ci-helpers.bash
+source ggupgrade_src/ci/main/scripts/environment.bash
+source ggupgrade_src/ci/main/scripts/ci-helpers.bash
 ./ccp_src/scripts/setup_ssh_to_cluster.sh
 
 # FIXME: Running analyze post-upgrade fails for materialized views. For now drop all materialized views
@@ -13,7 +13,7 @@ echo "Dropping materialized views before upgrading from 6X..."
 views=$(ssh -n cdw "
     set -eux -o pipefail
 
-    source /usr/local/greenplum-db-source/greenplum_path.sh
+    source /usr/local/greengage-db-source/greengage_path.sh
 
     psql -v ON_ERROR_STOP=0 -d regression --tuples-only --no-align --field-separator ' ' <<SQL_EOF
             SELECT relname FROM pg_class WHERE relkind = 'm';
@@ -25,7 +25,7 @@ echo "${views}" | while read -r view; do
         ssh -n cdw "
             set -eux -o pipefail
 
-            source /usr/local/greenplum-db-source/greenplum_path.sh
+            source /usr/local/greengage-db-source/greengage_path.sh
 
             psql -v ON_ERROR_STOP=1 -d regression -c 'DROP MATERIALIZED VIEW IF EXISTS ${view}';
         " || echo "Dropping materialized views failed. Continuing..."

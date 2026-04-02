@@ -8,7 +8,7 @@ import (
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
+	"github.com/GreengageDB/ggupgrade/greengage"
 )
 
 // finishMock is a defer function to make the sqlmock API a little bit more like
@@ -44,13 +44,13 @@ func MockSegmentConfiguration() *sqlmock.Rows {
 //
 // When changing this implementation, make sure you change
 // MockSegmentConfiguration() to match!
-func MockCluster() *greenplum.Cluster {
-	segments := greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Port: 15432, Hostname: "mdw", Address: "mdw-1", DataDir: "/data/coordinator/gpseg-1", Role: greenplum.PrimaryRole},
-		{DbID: 2, ContentID: 0, Port: 25432, Hostname: "sdw1", Address: "sdw1-1", DataDir: "/data/primary/gpseg0", Role: greenplum.PrimaryRole},
+func MockCluster() *greengage.Cluster {
+	segments := greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Port: 15432, Hostname: "mdw", Address: "mdw-1", DataDir: "/data/coordinator/gpseg-1", Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: 0, Port: 25432, Hostname: "sdw1", Address: "sdw1-1", DataDir: "/data/primary/gpseg0", Role: greengage.PrimaryRole},
 	}
 
-	cluster, err := greenplum.NewCluster(segments)
+	cluster, err := greengage.NewCluster(segments)
 	if err != nil {
 		panic(err)
 	}

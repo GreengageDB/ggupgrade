@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/cli/commands"
+	"github.com/GreengageDB/ggupgrade/cli/commands"
 )
 
 func TestHelpCommands(t *testing.T) {
@@ -28,9 +28,9 @@ func TestHelpCommands(t *testing.T) {
 			help := help
 
 			t.Run(fmt.Sprintf("testing command %q with flag %q", command, flag), func(t *testing.T) {
-				cmd := exec.Command("gpupgrade", command, flag)
+				cmd := exec.Command("ggupgrade", command, flag)
 				if command == "" {
-					cmd = exec.Command("gpupgrade", flag)
+					cmd = exec.Command("ggupgrade", flag)
 				}
 				output, err := cmd.Output()
 				if err != nil {
@@ -45,7 +45,7 @@ func TestHelpCommands(t *testing.T) {
 	}
 
 	t.Run("shows global help when no arguments are passed", func(t *testing.T) {
-		cmd := exec.Command("gpupgrade")
+		cmd := exec.Command("ggupgrade")
 		output, err := cmd.Output()
 		if err != nil {
 			t.Errorf("unexpected err: %#v", err)

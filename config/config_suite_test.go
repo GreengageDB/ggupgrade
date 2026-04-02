@@ -8,12 +8,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
 )
 
 func PostgresGPVersion_5_29_10() {
-	fmt.Println("postgres (Greenplum Database) 5.29.10 build commit:fca0e6aa84a7d611ce8b7986d6fc73ae93b76f5e")
+	fmt.Println("postgres (Greengage Database) 5.29.10 build commit:fca0e6aa84a7d611ce8b7986d6fc73ae93b76f5e")
 }
 
 func init() {
@@ -29,10 +29,10 @@ func TestMain(m *testing.M) {
 
 // MustCreateCluster creates a utils.Cluster and calls t.Fatalf() if there is
 // any error.
-func MustCreateCluster(t *testing.T, segments greenplum.SegConfigs) *greenplum.Cluster {
+func MustCreateCluster(t *testing.T, segments greengage.SegConfigs) *greengage.Cluster {
 	t.Helper()
 
-	cluster, err := greenplum.NewCluster(segments)
+	cluster, err := greengage.NewCluster(segments)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}

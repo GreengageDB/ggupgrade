@@ -11,15 +11,15 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 var execCommandHubStart = exec.Command
 var execCommandHubCount = exec.Command
 
 // CreateStateDir creates the state directory in the cli to ensure that at most
-// one gpupgrade is occurring at the same time.
+// one ggupgrade is occurring at the same time.
 func CreateStateDir() (err error) {
 	stateDir := utils.GetStateDir()
 
@@ -47,7 +47,7 @@ func StartHub(streams step.OutStreams) (err error) {
 		return step.Skip
 	}
 
-	cmd := execCommandHubStart("gpupgrade", "hub", "--daemonize")
+	cmd := execCommandHubStart("ggupgrade", "hub", "--daemonize")
 	log.Printf("Executing: %q", cmd.String())
 	output, err := cmd.CombinedOutput()
 	if err != nil {

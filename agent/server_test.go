@@ -13,10 +13,10 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/agent"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/agent"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/upgrade"
 )
 
 const timeout = 1 * time.Second
@@ -27,7 +27,7 @@ func TestServerStart(t *testing.T) {
 	t.Run("successfully starts and creates state directory if it does not exist", func(t *testing.T) {
 		tempDir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, tempDir)
-		stateDir := path.Join(tempDir, ".gpupgrade")
+		stateDir := path.Join(tempDir, ".ggupgrade")
 
 		agentServer := agent.New()
 
@@ -60,7 +60,7 @@ func TestServerStart(t *testing.T) {
 	})
 
 	t.Run("successfully starts if state directory already exists", func(t *testing.T) {
-		stateDir := testutils.GetTempDir(t, ".gpupgrade")
+		stateDir := testutils.GetTempDir(t, ".ggupgrade")
 		defer testutils.MustRemoveAll(t, stateDir)
 
 		agentServer := agent.New()
@@ -87,7 +87,7 @@ func TestServerStart(t *testing.T) {
 	})
 
 	t.Run("start returns an error when port is in use", func(t *testing.T) {
-		stateDir := testutils.GetTempDir(t, ".gpupgrade")
+		stateDir := testutils.GetTempDir(t, ".ggupgrade")
 		defer testutils.MustRemoveAll(t, stateDir)
 
 		portInUse, closeListener := mustListen(t)

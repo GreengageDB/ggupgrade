@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // This binary exists purely for the purpose of generating bash completion for
-// the CLI. Run `go generate ./cli/bash` to regenerate the gpupgrade.bash script.
+// the CLI. Run `go generate ./cli/bash` to regenerate the ggupgrade.bash script.
 package main
 
 import (
 	"log"
 	"os"
 
-	"github.com/greenplum-db/gpupgrade/cli/commands"
+	"github.com/GreengageDB/ggupgrade/cli/commands"
 )
 
-//go:generate go run generate.go gpupgrade.bash
+//go:generate go run generate.go ggupgrade.bash
 
 func main() {
 	root := commands.BuildRootCommand()

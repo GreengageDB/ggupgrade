@@ -15,15 +15,15 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 var ErrUnknownCatalogVersion = errors.New("pg_controldata output is missing catalog version")
 
-func (s *Server) GenerateInitsystemConfig(source *greenplum.Cluster) error {
+func (s *Server) GenerateInitsystemConfig(source *greengage.Cluster) error {
 	db, err := sql.Open("pgx", source.Connection())
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func (s *Server) writeConf(db *sql.DB) error {
 }
 
 func (s *Server) RemoveIntermediateCluster(streams step.OutStreams) error {
-	if reflect.DeepEqual(s.Intermediate, greenplum.Cluster{}) {
+	if reflect.DeepEqual(s.Intermediate, greengage.Cluster{}) {
 		return nil
 	}
 
@@ -77,8 +77,8 @@ func (s *Server) RemoveIntermediateCluster(streams step.OutStreams) error {
 	return nil
 }
 
-func InitTargetCluster(stream step.OutStreams, intermediate *greenplum.Cluster) error {
-	// Sanitize the child environment. The sourcing of greenplum_path.sh will
+func InitTargetCluster(stream step.OutStreams, intermediate *greengage.Cluster) error {
+	// Sanitize the child environment. The sourcing of greengage_path.sh will
 	// give us back almost everything we need, but it's important not to put a
 	// previous installation's ambient environment into the mix.
 	//
@@ -98,7 +98,7 @@ func InitTargetCluster(stream step.OutStreams, intermediate *greenplum.Cluster) 
 		args = append(args, "--ignore-warnings")
 	}
 
-	return intermediate.RunGreenplumCmdWithEnvironment(stream, "gpinitsystem", args, env)
+	return intermediate.RunGreengageCmdWithEnvironment(stream, "gpinitsystem", args, env)
 }
 
 func GetCheckpointSegmentsAndEncoding(gpinitsystemConfig []string, version semver.Version, db *sql.DB) ([]string, error) {
@@ -125,9 +125,9 @@ func GetCheckpointSegmentsAndEncoding(gpinitsystemConfig []string, version semve
 }
 
 func CreateInitialInitsystemConfig(targetCoordinatorDataDir string, useHbaHostnames bool) ([]string, error) {
-	gpinitsystemConfig := []string{`ARRAY_NAME="gp_upgrade cluster"`}
+	gpinitsystemConfig := []string{`ARRAY_NAME="ggupgrade cluster"`}
 
-	segPrefix, err := greenplum.GetCoordinatorSegPrefix(targetCoordinatorDataDir)
+	segPrefix, err := greengage.GetCoordinatorSegPrefix(targetCoordinatorDataDir)
 	if err != nil {
 		return gpinitsystemConfig, xerrors.Errorf("determine master segment prefix: %w", err)
 	}
@@ -152,7 +152,7 @@ func WriteInitsystemFile(gpinitsystemConfig []string, gpinitsystemFilepath strin
 	return nil
 }
 
-func WriteSegmentArray(config []string, intermediate *greenplum.Cluster) ([]string, error) {
+func WriteSegmentArray(config []string, intermediate *greengage.Cluster) ([]string, error) {
 	coordinator := intermediate.Coordinator()
 	config = append(config,
 		fmt.Sprintf("QD_PRIMARY_ARRAY=%s~%s~%d~%s~%d~%d",
@@ -187,9 +187,9 @@ func WriteSegmentArray(config []string, intermediate *greenplum.Cluster) ([]stri
 	return config, nil
 }
 
-func GetCatalogVersion(intermediate *greenplum.Cluster) (string, error) {
+func GetCatalogVersion(intermediate *greengage.Cluster) (string, error) {
 	stream := &step.BufferedStreams{}
-	err := intermediate.RunGreenplumCmd(stream, "pg_controldata", intermediate.CoordinatorDataDir())
+	err := intermediate.RunGreengageCmd(stream, "pg_controldata", intermediate.CoordinatorDataDir())
 	if err != nil {
 		return "", err
 	}

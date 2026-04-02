@@ -6,7 +6,7 @@ package agent
 import (
 	"os"
 
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
 )
 
 // TODO: migrate to a shared exectest implementation of the simple

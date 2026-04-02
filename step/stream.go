@@ -14,7 +14,7 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl"
 )
 
 type OutStreams interface {

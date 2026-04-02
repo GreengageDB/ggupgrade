@@ -11,9 +11,9 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func (s *Server) Revert(_ *idl.RevertRequest, stream idl.CliToHub_RevertServer) (err error) {
@@ -44,7 +44,7 @@ Cannot revert and restore the source cluster. Please contact support.`)
 		return err
 	}
 
-	st.RunConditionally(idl.Substep_ensure_gpupgrade_agents_are_running, configCreated && agentsStarted, func(_ step.OutStreams) error {
+	st.RunConditionally(idl.Substep_ensure_ggupgrade_agents_are_running, configCreated && agentsStarted, func(_ step.OutStreams) error {
 		_, err := RestartAgents(context.Background(), nil, AgentHosts(s.Source), s.AgentPort, utils.GetStateDir())
 		if err != nil {
 			return err

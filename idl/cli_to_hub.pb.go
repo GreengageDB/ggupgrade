@@ -10,10 +10,11 @@
 package idl
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
+
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -129,9 +130,9 @@ const (
 	Substep_create_backupdirs                                             Substep = 42
 	Substep_delete_backupdir                                              Substep = 43
 	Substep_analyze_target_cluster                                        Substep = 44
-	Substep_ensure_gpupgrade_agents_are_running                           Substep = 45
+	Substep_ensure_ggupgrade_agents_are_running                           Substep = 45
 	Substep_verify_gpdb_versions                                          Substep = 46
-	Substep_verify_gpupgrade_is_installed_across_all_hosts                Substep = 47
+	Substep_verify_ggupgrade_is_installed_across_all_hosts                Substep = 47
 	Substep_initialize_wait_for_cluster_to_be_ready                       Substep = 48
 	Substep_wait_for_cluster_to_be_ready_before_upgrade_master            Substep = 49
 )
@@ -184,9 +185,9 @@ var (
 		42: "create_backupdirs",
 		43: "delete_backupdir",
 		44: "analyze_target_cluster",
-		45: "ensure_gpupgrade_agents_are_running",
+		45: "ensure_ggupgrade_agents_are_running",
 		46: "verify_gpdb_versions",
-		47: "verify_gpupgrade_is_installed_across_all_hosts",
+		47: "verify_ggupgrade_is_installed_across_all_hosts",
 		48: "initialize_wait_for_cluster_to_be_ready",
 		49: "wait_for_cluster_to_be_ready_before_upgrade_master",
 	}
@@ -236,9 +237,9 @@ var (
 		"create_backupdirs":                                             42,
 		"delete_backupdir":                                              43,
 		"analyze_target_cluster":                                        44,
-		"ensure_gpupgrade_agents_are_running":                           45,
+		"ensure_ggupgrade_agents_are_running":                           45,
 		"verify_gpdb_versions":                                          46,
-		"verify_gpupgrade_is_installed_across_all_hosts":                47,
+		"verify_ggupgrade_is_installed_across_all_hosts":                47,
 		"initialize_wait_for_cluster_to_be_ready":                       48,
 		"wait_for_cluster_to_be_ready_before_upgrade_master":            49,
 	}

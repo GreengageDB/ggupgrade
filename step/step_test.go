@@ -14,14 +14,14 @@ import (
 	"github.com/golang/mock/gomock"
 	"google.golang.org/grpc/status"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/idl/mock_idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/substeps"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl/mock_idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/substeps"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func TestStepRun(t *testing.T) {
@@ -358,7 +358,7 @@ func TestHasStarted(t *testing.T) {
 	}()
 
 	t.Run("returns an error when getting the status file fails", func(t *testing.T) {
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", "does/not/exist")
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", "does/not/exist")
 		defer resetEnv()
 
 		hasStarted, err := step.HasStarted(idl.Step_initialize)
@@ -376,7 +376,7 @@ func TestHasStarted(t *testing.T) {
 		dir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, dir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", dir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", dir)
 		defer resetEnv()
 
 		path := filepath.Join(dir, step.SubstepsFileName)
@@ -396,7 +396,7 @@ func TestHasStarted(t *testing.T) {
 		dir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, dir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", dir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", dir)
 		defer resetEnv()
 
 		path := filepath.Join(dir, step.SubstepsFileName)
@@ -416,7 +416,7 @@ func TestHasStarted(t *testing.T) {
 		dir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, dir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", dir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", dir)
 		defer resetEnv()
 
 		path := filepath.Join(dir, step.SubstepsFileName)
@@ -446,7 +446,7 @@ func TestHasRun(t *testing.T) {
 		}
 	}()
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	cases := []struct {
@@ -491,7 +491,7 @@ func TestHasRun(t *testing.T) {
 	}
 
 	t.Run("returns an error when getting the status file fails", func(t *testing.T) {
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", "does/not/exist")
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", "does/not/exist")
 		defer resetEnv()
 
 		hasRun, err := step.HasRun(idl.Step_initialize, idl.Substep_saving_source_cluster_config)
@@ -509,7 +509,7 @@ func TestHasRun(t *testing.T) {
 		dir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, dir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", dir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", dir)
 		defer resetEnv()
 
 		path := filepath.Join(dir, step.SubstepsFileName)
@@ -529,7 +529,7 @@ func TestHasRun(t *testing.T) {
 		dir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, dir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", dir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", dir)
 		defer resetEnv()
 
 		path := filepath.Join(dir, step.SubstepsFileName)
@@ -557,7 +557,7 @@ func TestHasCompleted(t *testing.T) {
 		}
 	}()
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	cases := []struct {
@@ -606,7 +606,7 @@ func TestHasCompleted(t *testing.T) {
 	}
 
 	t.Run("returns an error when getting the status file fails", func(t *testing.T) {
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", "does/not/exist")
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", "does/not/exist")
 		defer resetEnv()
 
 		hasRun, err := step.HasCompleted(idl.Step_initialize, idl.Substep_start_agents)
@@ -624,7 +624,7 @@ func TestHasCompleted(t *testing.T) {
 		dir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, dir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", dir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", dir)
 		defer resetEnv()
 
 		path := filepath.Join(dir, step.SubstepsFileName)
@@ -644,7 +644,7 @@ func TestHasCompleted(t *testing.T) {
 		dir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, dir)
 
-		resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", dir)
+		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", dir)
 		defer resetEnv()
 
 		path := filepath.Join(dir, step.SubstepsFileName)

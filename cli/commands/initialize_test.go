@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/greenplum-db/gpupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl"
 )
 
 func TestParsePorts(t *testing.T) {

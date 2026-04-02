@@ -11,11 +11,11 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/idl/mock_idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl/mock_idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
 )
 
 func TestArchiveLogDirectories(t *testing.T) {
@@ -194,7 +194,7 @@ func TestGetLogArchiveDir(t *testing.T) {
 	var upgradeID string
 	actual := hub.GetLogArchiveDir("/tmp/log/dir", upgradeID, timeStamp)
 
-	expected := fmt.Sprintf("/tmp/log/gpupgrade-%s-20000314T121509", upgradeID)
+	expected := fmt.Sprintf("/tmp/log/ggupgrade-%s-20000314T121509", upgradeID)
 	if actual != expected {
 		t.Errorf("got %q want %q", actual, expected)
 	}

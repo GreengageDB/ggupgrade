@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Set up a multi-host Vagrant environment
-# for gpupgrade.
+# for ggupgrade.
 #
 # see README.md for more information
 #

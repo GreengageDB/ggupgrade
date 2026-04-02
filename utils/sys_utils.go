@@ -20,7 +20,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/google/renameio"
 
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 var (
@@ -101,9 +101,9 @@ func ResetSystemFunctions() {
 }
 
 func GetStateDir() string {
-	stateDir := os.Getenv("GPUPGRADE_HOME")
+	stateDir := os.Getenv("GGUPGRADE_HOME")
 	if stateDir == "" {
-		stateDir = filepath.Join(os.Getenv("HOME"), ".gpupgrade")
+		stateDir = filepath.Join(os.Getenv("HOME"), ".ggupgrade")
 	}
 
 	return stateDir
@@ -115,12 +115,12 @@ func GetLogDir() (string, error) {
 		return "", err
 	}
 
-	logDir := filepath.Join(currentUser.HomeDir, "gpAdminLogs", "gpupgrade")
+	logDir := filepath.Join(currentUser.HomeDir, "gpAdminLogs", "ggupgrade")
 	return logDir, nil
 }
 
 func GetDataMigrationSeedDir() string {
-	return filepath.Join("/", "usr", "local", "bin", "greenplum", "gpupgrade", "data-migration-scripts")
+	return filepath.Join("/", "usr", "local", "bin", "greengage", "ggupgrade", "data-migration-scripts")
 }
 
 func GetDefaultGeneratedDataMigrationScriptsDir() (string, error) {
@@ -207,13 +207,13 @@ func GetJSONFile(stateDir string, fileName string) (path string, err error) {
 	return path, nil
 }
 
-func GetGpupgradePath() (string, error) {
+func GetGgupgradePath() (string, error) {
 	hubPath, err := os.Executable()
 	if err != nil {
 		return "", err
 	}
 
-	return filepath.Join(filepath.Dir(hubPath), "gpupgrade"), nil
+	return filepath.Join(filepath.Dir(hubPath), "ggupgrade"), nil
 }
 
 // Calling os.Rename for a directory is allowed only when both the
@@ -221,7 +221,7 @@ func GetGpupgradePath() (string, error) {
 // Otherwise, it returns EXDEV error ("cross-device link not permitted").
 // To avoid such case, use the Move utility instead of os.Rename.
 // Found this issue on docker containers, when os.Rename was being used
-// to archive the gpupgrade log directory.
+// to archive the ggupgrade log directory.
 func Move(src string, dst string) error {
 	cmd := exec.Command("mv", src, dst)
 	_, err := cmd.Output()

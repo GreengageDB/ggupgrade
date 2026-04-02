@@ -14,8 +14,8 @@ CREATE OR REPLACE VIEW view_with_int2vectoreq AS SELECT '1 2'::INT2VECTOR = '1 2
 ---------------------------------------------------------------------------------
 --- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 ---------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
-! find $(ls -dt ~/gpAdminLogs/gpupgrade/pg_upgrade_*/ | head -1) -name "views_with_removed_operators.txt" -exec cat {} +;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+! find $(ls -dt ~/gpAdminLogs/ggupgrade/pg_upgrade_*/ | head -1) -name "views_with_removed_operators.txt" -exec cat {} +;
 
 ---------------------------------------------------------------------------------
 --- Workaround to unblock upgrade

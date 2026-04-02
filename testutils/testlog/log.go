@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/utils/syncbuf"
+	"github.com/GreengageDB/ggupgrade/utils/syncbuf"
 )
 
 func SetupTestLogger() *syncbuf.Syncbuf {

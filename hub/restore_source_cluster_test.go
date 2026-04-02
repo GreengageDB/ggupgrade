@@ -17,30 +17,30 @@ import (
 	"github.com/blang/semver/v4"
 	"github.com/golang/mock/gomock"
 
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/idl/mock_idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/rsync"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/idl/mock_idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
 func TestRsyncCoordinatorAndPrimaries(t *testing.T) {
 	testlog.SetupTestLogger()
 
-	cluster := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir", Role: greenplum.PrimaryRole},
-		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greenplum.MirrorRole},
-		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greenplum.PrimaryRole},
-		{DbID: 4, ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greenplum.MirrorRole},
-		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greenplum.PrimaryRole},
-		{DbID: 6, ContentID: 1, Hostname: "msdw2", DataDir: "/data/dbfast_mirror2/seg2", Role: greenplum.MirrorRole},
+	cluster := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir", Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "msdw2", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
 	})
-	cluster.GPHome = "/usr/local/greenplum-db"
+	cluster.GPHome = "/usr/local/greengage-db"
 	cluster.Version = semver.MustParse("5.0.0")
 
 	tablespaces := testutils.CreateTablespaces()
@@ -219,7 +219,7 @@ func TestRsyncCoordinatorAndPrimaries(t *testing.T) {
 		rsync.SetRsyncCommand(exectest.NewCommand(hub.Failure))
 		defer rsync.ResetRsyncCommand()
 
-		err := hub.RsyncCoordinatorTablespaces(step.DevNullStream, cluster.CoordinatorHostname(), tablespaces[int32(greenplum.CoordinatorDbid)], tablespaces[int32(cluster.Standby().DbID)])
+		err := hub.RsyncCoordinatorTablespaces(step.DevNullStream, cluster.CoordinatorHostname(), tablespaces[int32(greengage.CoordinatorDbid)], tablespaces[int32(cluster.Standby().DbID)])
 		if err == nil {
 			t.Error("unexpected nil error")
 		}
@@ -301,17 +301,17 @@ func TestRestoreCoordinatorAndPrimariesPgControl(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cluster := hub.MustCreateCluster(t, greenplum.SegConfigs{
-			{ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir", Role: greenplum.PrimaryRole},
-			{ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greenplum.MirrorRole},
-			{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greenplum.PrimaryRole},
-			{ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greenplum.MirrorRole},
-			{ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast2/seg2", Role: greenplum.PrimaryRole},
-			{ContentID: 1, Hostname: "msdw1", DataDir: "/data/dbfast_mirror2/seg2", Role: greenplum.MirrorRole},
-			{ContentID: 2, Hostname: "sdw2", DataDir: "/data/dbfast3/seg3", Role: greenplum.PrimaryRole},
-			{ContentID: 2, Hostname: "msdw2", DataDir: "/data/dbfast_mirror3/seg3", Role: greenplum.MirrorRole},
-			{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast4/seg4", Role: greenplum.PrimaryRole},
-			{ContentID: 3, Hostname: "msdw2", DataDir: "/data/dbfast_mirror4/seg4", Role: greenplum.MirrorRole},
+		cluster := hub.MustCreateCluster(t, greengage.SegConfigs{
+			{ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir", Role: greengage.PrimaryRole},
+			{ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greengage.MirrorRole},
+			{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+			{ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+			{ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
+			{ContentID: 1, Hostname: "msdw1", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
+			{ContentID: 2, Hostname: "sdw2", DataDir: "/data/dbfast3/seg3", Role: greengage.PrimaryRole},
+			{ContentID: 2, Hostname: "msdw2", DataDir: "/data/dbfast_mirror3/seg3", Role: greengage.MirrorRole},
+			{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast4/seg4", Role: greengage.PrimaryRole},
+			{ContentID: 3, Hostname: "msdw2", DataDir: "/data/dbfast_mirror4/seg4", Role: greengage.MirrorRole},
 		})
 
 		expectedError := os.ErrNotExist
@@ -356,17 +356,17 @@ func TestRestoreCoordinatorAndPrimariesPgControl(t *testing.T) {
 		defer ctrl.Finish()
 
 		coordinatorDir := testutils.GetTempDir(t, "")
-		cluster := hub.MustCreateCluster(t, greenplum.SegConfigs{
-			{ContentID: -1, Hostname: "coordinator", DataDir: coordinatorDir, Role: greenplum.PrimaryRole},
-			{ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greenplum.MirrorRole},
-			{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greenplum.PrimaryRole},
-			{ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greenplum.MirrorRole},
-			{ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast2/seg2", Role: greenplum.PrimaryRole},
-			{ContentID: 1, Hostname: "msdw1", DataDir: "/data/dbfast_mirror2/seg2", Role: greenplum.MirrorRole},
-			{ContentID: 2, Hostname: "sdw2", DataDir: "/data/dbfast3/seg3", Role: greenplum.PrimaryRole},
-			{ContentID: 2, Hostname: "msdw2", DataDir: "/data/dbfast_mirror3/seg3", Role: greenplum.MirrorRole},
-			{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast4/seg4", Role: greenplum.PrimaryRole},
-			{ContentID: 3, Hostname: "msdw2", DataDir: "/data/dbfast_mirror4/seg4", Role: greenplum.MirrorRole},
+		cluster := hub.MustCreateCluster(t, greengage.SegConfigs{
+			{ContentID: -1, Hostname: "coordinator", DataDir: coordinatorDir, Role: greengage.PrimaryRole},
+			{ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greengage.MirrorRole},
+			{ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+			{ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+			{ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
+			{ContentID: 1, Hostname: "msdw1", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
+			{ContentID: 2, Hostname: "sdw2", DataDir: "/data/dbfast3/seg3", Role: greengage.PrimaryRole},
+			{ContentID: 2, Hostname: "msdw2", DataDir: "/data/dbfast_mirror3/seg3", Role: greengage.MirrorRole},
+			{ContentID: 3, Hostname: "sdw2", DataDir: "/data/dbfast4/seg4", Role: greengage.PrimaryRole},
+			{ContentID: 3, Hostname: "msdw2", DataDir: "/data/dbfast_mirror4/seg4", Role: greengage.MirrorRole},
 		})
 
 		globalDir := filepath.Join(coordinatorDir, "global")

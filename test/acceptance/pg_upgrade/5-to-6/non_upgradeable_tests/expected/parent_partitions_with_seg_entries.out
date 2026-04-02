@@ -70,11 +70,11 @@ RESET
 -- s/segrel pg_aoseg.pg_aocsseg_\d+/segrel pg_aoseg.pg_aocsseg_XXXXX/
 --
 -- end_matchsubs
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
 -- start_ignore
 -- end_ignore
 (exited with code 1)
-! cat ~/gpAdminLogs/gpupgrade/pg_upgrade/p-1/parent_partitions_with_seg_entries.txt | LC_ALL=C sort -b;
+! cat ~/gpAdminLogs/ggupgrade/pg_upgrade/p-1/parent_partitions_with_seg_entries.txt | LC_ALL=C sort -b;
 Database: isolation2test
   public.ao_root_partition has non empty segrel pg_aoseg.pg_aoseg_38240
   public.ao_root_partition_1_prt_1 has non empty segrel pg_aoseg.pg_aoseg_38247

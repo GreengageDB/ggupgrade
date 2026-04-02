@@ -18,11 +18,11 @@ CREATE
 --------------------------------------------------------------------------------
 -- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 --------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
 -- start_ignore
 -- end_ignore
 (exited with code 1)
-! cat ~/gpAdminLogs/gpupgrade/pg_upgrade/p-1/duplicate_column_distribution.txt;
+! cat ~/gpAdminLogs/ggupgrade/pg_upgrade/p-1/duplicate_column_distribution.txt;
 Database: isolation2test
   public.distributed_on_duplicated_columns1: 1
   public.distributed_on_duplicated_columns2: 1, 2

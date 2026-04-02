@@ -7,18 +7,18 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/acceptance"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
 )
 
 func Test_PgUpgrade_Upgradeable_Tests(t *testing.T) {
-	// Since finalize archives the stateDir (GPUPGRADE_HOME) backups and
+	// Since finalize archives the stateDir (GGUPGRADE_HOME) backups and
 	// migration scripts cannot be stored here.
 	stateDir := testutils.GetTempDir(t, "stateDir")
 	defer testutils.MustRemoveAll(t, stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
 	backupDir := testutils.GetTempDir(t, "backup")

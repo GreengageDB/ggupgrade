@@ -17,16 +17,16 @@ import (
 	"golang.org/x/text/language"
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/cli/clistep"
-	"github.com/greenplum-db/gpupgrade/cli/commanders"
-	"github.com/greenplum-db/gpupgrade/config"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/greenplum/connection"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/upgrade"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/cli/clistep"
+	"github.com/GreengageDB/ggupgrade/cli/commanders"
+	"github.com/GreengageDB/ggupgrade/config"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/greengage/connection"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func initialize() *cobra.Command {
@@ -176,7 +176,7 @@ func initialize() *cobra.Command {
 			}
 
 			st.RunConditionally(idl.Substep_verify_gpdb_versions, !skipVersionCheck, func(streams step.OutStreams) error {
-				return greenplum.VerifyCompatibleGPDBVersions(sourceGPHome, targetGPHome)
+				return greengage.VerifyCompatibleGPDBVersions(sourceGPHome, targetGPHome)
 			})
 
 			st.Run(idl.Substep_saving_source_cluster_config, func(streams step.OutStreams) error {
@@ -246,7 +246,7 @@ func initialize() *cobra.Command {
 					return err
 				}
 
-				prompt := fmt.Sprintf("Continue with gpupgrade %s?  Yy|Nn: ", idl.Step_initialize)
+				prompt := fmt.Sprintf("Continue with ggupgrade %s?  Yy|Nn: ", idl.Step_initialize)
 				return clistep.Prompt(utils.StdinReader, prompt)
 			})
 
@@ -306,8 +306,8 @@ func initialize() *cobra.Command {
 	subInit.Flags().BoolVar(&nonInteractive, "non-interactive", false, "do not prompt for confirmation to proceed")
 	subInit.Flags().MarkHidden("non-interactive") //nolint
 	subInit.Flags().IntVar(&sourcePort, "source-master-port", 0, "master port for source gpdb cluster")
-	subInit.Flags().StringVar(&sourceGPHome, "source-gphome", "", "path for the source Greenplum installation")
-	subInit.Flags().StringVar(&targetGPHome, "target-gphome", "", "path for the target Greenplum installation")
+	subInit.Flags().StringVar(&sourceGPHome, "source-gphome", "", "path for the source Greengage installation")
+	subInit.Flags().StringVar(&targetGPHome, "target-gphome", "", "path for the target Greengage installation")
 	subInit.Flags().StringVar(&mode, "mode", "copy", "performs upgrade in either copy or link mode. Default is copy.")
 	subInit.Flags().StringVar(&parentBackupDirs, "parent-backup-dirs", "", "parent directories on each host to internally store the backup of the coordinator data directory and user defined coordinator tablespaces."+
 		"Defaults to the parent directory of each primary data directory on each primary host."+
@@ -317,8 +317,8 @@ func initialize() *cobra.Command {
 	subInit.Flags().BoolVar(&useHbaHostnames, "use-hba-hostnames", false, "use hostnames in pg_hba.conf")
 	subInit.Flags().StringVar(&dynamicLibraryPath, "dynamic-library-path", upgrade.DefaultDynamicLibraryPath, "sets the dynamic_library_path GUC to correctly find extensions installed outside their default location. Defaults to '$dynamic_library_path'.")
 	subInit.Flags().StringVar(&ports, "temp-port-range", "50432-65535", "set of ports to use when initializing the target cluster")
-	subInit.Flags().IntVar(&hubPort, "hub-port", upgrade.DefaultHubPort, "the port gpupgrade hub uses to listen for commands on")
-	subInit.Flags().IntVar(&agentPort, "agent-port", upgrade.DefaultAgentPort, "the port gpupgrade agent uses to listen for commands on")
+	subInit.Flags().IntVar(&hubPort, "hub-port", upgrade.DefaultHubPort, "the port ggupgrade hub uses to listen for commands on")
+	subInit.Flags().IntVar(&agentPort, "agent-port", upgrade.DefaultAgentPort, "the port ggupgrade agent uses to listen for commands on")
 	subInit.Flags().BoolVar(&stopBeforeClusterCreation, "stop-before-cluster-creation", false, "only run up to pre-init")
 	subInit.Flags().MarkHidden("stop-before-cluster-creation") //nolint
 	subInit.Flags().BoolVar(&skipVersionCheck, "skip-version-check", false, "disable source and target version check")

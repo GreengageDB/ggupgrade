@@ -13,8 +13,8 @@ CREATE DATABASE test_disallowed_pg_operator;
 ---------------------------------------------------------------------------------
 --- Assert that pg_upgrade --check correctly detects the non-upgradeable objects
 ---------------------------------------------------------------------------------
-!\retcode gpupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
-! find $(ls -dt ~/gpAdminLogs/gpupgrade/pg_upgrade_*/ | head -1) -name "databases_with_disallowed_pg_operator.txt" -exec cat {} +;
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+! find $(ls -dt ~/gpAdminLogs/ggupgrade/pg_upgrade_*/ | head -1) -name "databases_with_disallowed_pg_operator.txt" -exec cat {} +;
 
 ---------------------------------------------------------------------------------
 --- Cleanup

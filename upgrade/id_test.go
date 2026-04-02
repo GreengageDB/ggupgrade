@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greenplum-db/gpupgrade/upgrade"
+	"github.com/GreengageDB/ggupgrade/upgrade"
 )
 
 func TestID(t *testing.T) {

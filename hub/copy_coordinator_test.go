@@ -15,17 +15,17 @@ import (
 
 	"github.com/blang/semver/v4"
 
-	"github.com/greenplum-db/gpupgrade/config/backupdir"
-	"github.com/greenplum-db/gpupgrade/greenplum"
-	"github.com/greenplum-db/gpupgrade/hub"
-	"github.com/greenplum-db/gpupgrade/idl"
-	"github.com/greenplum-db/gpupgrade/step"
-	"github.com/greenplum-db/gpupgrade/testutils"
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/testutils/testlog"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
-	"github.com/greenplum-db/gpupgrade/utils/rsync"
+	"github.com/GreengageDB/ggupgrade/config/backupdir"
+	"github.com/GreengageDB/ggupgrade/greengage"
+	"github.com/GreengageDB/ggupgrade/hub"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/testutils"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/testutils/testlog"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
 const (
@@ -186,10 +186,10 @@ func TestCopy(t *testing.T) {
 func TestCopyCoordinatorDataDir(t *testing.T) {
 	testlog.SetupTestLogger()
 
-	intermediate := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: "/data/qddir/seg-1", Role: greenplum.PrimaryRole},
-		{ContentID: 0, DbID: 2, Port: 25432, Hostname: "host1", DataDir: "/data/dbfast1/seg1", Role: greenplum.PrimaryRole},
-		{ContentID: 1, DbID: 3, Port: 25433, Hostname: "host2", DataDir: "/data/dbfast2/seg2", Role: greenplum.PrimaryRole},
+	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole},
+		{ContentID: 0, DbID: 2, Port: 25432, Hostname: "host1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+		{ContentID: 1, DbID: 3, Port: 25433, Hostname: "host2", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
 	})
 
 	backupDirs, err := backupdir.ParseParentBackupDirs("", *intermediate)
@@ -236,13 +236,13 @@ func TestCopyCoordinatorTablespaces(t *testing.T) {
 	stateDir := testutils.GetTempDir(t, "")
 	defer os.RemoveAll(stateDir)
 
-	resetEnv := testutils.SetEnv(t, "GPUPGRADE_HOME", stateDir)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 	defer resetEnv()
 
-	intermediate := hub.MustCreateCluster(t, greenplum.SegConfigs{
-		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: "/data/qddir/seg-1", Role: greenplum.PrimaryRole},
-		{ContentID: 0, DbID: 2, Port: 25432, Hostname: "host1", DataDir: "/data/dbfast1/seg1", Role: greenplum.PrimaryRole},
-		{ContentID: 1, DbID: 3, Port: 25433, Hostname: "host2", DataDir: "/data/dbfast2/seg2", Role: greenplum.PrimaryRole},
+	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole},
+		{ContentID: 0, DbID: 2, Port: 25432, Hostname: "host1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+		{ContentID: 1, DbID: 3, Port: 25433, Hostname: "host2", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
 	})
 
 	backupDirs, err := backupdir.ParseParentBackupDirs("", *intermediate)
@@ -250,8 +250,8 @@ func TestCopyCoordinatorTablespaces(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	Tablespaces := greenplum.Tablespaces{
-		1: greenplum.SegmentTablespaces{
+	Tablespaces := greengage.Tablespaces{
+		1: greengage.SegmentTablespaces{
 			1663: &idl.TablespaceInfo{
 				Location:    "/tmp/tblspc1",
 				UserDefined: false},
@@ -259,7 +259,7 @@ func TestCopyCoordinatorTablespaces(t *testing.T) {
 				Location:    "/tmp/tblspc2",
 				UserDefined: true},
 		},
-		2: greenplum.SegmentTablespaces{
+		2: greengage.SegmentTablespaces{
 			1663: &idl.TablespaceInfo{
 				Location:    "/tmp/primary1/tblspc1",
 				UserDefined: false},
@@ -267,7 +267,7 @@ func TestCopyCoordinatorTablespaces(t *testing.T) {
 				Location:    "/tmp/primary1/tblspc2",
 				UserDefined: true},
 		},
-		3: greenplum.SegmentTablespaces{
+		3: greengage.SegmentTablespaces{
 			1663: &idl.TablespaceInfo{
 				Location:    "/tmp/primary2/tblspc1",
 				UserDefined: false},

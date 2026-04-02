@@ -5,7 +5,7 @@
         - get: enterprise_rpm
           trigger: true
           passed: [ build ]
-        - get: gpupgrade_src
+        - get: ggupgrade_src
           passed: [ build ]
         - get: gpdb_src_source
           resource: gpdb{{.Source}}_src
@@ -29,7 +29,7 @@
             tag: latest
         inputs:
           - name: enterprise_rpm
-          - name: gpupgrade_src
+          - name: ggupgrade_src
           - name: gpdb_src_source
           # Rename gpdb_src_target to gpdb_src since external scripts used within rely on that.
           - name: gpdb_src_target
@@ -37,10 +37,10 @@
           - name: rpm_gpdb_source
           - name: rpm_gpdb_target
         run:
-          path: gpupgrade_src/ci/main/scripts/pg-upgrade-tests.bash
+          path: ggupgrade_src/ci/main/scripts/pg-upgrade-tests.bash
       params:
-        SOURCE_PACKAGE: greenplum-db-{{.Source}}
-        TARGET_PACKAGE: greenplum-db-{{.Target}}
+        SOURCE_PACKAGE: greengage-db-{{.Source}}
+        TARGET_PACKAGE: greengage-db-{{.Target}}
   on_failure:
     do:
       - <<: *slack_alert

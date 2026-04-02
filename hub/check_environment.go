@@ -12,9 +12,9 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/greenplum-db/gpupgrade/testutils/exectest"
-	"github.com/greenplum-db/gpupgrade/utils"
-	"github.com/greenplum-db/gpupgrade/utils/errorlist"
+	"github.com/GreengageDB/ggupgrade/testutils/exectest"
+	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func CheckEnvironment(agentHostsIncludingCoordinator []string, sourceGphome string, intermediateGphome string) error {
@@ -39,8 +39,8 @@ func CheckEnvironment(agentHostsIncludingCoordinator []string, sourceGphome stri
 	}
 
 	if err != nil {
-		nextAction := `On all segments remove sourcing greenplum_path.sh and setting any Greenplum variables
-in .bashrc or .bash_profile. In a fresh shell re-run gpupgrade.`
+		nextAction := `On all segments remove sourcing greengage_path.sh and setting any Greengage variables
+in .bashrc or .bash_profile. In a fresh shell re-run ggupgrade.`
 		return utils.NewNextActionErr(err, nextAction)
 	}
 
@@ -68,7 +68,7 @@ func ResetLdLibraryPathCommand() {
 	ldLibraryPathCommand = exec.Command
 }
 
-// CheckEnvironmentOnSegment ensures that multiple versions of Greenplum
+// CheckEnvironmentOnSegment ensures that multiple versions of Greengage
 // environments are not mixed. Use ssh instead of gRPC since our utilities like
 // gpinitsystem, gpstart, gpstop, etc. use ssh internally. This checks up front
 // for the following error as described here:
