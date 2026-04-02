@@ -7,13 +7,15 @@ set -eux -o pipefail
 is_GPDB5() {
     local gphome=$1
     version=$(ssh cdw "$gphome"/bin/postgres --gp-version)
-    [[ $version =~ ^"postgres (Green\w+ Database) 5." ]]
+    pattern="^postgres \(Green\w+ Database\) 5\."
+    [[ $version =~ $pattern ]]
 }
 
 is_GPDB6() {
     local gphome=$1
     version=$(ssh cdw "$gphome"/bin/postgres --gp-version)
-    [[ $version =~ ^"postgres (Green\w+ Database) 6." ]]
+    pattern="^postgres \(Green\w+ Database\) 6\."
+    [[ $version =~ $pattern ]]
 }
 
 # set the database gucs
