@@ -1,20 +1,20 @@
 #!/bin/bash
 
-docker run -it --rm gpdb7_ggupgrade:latest bash -c "
+docker run -i --rm gpdb7_ggupgrade:latest bash -ex <<EOF
     set -exuo pipefail
     gpdb_src/concourse/scripts/setup_gpadmin_user.bash
     su gpadmin -c '
-        source /home/gpadmin/ggupgrade/ci/new/ggdb6_bin/greengage_path.sh;
-        cd /home/gpadmin/ggupgrade/ci/new/ggdb6_src/
-        make create-demo-cluster WITH_MIRRORS=${WITH_MIRRORS:-true}
+        source /usr/local/greengage-db-6X/greengage_path.sh;
+        cd /home/gpadmin/ggdb6_src/
+        make create-demo-cluster WITH_MIRRORS=${WITH_MIRRORS:-true} WITH_STANDBY=${WITH_STANDBY:-true}
     '
 
     bash -c 'source gpdb_src/concourse/scripts/common.bash; install_and_configure_gpdb;'
 
     su gpadmin -c '
-        source /home/gpadmin/ggupgrade/ci/new/ggdb6_bin/greengage_path.sh
-        source /home/gpadmin/ggupgrade/ci/new/ggdb6_src/gpAux/gpdemo/gpdemo-env.sh;
-        export GPHOME_SOURCE=/home/gpadmin/ggupgrade/ci/new/ggdb6_bin/
+        source /usr/local/greengage-db-6X/greengage_path.sh;
+        source /home/gpadmin/ggdb6_src/gpAux/gpdemo/gpdemo-env.sh;
+        export GPHOME_SOURCE=/usr/local/greengage-db-6X/
         export GPHOME_TARGET=/usr/local/greengage-db-devel/
         export PGPORT=6000
         export PGHOST=/tmp/
@@ -26,4 +26,4 @@ docker run -it --rm gpdb7_ggupgrade:latest bash -c "
         make install
         $1
     '
-"
+EOF

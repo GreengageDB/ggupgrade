@@ -17,27 +17,42 @@ services:
     volumes:
       - ${PWD}/ssh_keys:/home/gpadmin/.ssh.src
       - ${PWD}/logs_coordinator:/logs
+    networks:
+      backend:
+        aliases:
+          - cdw
   standby:
     <<: *common-service
     hostname: standby
     volumes:
       - ${PWD}/ssh_keys:/home/gpadmin/.ssh.src
       - ${PWD}/logs_standby:/logs
+    networks:
+      backend:
   sdw1:
     <<: *common-service
     hostname: sdw1
     volumes:
       - ${PWD}/ssh_keys:/home/gpadmin/.ssh.src
       - ${PWD}/logs_sdw1:/logs
+    networks:
+      backend:
   sdw2:
     <<: *common-service
     hostname: sdw2
     volumes:
       - ${PWD}/ssh_keys:/home/gpadmin/.ssh.src
       - ${PWD}/logs_sdw2:/logs
+    networks:
+      backend:
   sdw3:
     <<: *common-service
     hostname: sdw3
     volumes:
       - ${PWD}/ssh_keys:/home/gpadmin/.ssh.src
       - ${PWD}/logs_sdw3:/logs
+    networks:
+      backend:
+
+networks:
+  backend:

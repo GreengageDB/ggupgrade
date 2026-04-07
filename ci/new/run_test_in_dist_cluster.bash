@@ -1,11 +1,13 @@
 #!/bin/bash
 set -exuo pipefail
 
-function exec_on {
-    host="$1"
-    user="$2"
-    cmd="$3"
-    docker compose -p ggupgrade -f ci/new/docker-compose.yaml exec -u "$user" -T "$host" bash -c "$cmd"
+function exec_on_coordinator {
+    cmd="$1"
+    docker compose -p ggupgrade -f ci/new/docker-compose.yaml exec -u gpadmin -T coordinator bash -c "$cmd"
+}
+
+function cleanup {
+    docker compose -p ggupgrade -f ci/new/docker-compose.yaml down
 }
 
 WITH_MIRRORS="${WITH_MIRRORS:-true}"
@@ -22,7 +24,9 @@ export IMAGE=gpdb7_ggupgrade:latest
 
 bash ci/new/init_containers.sh "ggupgrade"
 
-exec_on coordinator gpadmin "bash -c
+trap cleanup EXIT
+
+exec_on_coordinator "bash -c
     cat > hostfile_all_hosts << 'EOF'
 coordinator
 standby
@@ -31,18 +35,17 @@ sdw2
 sdw3
 EOF
 "
-exec_on coordinator gpadmin "cat hostfile_all_hosts"
+exec_on_coordinator "cat hostfile_all_hosts"
 
-exec_on coordinator gpadmin "bash -c
+exec_on_coordinator "bash -c
     cat > hostfile_segment_hosts << 'EOF'
 sdw1
 sdw2
 sdw3
 EOF
 "
-exec_on coordinator gpadmin "cat hostfile_segment_hosts"
 
-exec_on coordinator gpadmin "bash -c
+exec_on_coordinator "bash -c
     cat > init_config << 'EOF'
 ARRAY_NAME=\"Greengage DB cluster\"
 SEG_PREFIX=gpseg
@@ -58,7 +61,7 @@ EOF
 "
 
 if [ "${WITH_MIRRORS}" == "true" ]; then
-    exec_on coordinator gpadmin "bash -c
+    exec_on_coordinator "bash -c
         cat >> init_config << 'EOF'
 MIRROR_PORT_BASE=10500
 declare -a MIRROR_DATA_DIRECTORY=(/data/mirror)
@@ -70,14 +73,14 @@ if [ "${WITH_STANDBY}" == "true" ]; then
     STANDBY_INIT_OPTS="-s standby"
 fi
 
-exec_on coordinator gpadmin "cat init_config"
-exec_on coordinator gpadmin "source /home/gpadmin/ggupgrade/ci/new/ggdb6_bin/greengage_path.sh; gpinitsystem -a -c init_config -h hostfile_segment_hosts $STANDBY_INIT_OPTS"
+set +e
+# gpinitsystem can exit with non zero exit code
+exec_on_coordinator "source /usr/local/greengage-db-6X/greengage_path.sh; gpinitsystem -a -c init_config -h hostfile_segment_hosts $STANDBY_INIT_OPTS"
+set -e
 
-exec_on coordinator gpadmin "
-cd /home/gpadmin/ggupgrade
-    source /home/gpadmin/ggupgrade/ci/new/ggdb6_bin/greengage_path.sh
-    source /home/gpadmin/ggupgrade/ci/new/ggdb6_src/gpAux/gpdemo/gpdemo-env.sh;
-    export GPHOME_SOURCE=/home/gpadmin/ggupgrade/ci/new/ggdb6_bin/
+exec_on_coordinator "
+    source /usr/local/greengage-db-6X/greengage_path.sh;
+    export GPHOME_SOURCE=/usr/local/greengage-db-6X/
     export GPHOME_TARGET=/usr/local/greengage-db-devel/
     export PGPORT=5432
     export PGHOST=/tmp/
@@ -89,5 +92,3 @@ cd /home/gpadmin/ggupgrade
     make install
     $1
 "
-
-docker rm -f ggupgrade-standby-1 ggupgrade-coordinator-1 ggupgrade-sdw3-1 ggupgrade-sdw1-1 ggupgrade-sdw2-1

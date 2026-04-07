@@ -25,6 +25,8 @@ for service in $services
 do
   docker compose -p $project -f ci/new/docker-compose.yaml exec -T \
     $service bash -c "ssh-keyscan ${services/$service/} >> /home/gpadmin/.ssh/known_hosts" &
+  docker compose -p $project -f ci/new/docker-compose.yaml exec -T \
+    $service bash -c "ssh-keyscan cdw >> /home/gpadmin/.ssh/known_hosts" &
 done
 wait
 
