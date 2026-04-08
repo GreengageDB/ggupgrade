@@ -2,17 +2,75 @@ name: CI
 
 on:
   pull_request:
-    branches: [ main ]
+
+# Concurrency control to cancel previous runs on new push to same PR/branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true  # Automatically cancel any previous runs for the same group
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/setup-go@v4
         with:
-          go-version: '1.19'
-          cache: false
-      - uses: actions/checkout@v3
+          go-version: '1.20'
+      - uses: actions/checkout@v4
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
+# These tests can run without a cluster.
+  unit_and_integration:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+      - name: Set Environment
+        run: |
+          echo "GOPATH=/home/runner/work/gpbackup/gpbackup/go" >> $GITHUB_ENV
+          echo "/home/runner/work/gpbackup/gpbackup/go/bin" >> $GITHUB_PATH
+          mkdir -p /home/runner/work/gpbackup/gpbackup/go/bin/
+      - uses: actions/checkout@v4
+      - run: make unit
+      - run: |
+          make
+          make install
+          make integration
+# These tests require a demo cluster
+  demo_tests:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [acceptance, pg-upgrade-tests]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+          submodules: 'recursive'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
 
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./ci/new/Dockerfile
+          load: true
+          push: false
+          tags: gpdb7_ggupgrade:latest
+
+      - name: acceptance test
+        run: |
+          bash ./ci/new/run_test_in_demo_cluster.bash make ${{ matrix.test }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ggupgrade_${{ matrix.test }}_demo_logs
+          path: ./logs/*
