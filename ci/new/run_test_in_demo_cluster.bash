@@ -3,11 +3,11 @@
 docker run -i --rm gpdb7_ggupgrade:latest bash -ex <<EOF
     set -exuo pipefail
     gpdb_src/concourse/scripts/setup_gpadmin_user.bash
-    su gpadmin -c '
+    su gpadmin <<EOF1
         source /usr/local/greengage-db-6X/greengage_path.sh
         cd /home/gpadmin/ggdb6_src/
         make create-demo-cluster WITH_MIRRORS=${WITH_MIRRORS:-true} WITH_STANDBY=${WITH_STANDBY:-true}
-    '
+EOF1
 
     su gpadmin <<EOF1
         source /usr/local/greengage-db-6X/greengage_path.sh
