@@ -11,12 +11,11 @@ services=$(docker compose -p "$project" -f ci/new/docker-compose.yaml config --s
 for service in $services
 do
   docker compose -p $project -f ci/new/docker-compose.yaml exec -T \
-    $service bash -c " mkdir -p /data/primary && mkdir -p /data/mirror && mkdir -p /data/coordinator/ && mkdir -p /data/standby/seg-1 &&
+    $service bash -ex <<EOF &
+      mkdir -p /data/primary && mkdir -p /data/mirror && mkdir -p /data/coordinator/ && mkdir -p /data/standby/seg-1 &&
       chmod -R 777 /data &&
-      # each host should have its own copy of the (initially identical) files in .ssh
-      cp -rf .ssh.src .ssh &&
-      bash -c 'source gpdb_src/concourse/scripts/common.bash; install_and_configure_gpdb;' &&
-      ./gpdb_src/concourse/scripts/setup_gpadmin_user.bash" &
+      ./gpdb_src/concourse/scripts/setup_gpadmin_user.bash
+EOF
 done
 wait
 
