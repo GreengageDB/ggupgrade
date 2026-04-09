@@ -1,8 +1,8 @@
-# ggupgrade [![Concourse Build Status](https://prod.ci.gpdb.pivotal.io/api/v1/teams/main/pipelines/gpupgrade/badge)](https://prod.ci.gpdb.pivotal.io/teams/main/pipelines/gpupgrade)
+# ggupgrade
 
 ggupgrade runs [pg_upgrade](https://www.postgresql.org/docs/current/static/pgupgrade.html)
 across all segments to upgrade a [Greengage cluster](https://github.com/GreengageDB/greengage)
-across major versions. For further details read the Greengage Database Upgrade [documentation](https://gpdb.docs.pivotal.io/upgrade/) and [blog post](https://greenplum.org/greenplum-database-upgrade/). 
+across major versions. For further details read the Greengage Database Upgrade documentation.
 We warmly welcome any feedback and
 [contributions](https://github.com/GreengageDB/ggupgrade/blob/main/CONTRIBUTING.md).
 

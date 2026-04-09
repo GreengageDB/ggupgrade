@@ -87,9 +87,6 @@ build_linux build_mac: build
 BUILD_FLAGS = -gcflags="all=-N -l"
 override BUILD_FLAGS += -ldflags "$(VERSION_LD_STR)"
 
-enterprise-tarball: RELEASE=Enterprise
-enterprise-tarball: build tarball
-
 oss-tarball: RELEASE=Open Source
 oss-tarball: build tarball
 
@@ -110,11 +107,6 @@ tarball:
 	( cd tarball; tar czf ../$(TARBALL_NAME) . )
 	sha256sum $(TARBALL_NAME) > CHECKSUM
 	rm -r tarball
-
-enterprise-rpm: RELEASE=Enterprise
-enterprise-rpm: NAME=Greengage Database Upgrade
-enterprise-rpm: LICENSE=VMware Software EULA
-enterprise-rpm: enterprise-tarball rpm
 
 oss-rpm: RELEASE=Open Source
 oss-rpm: NAME=Greengage Database Upgrade
