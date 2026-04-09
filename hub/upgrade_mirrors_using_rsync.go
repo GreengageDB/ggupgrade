@@ -57,6 +57,10 @@ func UpgradeMirrorsUsingRsync(agentConns []*idl.Connection, source *greengage.Cl
 		return err
 	}
 
+	if err := UpdateIntermediateMirrorConfig(agentConns, intermediate); err != nil {
+		return err
+	}
+
 	if err := intermediate.StartCoordinatorOnly(step.DevNullStream); err != nil {
 		return err
 	}
