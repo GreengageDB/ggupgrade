@@ -13,7 +13,7 @@ do
   docker compose -p $project -f ci/new/docker-compose.yaml exec -T \
     $service bash -ex <<EOF &
       mkdir -p /data/primary && mkdir -p /data/mirror && mkdir -p /data/coordinator/ && mkdir -p /data/standby/seg-1 &&
-      chmod -R 777 /data &&
+      chmod -R 777 /data && chmod -R 777 /logs &&
       ./gpdb_src/concourse/scripts/setup_gpadmin_user.bash
 EOF
 done
@@ -23,9 +23,7 @@ wait
 for service in $services
 do
   docker compose -p $project -f ci/new/docker-compose.yaml exec -T \
-    $service bash -c "ssh-keyscan ${services/$service/} >> /home/gpadmin/.ssh/known_hosts" &
-  docker compose -p $project -f ci/new/docker-compose.yaml exec -T \
-    $service bash -c "ssh-keyscan cdw >> /home/gpadmin/.ssh/known_hosts" &
+    $service bash -c "ssh-keyscan ${services/$service/} cdw >> /home/gpadmin/.ssh/known_hosts" &
 done
 wait
 

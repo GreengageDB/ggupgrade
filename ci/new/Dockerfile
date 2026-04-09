@@ -9,19 +9,48 @@ RUN set -eux; \
 
 FROM $GGDB7_IMAGE
 
-COPY --from=ggdb6 /home/gpadmin/gpdb_src /home/gpadmin/ggdb6_src
-COPY --from=ggdb6 /usr/local/greengage-db-devel /usr/local/greengage-db-6X
+COPY --from=ggdb6 --chown=1000:1000 /home/gpadmin/gpdb_src /home/gpadmin/ggdb6_src
+COPY --from=ggdb6 --chown=1000:1000 /usr/local/greengage-db-devel /usr/local/greengage-db-6X
+
+ENV PATH=$PATH:/opt/go/bin:/home/gpadmin/go/bin \
+    GOPATH=/home/gpadmin/go
 
 RUN set -ex; \
     source gpdb_src/concourse/scripts/common.bash; \
     install_and_configure_gpdb; \
-    mv /usr/local/greengage-db-devel /usr/local/greengage-db-7X
+    mv /usr/local/greengage-db-devel /usr/local/greengage-db-7X; \
+    chown -R 1000:1000 /usr/local/greengage-db-7X
+
+RUN set -ex; \
+    source /usr/local/greengage-db-7X/greengage_path.sh; \
+    export LDFLAGS="-L${GPHOME}/lib"; \
+    export CPPFLAGS="-I${GPHOME}/include"; \
+    cd gpdb_src; \
+    ./configure --prefix=/usr/local/greengage-db-7X \
+        --without-zlib --without-rt --without-libcurl \
+        --without-libedit-preferred --without-docdir --without-readline \
+        --disable-gpcloud --disable-gpfdist --disable-orca \
+        ${CONFIGURE_FLAGS}; \
+    make -C /home/gpadmin/gpdb_src/src/test/isolation2 install
 
 RUN set -eux; \
     wget https://golang.org/dl/go1.20.5.linux-amd64.tar.gz -q -O - | tar -C /opt -xz; \
     apt update; \
-    apt install python2 python2-dev python-pip -y; \
-    ln -sf /bin/python2 /bin/python; \
-    python -m pip install future==0.16;
+    . /etc/os-release; \
+    if [ "$VERSION_ID" = "22.04" ]; then \
+      apt install python2 python2-dev python-pip -y; \
+      ln -sf /bin/python2 /bin/python; \
+      python -m pip install future==0.16; \
+    else \
+      apt install python-is-python3; \
+      python -m pip install future==1.0.0; \
+    fi
 
 COPY . /home/gpadmin/ggupgrade
+
+RUN set -eux; \
+    mkdir -p /home/gpadmin/go/bin; \
+    chown -R 1000:1000 /home/gpadmin/go; \
+    cd /home/gpadmin/ggupgrade; \
+    make; \
+    make install
