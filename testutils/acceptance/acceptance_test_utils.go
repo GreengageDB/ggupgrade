@@ -345,8 +345,7 @@ func Isolation2_regress(t *testing.T, sourceVersion semver.Version, gphome strin
 		binDir = "--psqldir"
 		// Set PYTHONPATH directly since it is needed when running the
 		// pg_upgrade tests locally. Normally one would source
-		// greengage_path.sh, but that causes the following issues:
-		// https://web.archive.org/web/20220506055918/https://groups.google.com/a/greenplum.org/g/gpdb-dev/c/JN-YwjCCReY/m/0L9wBOvlAQAJ
+		// greengage_path.sh.
 		env = append(env, "PYTHONPATH="+filepath.Join(GPHOME_SOURCE, "lib/python"))
 	} else {
 		MustUnsetenv(t, "PYTHONHOME")

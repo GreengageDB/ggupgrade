@@ -159,15 +159,6 @@ Checkout [vim-go](https://github.com/fatih/vim-go) and [go-delve](https://github
     - check "Current project packages"
 
 ##### Copyright
-- Preferences > Editor > Copyright > Copyright Profiles
-  - Add new profile called "vmware" with the following text:
-    
-    ```
-    Copyright (c) 2017-$originalComment.match("Copyright \(c\) (\d+)", 1, "-")$today.year VMware, Inc. or its affiliates
-    SPDX-License-Identifier: Apache-2.0
-    ```
-- Preferences > Editor > Copyright
-  - Select "vmware" for default project copyright.
 - Preferences > Editor > Copyright > Formatting
   - Select "Use custom formatting options"
   - For Comment Type: select "use line comment"

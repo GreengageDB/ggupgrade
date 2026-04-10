@@ -40,7 +40,7 @@ Optimize the review experience for others. The goal is to make reviewing PRs eas
 
 ## Contributing
 
-- Sign our [Contributor License Agreement](https://cla.vmware.com/cla/1/preview).
+- Sign our [Contributor License Agreement](https://cla.greengagedb.org/sign/greengage).
 
 - Fork the ggupgrade repository on GitHub.
 

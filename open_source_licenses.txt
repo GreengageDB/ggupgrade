@@ -1698,48 +1698,6 @@ APPENDIX. Standard License Files
 
        See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
 
-       ggupgrade-main/multihost/generate-cluster.bash
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
-
-       ggupgrade-main/multihost/provision.bash
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
-
-       ggupgrade-main/multihost/provision-hub.bash
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
-
-       ggupgrade-main/multihost/provision-segment-agent.bash
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
-
-       ggupgrade-main/multihost/provision-standby-agent.bash
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
-
-       ggupgrade-main/multihost/sync-ssh-keys.bash
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
-
-       ggupgrade-main/multihost/vagrant.rb
-
-       Copyright (c) 2017-2023 VMware, Inc.
-
-       See SECTION 40 in 'LICENSE TEXT REFERENCE TABLE'
-
        ggupgrade-main/NOTICE
 
        Copyright 2020 VMware, Inc. or its affiliates

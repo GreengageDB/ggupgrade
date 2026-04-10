@@ -172,9 +172,6 @@ contents_without_mirror() {
 # | 4c: rebalance standby           | coordinator |     -       | primary | mirror  |
 # | 4d: rebalance standby           | coordinator |   standby   | primary | mirror  |
 #
-# For rebalancing the standby, we followed these instructions:
-# https://web.archive.org/web/20221207234527/https://gpdb.docs.pivotal.io/6-4/admin_guide/highavail/topics/g-restoring-master-mirroring-after-a-recovery.html#topic17
-#
 # NOTE: when in a given step of this test, keep in mind that the coordinator
 #  switches back and forth between the cdw host("COORDINATOR") and the cmdw host("standby").
 
