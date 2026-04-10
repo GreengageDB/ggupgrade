@@ -1,8 +1,8 @@
-# ggupgrade [![Concourse Build Status](https://prod.ci.gpdb.pivotal.io/api/v1/teams/main/pipelines/gpupgrade/badge)](https://prod.ci.gpdb.pivotal.io/teams/main/pipelines/gpupgrade)
+# ggupgrade
 
 ggupgrade runs [pg_upgrade](https://www.postgresql.org/docs/current/static/pgupgrade.html)
 across all segments to upgrade a [Greengage cluster](https://github.com/GreengageDB/greengage)
-across major versions. For further details read the Greengage Database Upgrade [documentation](https://gpdb.docs.pivotal.io/upgrade/) and [blog post](https://greenplum.org/greenplum-database-upgrade/). 
+across major versions. For further details read the Greengage Database Upgrade documentation.
 We warmly welcome any feedback and
 [contributions](https://github.com/GreengageDB/ggupgrade/blob/main/CONTRIBUTING.md).
 
@@ -159,15 +159,6 @@ Checkout [vim-go](https://github.com/fatih/vim-go) and [go-delve](https://github
     - check "Current project packages"
 
 ##### Copyright
-- Preferences > Editor > Copyright > Copyright Profiles
-  - Add new profile called "vmware" with the following text:
-    
-    ```
-    Copyright (c) 2017-$originalComment.match("Copyright \(c\) (\d+)", 1, "-")$today.year VMware, Inc. or its affiliates
-    SPDX-License-Identifier: Apache-2.0
-    ```
-- Preferences > Editor > Copyright
-  - Select "vmware" for default project copyright.
 - Preferences > Editor > Copyright > Formatting
   - Select "Use custom formatting options"
   - For Comment Type: select "use line comment"
