@@ -70,7 +70,9 @@ func ResetLdLibraryPathCommand() {
 
 // CheckEnvironmentOnSegment ensures that multiple versions of Greengage
 // environments are not mixed. Use ssh instead of gRPC since our utilities like
-// gpinitsystem, gpstart, gpstop, etc. use ssh internally.
+// gpinitsystem, gpstart, gpstop, etc. use ssh internally. This checks up front
+// for the following error as described here:
+// https://web.archive.org/web/20220506055918/https://groups.google.com/a/greenplum.org/g/gpdb-dev/c/JN-YwjCCReY/m/0L9wBOvlAQAJ
 func CheckEnvironmentOnSegment(host string, sourceGphome string, targetGphome string) error {
 	// check $PATH
 	cmd := pathCommand("ssh", "-q", host, "echo", "$PATH")
