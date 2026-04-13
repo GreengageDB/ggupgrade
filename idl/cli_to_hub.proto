@@ -110,7 +110,7 @@ enum Substep {
   verify_ggupgrade_is_installed_across_all_hosts = 47;
   initialize_wait_for_cluster_to_be_ready = 48;
   wait_for_cluster_to_be_ready_before_upgrade_master = 49;
-  check_for_oboslete_plpython = 50;
+  check_for_obsolete_plpython = 50;
 }
 
 enum Status {
