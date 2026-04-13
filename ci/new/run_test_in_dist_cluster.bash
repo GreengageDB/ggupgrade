@@ -14,8 +14,6 @@ then
   ssh-keygen -P "" -f ssh_keys/id_rsa
 fi
 
-export IMAGE=gpdb7_ggupgrade:latest
-
 bash ci/new/init_containers.sh "ggupgrade"
 
 trap cleanup EXIT
@@ -80,21 +78,7 @@ $@
 exit_code=\$?
 set -e
 
-params=(
-  "./ d gpAdminLogs"
-  "/data d log"
-  "/data d pg_log"
-)
-for param in "\${params[@]}"; do
-  read -r path type name <<< "\$param"
-  gpssh -f /home/gpadmin/hostfile_all_hosts "find \$path -name \$name -type \$type -exec tar -rf "/logs/\$name.tar" {} \;"
-done
-
-cp /home/gpadmin/ggupgrade/test/acceptance/pg_upgrade/6-to-7/non_upgradeable_tests/regression.diffs /logs/regression_non_upgradeable.diffs || true
-cp /home/gpadmin/ggupgrade/test/acceptance/pg_upgrade/6-to-7/upgradeable_tests/source_cluster_regress/regression.diffs /logs/regression_upgradeable.diffs || true
-path="/home/gpadmin/ggupgrade/test/acceptance/pg_upgrade/6-to-7/"
-name="results"
-find \$path -name \$name -type d -exec tar -rf "/logs/\$name.tar" {} \; || true
+bash /home/gpadmin/ggupgrade/ci/new/collect_logs.bash /data gpssh -f /home/gpadmin/hostfile_all_hosts
 
 exit \$exit_code
 EOF
