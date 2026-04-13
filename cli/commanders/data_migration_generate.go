@@ -48,7 +48,7 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 		return fmt.Errorf("failed to find seed scripts for Greengage version %s under %q", version, seedDir)
 	}
 
-	db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port)
+	db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port, "template1")
 	if err != nil {
 		return err
 	}
@@ -132,7 +132,7 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 var bootstrapConnectionFunc = connection.Bootstrap
 
 // XXX: for internal testing only
-func SetBootstrapConnectionFunction(connectionFunc func(destination idl.ClusterDestination, gphome string, port int) (*sql.DB, error)) {
+func SetBootstrapConnectionFunction(connectionFunc func(destination idl.ClusterDestination, gphome string, port int, database string) (*sql.DB, error)) {
 	bootstrapConnectionFunc = connectionFunc
 }
 

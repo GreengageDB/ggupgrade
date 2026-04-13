@@ -185,7 +185,7 @@ func initialize() *cobra.Command {
 					return err
 				}
 
-				db, err := connection.Bootstrap(idl.ClusterDestination_source, sourceGPHome, sourcePort)
+				db, err := connection.Bootstrap(idl.ClusterDestination_source, sourceGPHome, sourcePort, "template1")
 				if err != nil {
 					return err
 				}
