@@ -117,5 +117,5 @@ RESET optimizer_enable_ctas;
 """.format(swap_sql)
 return swap_sql
 
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpython3u;
 SELECT __ggupgrade_tmp_generator.fix_het();

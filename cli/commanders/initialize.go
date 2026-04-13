@@ -13,6 +13,8 @@ import (
 
 	"github.com/GreengageDB/ggupgrade/step"
 	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 var execCommandHubStart = exec.Command
@@ -76,4 +78,26 @@ func IsHubRunning() (bool, error) {
 	}
 
 	return true, nil
+}
+
+func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, seedDir string) (err error) {
+	db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if cErr := db.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
+
+	// GetDatabases requires to specify script dirs, even though we don't generate them
+	// in here. We can always refactor out this function, but it doesn't seem to be a problem.
+	// 
+	databases, err := GetDatabases(db, utils.System.DirFS(seedDir))
+
+	_ = databases
+	_ = err
+
+	return nil
 }

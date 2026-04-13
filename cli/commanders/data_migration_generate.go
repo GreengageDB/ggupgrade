@@ -239,7 +239,7 @@ Select: `)
 }
 
 func GenerateScriptsPerDatabase(streams step.OutStreams, database DatabaseInfo, gphome string, port int, seedDir string, outputDir string, bar *mpb.Bar) error {
-	output, err := executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpythonu;`)
+	output, err := executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpython3u;`)
 	if err != nil && !strings.Contains(err.Error(), "already exists") {
 		return err
 	}
