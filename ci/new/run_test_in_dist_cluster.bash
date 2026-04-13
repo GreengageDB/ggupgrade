@@ -64,13 +64,9 @@ fi
 source /usr/local/greengage-db-6X/greengage_path.sh
 gpinitsystem -a -c init_config -h hostfile_segment_hosts \$STANDBY_INIT_OPTS </dev/null || true
 
-export GPHOME_SOURCE=/usr/local/greengage-db-6X/
-export GPHOME_TARGET=/usr/local/greengage-db-7X/
+source ggupgrade/ci/new/common.bash
 export PGPORT=5432
-export PGHOST=/tmp/
-export PATH=\$PATH:/opt/go/bin:~/go/bin
-export GOPATH=~/go
-export ISOLATION2_PATH=/home/gpadmin/gpdb_src/src/test/isolation2
+
 set +e
 cd /home/gpadmin/ggupgrade
 # run test command passed to script
@@ -78,7 +74,7 @@ $@
 exit_code=\$?
 set -e
 
-bash /home/gpadmin/ggupgrade/ci/new/collect_logs.bash /data gpssh -f /home/gpadmin/hostfile_all_hosts
+collect_logs /data gpssh -f /home/gpadmin/hostfile_all_hosts
 
 exit \$exit_code
 EOF
