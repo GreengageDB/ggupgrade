@@ -126,7 +126,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 	if err != nil {
 		return err
 	}
-	
+
 	var contents bytes.Buffer
 	plpythonu_is_present := false
 	plpython2u_is_present := false
@@ -145,7 +145,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		}
 
 		var plpython2u_count int
-		row = db.QueryRow("SELECT COUNT(*) FROM pg_language WHERE lanname = 'plpython2u';")	
+		row = db.QueryRow("SELECT COUNT(*) FROM pg_language WHERE lanname = 'plpython2u';")
 
 		err = row.Scan(&plpython2u_count)
 		if err != nil {
@@ -157,7 +157,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		}
 
 		plpythonu_is_present  = plpythonu_is_present  || (plpythonu_count > 0)
-		plpython2u_is_present = plpython2u_is_present || (plpython2u_count > 0) 
+		plpython2u_is_present = plpython2u_is_present || (plpython2u_count > 0)
 
 		contents.WriteString(substeps.Divider);
 		contents.WriteString("\n");
@@ -172,7 +172,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		}
 
 		for rows.Next() {
-			var proname string 
+			var proname string
 			err = rows.Scan(&proname)
 			if err != nil {
 				return xerrors.Errorf("database '%v': %w", db_info.Datname, err)
@@ -200,7 +200,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		return err
 	}
 
-	var found_languages string	
+	var found_languages string
 	var drop_command string
 
 	if plpythonu_is_present && plpython2u_is_present {
