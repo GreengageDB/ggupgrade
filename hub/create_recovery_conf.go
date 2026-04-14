@@ -6,18 +6,12 @@ package hub
 import (
 	"context"
 
-	"fmt"
-
 	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 func CreateRecoveryConfOnSegments(agentConns []*idl.Connection, intermediate *greengage.Cluster) error {
-	if intermediate.Version.Major < 7 {
-		return fmt.Errorf("We don't consider to 6.x migration below")
-	}
-
 	user, err := utils.System.Current()
 	if err != nil {
 		return err
@@ -33,10 +27,11 @@ func CreateRecoveryConfOnSegments(agentConns []*idl.Connection, intermediate *gr
 			intermediatePrimary := intermediate.Primaries[intermediateMirror.ContentID]
 
 			connReq := &idl.CreateRecoveryConfRequest_Connection{
-				MirrorDataDir: intermediateMirror.DataDir,
-				User:          user.Username,
-				PrimaryHost:   intermediatePrimary.Hostname,
-				PrimaryPort:   int32(intermediatePrimary.Port),
+				MirrorDataDir:      intermediateMirror.DataDir,
+				User:               user.Username,
+				PrimaryHost:        intermediatePrimary.Hostname,
+				PrimaryPort:        int32(intermediatePrimary.Port),
+				TargetMajorVersion: intermediate.Version.Major,
 			}
 
 			connReqs = append(connReqs, connReq)
