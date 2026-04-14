@@ -20,6 +20,8 @@ import (
 	"github.com/vbauerster/mpb/v8"
 	"github.com/vbauerster/mpb/v8/decor"
 	"golang.org/x/xerrors"
+	"github.com/blang/semver/v4"
+
 
 	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/greengage/connection"
@@ -96,7 +98,7 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 		go func(streams step.OutStreams, database DatabaseInfo, gphome string, port int, seedDir string, outputDir string, bar *mpb.Bar) {
 			defer wg.Done()
 
-			err = GenerateScriptsPerDatabase(streams, database, gphome, port, seedDir, outputDir, bar)
+			err = GenerateScriptsPerDatabase(streams, database, gphome, port, seedDir, outputDir, version, bar)
 			if err != nil {
 				errChan <- err
 				bar.Abort(false)
@@ -238,8 +240,18 @@ Select: `)
 	}
 }
 
-func GenerateScriptsPerDatabase(streams step.OutStreams, database DatabaseInfo, gphome string, port int, seedDir string, outputDir string, bar *mpb.Bar) error {
-	output, err := executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpython3u;`)
+func GenerateScriptsPerDatabase(streams step.OutStreams, database DatabaseInfo, gphome string, port int, seedDir string, outputDir string, version semver.Version, bar *mpb.Bar) error {
+	var output []byte
+	var err error
+	switch {
+	case version.Major == 5:
+		output, err = executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpythonu;`)
+	case version.Major == 6:
+		output, err = executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpython3u;`)
+	default:
+		return fmt.Errorf("Internal error: unsupported source cluster version %v", version)
+	}
+
 	if err != nil && !strings.Contains(err.Error(), "already exists") {
 		return err
 	}
