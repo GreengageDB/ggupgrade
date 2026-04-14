@@ -83,8 +83,7 @@ func IsHubRunning() (bool, error) {
 	return true, nil
 }
 
-// nomerge: better naming
-const err_message =
+const ErrorMessagePlpython =
 `Can not start migration because %v present in the cluster.
 
 We don't support plpython2u in Greengage 7 because Python 2 has been deprecated for a while.
@@ -100,7 +99,6 @@ After this is done, execute the following query for each database:
 %v
 '''
 `
-
 
 func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, seedDir string) (err error) {
 	version, err := greengage.Version(gphome)
@@ -128,54 +126,54 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 	}
 
 	var contents bytes.Buffer
-	plpythonu_is_present := false
-	plpython2u_is_present := false
-	for _, db_info := range databases {
-		db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port, db_info.Datname)
+	plpythonuIsPresent := false
+	plpython2uIsPresent := false
+	for _, dbInfo := range databases {
+		db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port, dbInfo.Datname)
 		if err != nil {
 			return err
 		}
 
-		var plpythonu_count int
+		var plpythonuCount int
 		row := db.QueryRow("SELECT COUNT(*) FROM pg_language WHERE lanname = 'plpythonu';")
 
-		err = row.Scan(&plpythonu_count)
+		err = row.Scan(&plpythonuCount)
 		if err != nil {
-			return xerrors.Errorf("database '%v': %w", db_info.Datname, err)
+			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 		}
 
-		var plpython2u_count int
+		var plpython2uCount int
 		row = db.QueryRow("SELECT COUNT(*) FROM pg_language WHERE lanname = 'plpython2u';")
 
-		err = row.Scan(&plpython2u_count)
+		err = row.Scan(&plpython2uCount)
 		if err != nil {
-			return xerrors.Errorf("database '%v': %w", db_info.Datname, err)
+			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 		}
 
-		if plpython2u_count == 0 && plpythonu_count == 0 {
+		if plpython2uCount == 0 && plpythonuCount == 0 {
 			continue
 		}
 
-		plpythonu_is_present  = plpythonu_is_present  || (plpythonu_count > 0)
-		plpython2u_is_present = plpython2u_is_present || (plpython2u_count > 0)
+		plpythonuIsPresent  = plpythonuIsPresent  || (plpythonuCount > 0)
+		plpython2uIsPresent = plpython2uIsPresent || (plpython2uCount > 0)
 
 		contents.WriteString(substeps.Divider);
 		contents.WriteString("\n");
-		contents.WriteString(fmt.Sprintf("Database: '%s'\n", db_info.Datname));
+		contents.WriteString(fmt.Sprintf("Database: '%s'\n", dbInfo.Datname));
 		contents.WriteString(substeps.Divider);
 		contents.WriteString("\n");
 
 		const query = "SELECT proname FROM pg_proc JOIN pg_language ON pg_proc.prolang = pg_language.oid WHERE pg_language.lanname = 'plpythonu' or pg_language.lanname = 'plpython2u';"
 		rows, err := db.Query(query)
 		if err != nil {
-			return xerrors.Errorf("database '%v': %w", db_info.Datname, err)
+			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 		}
 
 		for rows.Next() {
 			var proname string
 			err = rows.Scan(&proname)
 			if err != nil {
-				return xerrors.Errorf("database '%v': %w", db_info.Datname, err)
+				return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 			}
 
 			contents.WriteString(proname);
@@ -183,7 +181,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		}
 	}
 
-	if !plpythonu_is_present && !plpython2u_is_present {
+	if !plpythonuIsPresent && !plpython2uIsPresent {
 		// no plpython2u in the cluster, can safely continue
 		return nil
 	}
@@ -200,22 +198,22 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		return err
 	}
 
-	var found_languages string
-	var drop_command string
+	var foundLanguages string
+	var dropCommand string
 
-	if plpythonu_is_present && plpython2u_is_present {
-		found_languages = "plpython2u and plpythonu (an alias to plpython2u) are"
-		drop_command = "DROP LANGUAGE IF EXISTS plpython2u;\nDROP LANGUAGE IF EXISTS plpythonu;"
-	} else if plpython2u_is_present {
-		found_languages = "plpython2u is"
-		drop_command = "DROP LANGUAGE IF EXISTS plpython2u;"
-	} else if plpythonu_is_present {
-		found_languages = "plpythonu (an alias to plpython2u) is"
-		drop_command = "DROP LANGUAGE IF EXISTS plpythonu;"
+	if plpythonuIsPresent && plpython2uIsPresent {
+		foundLanguages = "plpython2u and plpythonu (an alias to plpython2u) are"
+		dropCommand = "DROP LANGUAGE IF EXISTS plpython2u;\nDROP LANGUAGE IF EXISTS plpythonu;"
+	} else if plpython2uIsPresent {
+		foundLanguages = "plpython2u is"
+		dropCommand = "DROP LANGUAGE IF EXISTS plpython2u;"
+	} else if plpythonuIsPresent {
+		foundLanguages = "plpythonu (an alias to plpython2u) is"
+		dropCommand = "DROP LANGUAGE IF EXISTS plpythonu;"
 	} else {
 		// no way to get here
 		return xerrors.Errorf("Internal error: unexpected condition")
 	}
 
-	return xerrors.Errorf(err_message, found_languages, filePath, drop_command)
+	return xerrors.Errorf(ErrorMessagePlpython, foundLanguages, filePath, dropCommand)
 }
