@@ -119,6 +119,9 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 	// GetDatabases requires to specify script dirs, even though we don't generate them
 	// in here. We can always refactor this function, but it doesn't seem to be a problem right now.
 	databases, err := GetDatabases(db, utils.System.DirFS(seedDir))
+	if err != nil {
+		return err
+	}
 
 	err = db.Close()
 	if err != nil {
