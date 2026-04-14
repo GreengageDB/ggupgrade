@@ -36,12 +36,13 @@ func createRecoveryConf(connReqs []*idl.CreateRecoveryConfRequest_Connection) er
 		go func(connReq *idl.CreateRecoveryConfRequest_Connection) {
 			defer wg.Done()
 
-			config := fmt.Sprintf(`
+			common_config := fmt.Sprintf(`
 primary_conninfo = 'user=%s host=%s port=%d sslmode=disable sslcompression=1 krbsrvname=postgres application_name=gp_walreceiver'
 primary_slot_name = 'internal_wal_replication_slot'`, connReq.GetUser(), connReq.GetPrimaryHost(), connReq.GetPrimaryPort())
 
 			switch {
 			case connReq.GetTargetMajorVersion() == 6:
+				config := `standby_mode = 'on'` + common_config
 				err := os.WriteFile(filepath.Join(connReq.GetMirrorDataDir(), "recovery.conf"), []byte(config), 0644)
 				if err != nil {
 					errs <- err
@@ -52,7 +53,7 @@ primary_slot_name = 'internal_wal_replication_slot'`, connReq.GetUser(), connReq
 					errs <- err
 				}
 				defer f.Close()
-				_, err = f.WriteString(config)
+				_, err = f.WriteString(common_config)
 				if err != nil {
 					errs <- err
 				}
