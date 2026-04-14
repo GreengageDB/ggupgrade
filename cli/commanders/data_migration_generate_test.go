@@ -245,7 +245,7 @@ func TestGenerateScriptsPerDatabase(t *testing.T) {
 		}
 		defer testutils.FinishMock(mock, t)
 
-		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int) (*sql.DB, error) {
+		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int, database string) (*sql.DB, error) {
 			return db, nil
 		})
 		defer commanders.ResetBootstrapConnectionFunction()
@@ -320,7 +320,7 @@ func TestGenerateScriptsPerDatabase(t *testing.T) {
 		}
 		defer testutils.FinishMock(mock, t)
 
-		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int) (*sql.DB, error) {
+		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int, database string) (*sql.DB, error) {
 			return db, nil
 		})
 		defer commanders.ResetBootstrapConnectionFunction()
@@ -354,7 +354,7 @@ func TestGenerateScriptsPerDatabase(t *testing.T) {
 		}
 		defer testutils.FinishMock(mock, t)
 
-		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int) (*sql.DB, error) {
+		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int, database string) (*sql.DB, error) {
 			return db, nil
 		})
 		defer commanders.ResetBootstrapConnectionFunction()
@@ -391,7 +391,7 @@ func TestGenerateScriptsPerDatabase(t *testing.T) {
 		}
 		defer testutils.FinishMock(mock, t)
 
-		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int) (*sql.DB, error) {
+		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int, database string) (*sql.DB, error) {
 			return db, nil
 		})
 		defer commanders.ResetBootstrapConnectionFunction()
