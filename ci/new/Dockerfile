@@ -9,11 +9,15 @@ RUN set -eux; \
 
 FROM $GGDB7_IMAGE
 
-COPY --from=ggdb6 --chown=1000:1000 /home/gpadmin/gpdb_src /home/gpadmin/ggdb6_src
+COPY --from=ggdb6 --chown=1000:1000 /home/gpadmin/gpdb_src ggdb6_src
 COPY --from=ggdb6 --chown=1000:1000 /usr/local/greengage-db-devel /usr/local/greengage-db-6X
 
 ENV PATH=$PATH:/opt/go/bin:/home/gpadmin/go/bin \
-    GOPATH=/home/gpadmin/go
+    GOPATH=/home/gpadmin/go \
+    GPHOME_SOURCE=/usr/local/greengage-db-6X \
+    GPHOME_TARGET=/usr/local/greengage-db-7X \
+    PGHOST=/tmp \
+    ISOLATION2_PATH=/home/gpadmin/gpdb_src/src/test/isolation2
 
 RUN set -eux; \
     export CONFIGURE_FLAGS=; \
@@ -24,12 +28,7 @@ RUN set -eux; \
 
 RUN set -eux; \
     source /usr/local/greengage-db-7X/greengage_path.sh; \
-    cd gpdb_src; \
-    ./configure --prefix=/usr/local/greengage-db-7X \
-        --without-zlib --without-rt --without-libcurl \
-        --without-libedit-preferred --without-docdir --without-readline \
-        --disable-gpcloud --disable-gpfdist --disable-orca; \
-    make -C src/test/isolation2 install
+    make -C gpdb_src/src/test/isolation2 install
 
 RUN set -eux; \
     wget https://golang.org/dl/go1.20.5.linux-amd64.tar.gz -q -O - | tar -C /opt -xz; \

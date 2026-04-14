@@ -68,14 +68,14 @@ source ggupgrade/ci/new/common.bash
 export PGPORT=5432
 
 set +e
-pushd /home/gpadmin/ggupgrade
+pushd ggupgrade
 # run test command passed to script
 $@
 exit_code=\$?
 set -e
 popd
 
-collect_logs /data gpssh -f /home/gpadmin/hostfile_all_hosts
+collect_logs /data gpssh -f hostfile_all_hosts
 
 exit \$exit_code
 EOF

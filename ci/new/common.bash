@@ -17,9 +17,4 @@ function collect_logs {
     cp ggupgrade/test/acceptance/pg_upgrade/6-to-7/upgradeable_tests/source_cluster_regress/regression.diffs /logs/regression_upgradeable.diffs || true
 }
 
-export GPHOME_SOURCE=/usr/local/greengage-db-6X/
-export GPHOME_TARGET=/usr/local/greengage-db-7X/
-export PGHOST=/tmp/
 export PATH=$PATH:/opt/go/bin:~/go/bin
-export GOPATH=~/go
-export ISOLATION2_PATH=~/gpdb_src/src/test/isolation2
