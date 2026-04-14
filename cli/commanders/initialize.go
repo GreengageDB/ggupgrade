@@ -93,7 +93,7 @@ Please manually migrate all functions using plpython2u to plpython3u.
 Affected databases and functions are listed in this file:
 '%v'
 
-After this is done, execute the following query for each database:
+After this is done, execute the following query for each affected database:
 
 '''
 %v
