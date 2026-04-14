@@ -7,10 +7,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"bytes"
 	"os/exec"
+	"path/filepath"
 
 	"golang.org/x/xerrors"
 
+	"github.com/GreengageDB/ggupgrade/substeps"
 	"github.com/GreengageDB/ggupgrade/step"
 	"github.com/GreengageDB/ggupgrade/utils"
 	"github.com/GreengageDB/ggupgrade/idl"
@@ -83,42 +86,46 @@ func IsHubRunning() (bool, error) {
 const err_message =
 `Can not start migration because %v present in the cluster.
 
-We don't support plpython2u in Greengage 7 beause Python 2 has been depricated for a while.
-Please manually migrate every function that uses plpython2u to plpython3u.
+We don't support plpython2u in Greengage 7 because Python 2 has been deprecated for a while.
 
-After you done, execute the following query:
+Please manually migrate all functions using plpython2u to plpython3u.
+
+Affected functions for each database are listed in this file:
+'%v'
+
+After this is done, execute the following query for each database:
 
 '''
 %v
 '''
-
-Note that there steps should be done for each existing database.`
+`
 
 
 func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, seedDir string) (err error) {
-	// nomerge: do we really need to use this function in here?
 	db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port, "template1")
 	if err != nil {
 		return err
 	}
 
 	// GetDatabases requires to specify script dirs, even though we don't generate them
-	// in here. We can always refactor out this function, but it doesn't seem to be a problem.
-	// 
+	// in here. We can always refactor this function, but it doesn't seem to be a problem right now.
 	databases, err := GetDatabases(db, utils.System.DirFS(seedDir))
 
 	err = db.Close()
 	if err != nil {
 		return err
 	}
-
+	
+	var contents bytes.Buffer
+	plpythonu_is_present := false
+	plpython2u_is_present := false
 	for _, db_info := range databases {
 		db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port, db_info.Datname)
 		if err != nil {
 			return err
 		}
 
-		plpythonu_count := -1
+		var plpythonu_count int
 		row := db.QueryRow("SELECT COUNT(*) FROM pg_language WHERE lanname = 'plpythonu';")
 
 		err = row.Scan(&plpythonu_count)
@@ -126,7 +133,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 			return xerrors.Errorf("database '%v': %w", db_info.Datname, err)
 		}
 
-		plpython2u_count := -1
+		var plpython2u_count int
 		row = db.QueryRow("SELECT COUNT(*) FROM pg_language WHERE lanname = 'plpython2u';")	
 
 		err = row.Scan(&plpython2u_count)
@@ -134,36 +141,70 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 			return xerrors.Errorf("database '%v': %w", db_info.Datname, err)
 		}
 
-		// Strictly speaking, we should check that both 
-		// plpython2u_count and plpython2u_count are not equal 
-		// to one instead of checking that they are not equal to zero,
-		// as there is no way for pg_language view to have duplicating 
-		// entries for them. But let's be conservative.
+		if plpython2u_count == 0 && plpythonu_count == 0 {
+			continue
+		}
 
-		// nomerge: actually report all the databases and all affected functions
-	
-		var found_languages string	
-		var drop_command string
+		plpythonu_is_present  = plpythonu_is_present  || (plpythonu_count > 0)
+		plpython2u_is_present = plpython2u_is_present || (plpython2u_count > 0) 
 
-		if (plpythonu_count > 0 || plpython2u_count > 0) {
-			if (plpythonu_count > 0 && plpython2u_count > 0) {
-				found_languages = "plpython2u and plpythonu (an alias to plpython2u) are"
-				drop_command = "DROP LANGUAGE plpython2u;\nDROP LANGUAGE plpythonu;"
-			} else if (plpython2u_count > 0) {
-				found_languages = "plpython2u is"
-				drop_command = "DROP LANGUAGE plpython2u;"
-			} else if (plpythonu_count > 0) {
-				found_languages = "plpythonu (an alias to plpython2u) is"
-				drop_command = "DROP LANGUAGE plpythonu;"
-			} else {
-				// no way to get here
-				return xerrors.Errorf("internal error: unexpected condition")
+		contents.WriteString(substeps.Divider);
+		contents.WriteString("\n");
+		contents.WriteString(fmt.Sprintf("Database: '%s'\n", db_info.Datname));
+		contents.WriteString(substeps.Divider);
+		contents.WriteString("\n");
+
+		const query = "SELECT proname FROM pg_proc JOIN pg_language ON pg_proc.prolang = pg_language.oid WHERE pg_language.lanname = 'plpythonu' or pg_language.lanname = 'plpython2u';"
+		rows, err := db.Query(query)
+		if err != nil {
+			return xerrors.Errorf("database '%v': %w", db_info.Datname, err)
+		}
+
+		for rows.Next() {
+			var proname string 
+			err = rows.Scan(&proname)
+			if err != nil {
+				return xerrors.Errorf("database '%v': %w", db_info.Datname, err)
 			}
 
-			formatted_err_message := fmt.Sprintf(err_message, found_languages, drop_command)
-			return xerrors.Errorf("database '%v': %v", db_info.Datname, formatted_err_message)
+			contents.WriteString(proname);
+			contents.WriteString("\n");
 		}
 	}
 
-	return nil
+	if !plpythonu_is_present && !plpython2u_is_present {
+		// no plpython2u in the cluster, can safely continue
+		return nil
+	}
+
+	outputDir, err := utils.GetLogDir()
+	if err != nil {
+		return xerrors.Errorf("Internal error: unexpected condition")
+	}
+
+	const outputFile = "databases_with_plpython2u.pl"
+	filePath := filepath.Join(outputDir, outputFile)
+	err = utils.System.WriteFile(filePath, contents.Bytes(), 0644)
+	if err != nil {
+		return err
+	}
+
+	var found_languages string	
+	var drop_command string
+
+	if plpythonu_is_present && plpython2u_is_present {
+		found_languages = "plpython2u and plpythonu (an alias to plpython2u) are"
+		drop_command = "DROP LANGUAGE IF EXISTS plpython2u;\nDROP LANGUAGE IF EXISTS plpythonu;"
+	} else if plpython2u_is_present {
+		found_languages = "plpython2u is"
+		drop_command = "DROP LANGUAGE IF EXISTS plpython2u;"
+	} else if plpythonu_is_present {
+		found_languages = "plpythonu (an alias to plpython2u) is"
+		drop_command = "DROP LANGUAGE IF EXISTS plpythonu;"
+	} else {
+		// no way to get here
+		return xerrors.Errorf("Internal error: unexpected condition")
+	}
+
+	return xerrors.Errorf(err_message, found_languages, filePath, drop_command)
 }

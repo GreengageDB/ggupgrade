@@ -65,6 +65,7 @@ var SubstepDescriptions = map[idl.Substep]substepText{
 	idl.Substep_wait_for_cluster_to_be_ready_after_updating_catalog:           substepText{"Waiting for cluster to be ready...", "Wait for cluster to be ready"},
 	idl.Substep_check_active_connections_on_source_cluster:                    substepText{"Checking active connections on source cluster...", "Check active connections on source cluster"},
 	idl.Substep_check_active_connections_on_target_cluster:                    substepText{"Checking active connections on target cluster...", "Check active connections on target cluster"},
+	idl.Substep_check_for_obsolete_plpython:                                   substepText{"Checking for plpython2u...", "Check for plpython2u"},
 	idl.Substep_generate_data_migration_scripts:                               substepText{"Generating data migration SQL scripts...", "Generated data migration SQL scripts"},
 	idl.Substep_execute_stats_data_migration_scripts:                          substepText{"Executing stats data migration SQL scripts...", "Executed stats data migration SQL scripts"},
 	idl.Substep_execute_initialize_data_migration_scripts:                     substepText{"Executing initialize data migration SQL scripts...", "Executed initialize data migration SQL scripts"},
