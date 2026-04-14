@@ -104,7 +104,7 @@ DROP TABLE __ggupgrade_tmp_executor.scratch_table;
 # We create a schema during the executor runtime for the temporary scratch tables.
 # This schema has a different name than the generator temp schema to avoid potential double create and/or premature
 # drop commands.
-if swap_sql is not "":
+if swap_sql != "":
     swap_sql = """
 SET gp_enable_exchange_default_partition = on;
 SET optimizer_enable_ctas = off;
