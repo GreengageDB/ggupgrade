@@ -262,7 +262,7 @@ func GetTempTargetCluster(t *testing.T) greengage.Cluster {
 func getCluster(t *testing.T, gphome string, port int, destination idl.ClusterDestination) greengage.Cluster {
 	t.Helper()
 
-	db, err := connection.Bootstrap(destination, gphome, port)
+	db, err := connection.Bootstrap(destination, gphome, port, "template1")
 	if err != nil {
 		t.Fatalf("bootstraping db connection to %q %q %q: %v", destination, gphome, port, err)
 	}
