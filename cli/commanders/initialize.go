@@ -194,7 +194,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		return xerrors.Errorf("Internal error: unexpected condition")
 	}
 
-	const outputFile = "databases_with_plpython2u.pl"
+	const outputFile = "databases_with_plpython2u.txt"
 	filePath := filepath.Join(outputDir, outputFile)
 	err = utils.System.WriteFile(filePath, contents.Bytes(), 0644)
 	if err != nil {
