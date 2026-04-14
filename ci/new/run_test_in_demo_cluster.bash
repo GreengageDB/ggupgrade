@@ -10,8 +10,9 @@ docker run -i --rm \
     su gpadmin <<EOF1
         set -exuo pipefail
         source /usr/local/greengage-db-6X/greengage_path.sh
-        cd /home/gpadmin/ggdb6_src/
+        pushd /home/gpadmin/ggdb6_src/
         make create-demo-cluster WITH_MIRRORS=${WITH_MIRRORS:-true} WITH_STANDBY=${WITH_STANDBY:-true}
+        popd
 
         source /usr/local/greengage-db-6X/greengage_path.sh
         source /home/gpadmin/ggdb6_src/gpAux/gpdemo/gpdemo-env.sh
@@ -19,12 +20,12 @@ docker run -i --rm \
         source /home/gpadmin/ggupgrade/ci/new/common.bash
         export PGPORT=6000
 #       run test command passed to script
-        cd /home/gpadmin/ggupgrade
+        pushd /home/gpadmin/ggupgrade
         set +e
         $@
         exit_code=\\\$?
         set -e
-        cd
+        popd
 
         collect_logs ggdb6_src/gpAux/gpdemo/datadirs/ bash -c
 

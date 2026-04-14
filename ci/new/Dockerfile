@@ -21,17 +21,14 @@ RUN set -ex; \
     mv /usr/local/greengage-db-devel /usr/local/greengage-db-7X; \
     chown -R 1000:1000 /usr/local/greengage-db-7X
 
-RUN set -ex; \
+RUN set -eux; \
     source /usr/local/greengage-db-7X/greengage_path.sh; \
-    export LDFLAGS="-L${GPHOME}/lib"; \
-    export CPPFLAGS="-I${GPHOME}/include"; \
     cd gpdb_src; \
     ./configure --prefix=/usr/local/greengage-db-7X \
         --without-zlib --without-rt --without-libcurl \
         --without-libedit-preferred --without-docdir --without-readline \
-        --disable-gpcloud --disable-gpfdist --disable-orca \
-        ${CONFIGURE_FLAGS}; \
-    make -C /home/gpadmin/gpdb_src/src/test/isolation2 install
+        --disable-gpcloud --disable-gpfdist --disable-orca; \
+    make -C src/test/isolation2 install
 
 RUN set -eux; \
     wget https://golang.org/dl/go1.20.5.linux-amd64.tar.gz -q -O - | tar -C /opt -xz; \
@@ -46,11 +43,11 @@ RUN set -eux; \
       python -m pip install future==1.0.0; \
     fi
 
-COPY . /home/gpadmin/ggupgrade
+COPY . ggupgrade
 
 RUN set -eux; \
-    mkdir -p /home/gpadmin/go/bin; \
-    chown -R 1000:1000 /home/gpadmin/go; \
-    cd /home/gpadmin/ggupgrade; \
+    mkdir -p go/bin; \
+    chown -R 1000:1000 go; \
+    cd ggupgrade; \
     make; \
     make install

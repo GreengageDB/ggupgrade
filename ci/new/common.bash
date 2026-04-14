@@ -22,4 +22,4 @@ export GPHOME_TARGET=/usr/local/greengage-db-7X/
 export PGHOST=/tmp/
 export PATH=$PATH:/opt/go/bin:~/go/bin
 export GOPATH=~/go
-export ISOLATION2_PATH=/home/gpadmin/gpdb_src/src/test/isolation2
+export ISOLATION2_PATH=~/gpdb_src/src/test/isolation2
