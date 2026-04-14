@@ -15,7 +15,8 @@ COPY --from=ggdb6 --chown=1000:1000 /usr/local/greengage-db-devel /usr/local/gre
 ENV PATH=$PATH:/opt/go/bin:/home/gpadmin/go/bin \
     GOPATH=/home/gpadmin/go
 
-RUN set -ex; \
+RUN set -eux; \
+    export CONFIGURE_FLAGS=; \
     source gpdb_src/concourse/scripts/common.bash; \
     install_and_configure_gpdb; \
     mv /usr/local/greengage-db-devel /usr/local/greengage-db-7X; \
