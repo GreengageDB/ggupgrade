@@ -13,6 +13,7 @@ import (
 
 	"golang.org/x/xerrors"
 
+	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/substeps"
 	"github.com/GreengageDB/ggupgrade/step"
 	"github.com/GreengageDB/ggupgrade/utils"
@@ -90,7 +91,7 @@ We don't support plpython2u in Greengage 7 because Python 2 has been deprecated 
 
 Please manually migrate all functions using plpython2u to plpython3u.
 
-Affected functions for each database are listed in this file:
+Affected databases and functions are listed in this file:
 '%v'
 
 After this is done, execute the following query for each database:
@@ -102,6 +103,16 @@ After this is done, execute the following query for each database:
 
 
 func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, seedDir string) (err error) {
+	version, err := greengage.Version(gphome)
+	if err != nil {
+		return err
+	}
+
+	if (version.Major != 6) {
+		// This check is relevant only for 6.x.
+		return nil;
+	}
+
 	db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port, "template1")
 	if err != nil {
 		return err
