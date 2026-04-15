@@ -1,13 +1,11 @@
 #!/bin/bash
 
-docker run -i --rm \
- -v "$(pwd)/logs:/logs" \
- "$IMAGE" bash -ex <<EOF
-    set -exuo pipefail
-    gpdb_src/concourse/scripts/setup_gpadmin_user.bash
-    chown -R gpadmin:gpadmin /logs
+set -exuo pipefail
+gpdb_src/concourse/scripts/setup_gpadmin_user.bash
+mkdir /logs || true
+chown -R gpadmin:gpadmin /logs
 
-    su gpadmin <<EOF1
+su gpadmin <<EOF
         set -exuo pipefail
         source /usr/local/greengage-db-6X/greengage_path.sh
         pushd ggdb6_src
@@ -23,12 +21,11 @@ docker run -i --rm \
         pushd ggupgrade
         set +e
         $@
-        exit_code=\\\$?
+        exit_code=\$?
         set -e
         popd
 
         collect_logs ggdb6_src/gpAux/gpdemo/datadirs/ bash -c
 
-        exit \\\$exit_code
-EOF1
+        exit \$exit_code
 EOF
