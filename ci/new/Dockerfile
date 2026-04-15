@@ -17,7 +17,7 @@ ENV PATH=$PATH:/opt/go/bin:/home/gpadmin/go/bin \
     GPHOME_SOURCE=/usr/local/greengage-db-6X \
     GPHOME_TARGET=/usr/local/greengage-db-7X \
     PGHOST=/tmp \
-    ISOLATION2_PATH=/home/gpadmin/gpdb_src/src/test/isolation2
+    ISOLATION2_PATH=/usr/local/greengage-db-7X/lib/postgresql/pgxs/src/test/isolation2/
 
 RUN set -eux; \
     export CONFIGURE_FLAGS=; \
@@ -25,10 +25,6 @@ RUN set -eux; \
     install_and_configure_gpdb; \
     mv /usr/local/greengage-db-devel /usr/local/greengage-db-7X; \
     chown -R 1000:1000 /usr/local/greengage-db-7X
-
-RUN set -eux; \
-    source /usr/local/greengage-db-7X/greengage_path.sh; \
-    make -C gpdb_src/src/test/isolation2 install
 
 RUN set -eux; \
     wget https://golang.org/dl/go1.20.5.linux-amd64.tar.gz -q -O - | tar -C /opt -xz; \
