@@ -137,22 +137,22 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 			return err
 		}
 
-		const languageQuery = "SELECT count(*) FILTER (WHERE l.lanname = 'plpythonu'), count(*) FILTER (WHERE l.lanname = 'plpython2u') FROM pg_catalog.pg_language l WHERE l.lanname in ('plpythonu', 'plpython2u');"
+		const languageQuery = "SELECT EXISTS(SELECT * FROM pg_catalog.pg_language WHERE lanname = 'plpythonu') plpythonu, EXISTS(SELECT * FROM pg_catalog.pg_language WHERE lanname = 'plpython2u') plpython2u;"
 
-		var plpythonuCount int
-		var plpython2uCount int
+		var plpythonuIsPresentInDatabase bool
+		var plpython2uIsPresentInDatabase bool
 		row := db.QueryRow(languageQuery)
-		err = row.Scan(&plpythonuCount, &plpython2uCount)
+		err = row.Scan(&plpythonuIsPresentInDatabase, &plpython2uIsPresentInDatabase)
 		if err != nil {
 			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 		}
 
-		if plpython2uCount == 0 && plpythonuCount == 0 {
+		if !plpython2uIsPresentInDatabase && !plpythonuIsPresentInDatabase {
 			continue
 		}
 
-		plpythonuIsPresent  = plpythonuIsPresent  || (plpythonuCount > 0)
-		plpython2uIsPresent = plpython2uIsPresent || (plpython2uCount > 0)
+		plpythonuIsPresent  = plpythonuIsPresent  || plpythonuIsPresentInDatabase
+		plpython2uIsPresent = plpython2uIsPresent || plpython2uIsPresentInDatabase
 
 		contents.WriteString(substeps.Divider);
 		contents.WriteString("\n");
