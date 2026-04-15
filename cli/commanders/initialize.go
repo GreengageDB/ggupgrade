@@ -137,18 +137,12 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 			return err
 		}
 
+		const languageQuery = "SELECT count(*) FILTER (WHERE l.lanname = 'plpythonu'), count(*) FILTER (WHERE l.lanname = 'plpython2u') FROM pg_catalog.pg_language l WHERE l.lanname in ('plpythonu', 'plpython2u');"
+
 		var plpythonuCount int
-		row := db.QueryRow("SELECT COUNT(*) FROM pg_catalog.pg_language l WHERE l.lanname = 'plpythonu';")
-
-		err = row.Scan(&plpythonuCount)
-		if err != nil {
-			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
-		}
-
 		var plpython2uCount int
-		row = db.QueryRow("SELECT COUNT(*) FROM pg_catalog.pg_language l WHERE l.lanname = 'plpython2u';")
-
-		err = row.Scan(&plpython2uCount)
+		row := db.QueryRow(languageQuery)
+		err = row.Scan(&plpythonuCount, &plpython2uCount)
 		if err != nil {
 			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 		}
@@ -166,8 +160,8 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		contents.WriteString(substeps.Divider);
 		contents.WriteString("\n");
 
-		const query = "SELECT c.proname FROM pg_catalog.pg_proc c JOIN pg_catalog.pg_language l ON c.prolang = l.oid WHERE l.lanname in ('plpythonu', 'plpython2u');"
-		rows, err := db.Query(query)
+		const functionQuery = "SELECT c.proname FROM pg_catalog.pg_proc c JOIN pg_catalog.pg_language l ON c.prolang = l.oid WHERE l.lanname in ('plpythonu', 'plpython2u');"
+		rows, err := db.Query(functionQuery)
 		if err != nil {
 			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 		}
