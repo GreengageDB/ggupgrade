@@ -268,7 +268,7 @@ func TestGenerateScriptsPerDatabase(t *testing.T) {
 
 			actualSql := args[7:8]
 			if numCalls == 1 {
-				expected := []string{"CREATE LANGUAGE plpythonu;"}
+				expected := []string{"CREATE LANGUAGE plpython3u;"}
 				if !reflect.DeepEqual(actualSql, expected) {
 					t.Errorf("got sql %q, want %q", actualSql, expected)
 				}
