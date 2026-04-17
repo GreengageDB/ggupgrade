@@ -331,7 +331,7 @@ func RestoreDemoCluster(t *testing.T, backupDir string, source greengage.Cluster
 	}
 }
 
-func Isolation2_regress(t *testing.T, sourceVersion semver.Version, gphome string, port string, inputDir string, outputDir string, schedule idl.Schedule) string {
+func Isolation2_regress(t *testing.T, sourceVersion semver.Version, gphome string, port string, testDir string, inputDir string, outputDir string, schedule idl.Schedule) string {
 	t.Helper()
 
 	var cmdArgs []string
@@ -361,8 +361,10 @@ func Isolation2_regress(t *testing.T, sourceVersion semver.Version, gphome strin
 		tests = focus
 	}
 
+	initFile := filepath.Join(testDir, "init_file_isolation2")
+
 	cmdArgs = append(cmdArgs,
-		"--init-file", "init_file_isolation2",
+		"--init-file", initFile,
 		"--inputdir", inputDir,
 		"--outputdir", outputDir,
 		binDir, filepath.Join(gphome, "bin"),

@@ -1,0 +1,58 @@
+x-common-service: &common-service
+  image: "${IMAGE}"
+  privileged: true
+  sysctls:
+    kernel.sem: 500 1024000 200 4096
+  init: true
+  ulimits:
+    nofile: 65535
+  entrypoint: >
+    sleep infinity
+
+services:
+  coordinator:
+    <<: *common-service
+    working_dir: /home/gpadmin
+    hostname: coordinator
+    volumes:
+      - ${PWD}/ssh_keys:/home/gpadmin/.ssh
+      - ${PWD}/logs_coordinator:/logs
+    networks:
+      backend:
+        aliases:
+          - cdw
+  standby:
+    <<: *common-service
+    hostname: standby
+    volumes:
+      - ${PWD}/ssh_keys:/home/gpadmin/.ssh
+      - ${PWD}/logs_standby:/logs
+    networks:
+      backend:
+  sdw1:
+    <<: *common-service
+    hostname: sdw1
+    volumes:
+      - ${PWD}/ssh_keys:/home/gpadmin/.ssh
+      - ${PWD}/logs_sdw1:/logs
+    networks:
+      backend:
+  sdw2:
+    <<: *common-service
+    hostname: sdw2
+    volumes:
+      - ${PWD}/ssh_keys:/home/gpadmin/.ssh
+      - ${PWD}/logs_sdw2:/logs
+    networks:
+      backend:
+  sdw3:
+    <<: *common-service
+    hostname: sdw3
+    volumes:
+      - ${PWD}/ssh_keys:/home/gpadmin/.ssh
+      - ${PWD}/logs_sdw3:/logs
+    networks:
+      backend:
+
+networks:
+  backend:
