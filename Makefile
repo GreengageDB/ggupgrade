@@ -46,7 +46,7 @@ coverage:
 
 BUILD_ENV = $($(OS)_ENV)
 
-.PHONY: setup-env install-dependencies generate build build_linux build_mac
+.PHONY: install-dependencies generate build build_linux build_mac
 
 # We don't have file dependencies for the following targets (meaning that they have to be rebuilt for each `make` command)
 # because `go` command itself is a build tool, and it doesn't work with `make` recipes.
@@ -58,20 +58,20 @@ TOOLS_DIR = dev-bin
 $(TOOLS_DIR):
 	mkdir $(TOOLS_DIR)
 
-setup-env:
-	export GOBIN='$(CURDIR)/$(TOOLS_DIR)'
-	export GOFLAGS='-mod=readonly'
+# Setup $GOBIN and $PATH to point to installed modules
+export GOBIN := $(CURDIR)/$(TOOLS_DIR)
+export PATH  := $(PATH):$(GOBIN)
 
 # Fetch all used binaries/modules.
 # Note, that these binaries should be present in the `tools.go` file so their version can be recoreded in `mod.go`.
 # When adding a new tool, add its module to `tools.go`, then run `go mod tidy`, and finally put `go install` here.
-install-dependencies: $(TOOLS_DIR) setup-env
+install-dependencies: $(TOOLS_DIR)
 	go mod download
 	go install google.golang.org/protobuf/cmd/protoc-gen-go
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	go install github.com/golang/mock/mockgen
 
-generate: setup-env
+generate:
 	go generate	./idl
 	go generate ./cli/bash
 
