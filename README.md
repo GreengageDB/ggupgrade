@@ -131,7 +131,7 @@ ggupgrade inits a fresh target cluster "next to" the source cluster, and upgrade
 
 - Golang. See the top of [go.mod](go.mod) for the current version used.
 - protoc. This is the compiler for the [grpc protobuf](https://grpc.io/)
-  system which can be installed from the github repository
+  system which can be installed from the github repository.
   `https://github.com/protocolbuffers/protobuf/releases`.
 - other developer dependencies will be automatically installed when running `make`.
 
