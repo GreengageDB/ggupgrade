@@ -130,10 +130,10 @@ ggupgrade inits a fresh target cluster "next to" the source cluster, and upgrade
 ### Prerequisites
 
 - Golang. See the top of [go.mod](go.mod) for the current version used.
-- protoc. This is the compiler for the [gRPC protobuf](https://grpc.io/) 
-system which can be installed on macOS with `brew install protobuf`.
-- Run `make && make depend-dev` to install other developer dependencies. Note 
-make needs to be run first.
+- protoc. this is the compiler for the [grpc protobuf](https://grpc.io/)
+  system which can be installed from the github repository
+  `https://github.com/protocolbuffers/protobuf/releases`.
+- other developer dependencies will be automatically installed when running `make`.
 
 ### Setting up your IDE
 
@@ -171,14 +171,19 @@ Checkout [vim-go](https://github.com/fatih/vim-go) and [go-delve](https://github
 ### Build and Test
 
 ```
-make             # builds ggupgrade binary locally
-make depend-dev  # initial one-time directive to install developer dependencies
-make install     # installs ggupgrade into $GOBIN
-make lint        # runs linter
-make unit        # runs unit test
+make                        # fetches dependencies, creates auto-generated files and builds ggupgrade
+make install-dependencies   # installs neccessary developer dependencies and tools
+make generate               # recompiles proto files to generate gRPC client and server code
+make build                  # build ggupgrade binary
+make install                # installs ggupgrade into $GOBIN
+make lint                   # runs linter
+make unit                   # runs unit test
 ```
 
-Cross-compile with:
+When building ggupgrade for the first time, run the regular `make` command, as it will generate code from `.proto` files.
+Unless you modify `.proto` files, it is enough to do his step only once. So on subsequent build you can skip it and run only `make build`.
+
+After the regular `make`, cross-compile with:
 - `make build_linux`
 - `make build_mac`
 
@@ -279,12 +284,6 @@ need to delete it, push tags, and re-fly as Concourse has some weird caching
 issues.
 
 
-## Generating gRPC code
-
-To recompile proto files to generate gRPC client and server code run 
-`go generate ./idl`
-
-
 ## Bash Completion
 
 To enable tab completion of ggupgrade commands source the `cli/bash/ggupgrade.bash`
@@ -325,6 +324,6 @@ Logs are located on **_all hosts_**.
 to debug.
 - For faster iterations:
   - Make any local changes in the code
-  - Rebuild with `make && make install`
+  - Rebuild with `make build && make install` or `make && make install`
   - Reload the new code with `ggupgrade restart-services` or manually stop and restart the hub.
   - Repeat the above breakpoints and attaching to the new processes as their PIDs have changed.
