@@ -72,7 +72,6 @@ install-dependencies: $(TOOLS_DIR) setup-env
 	go install github.com/golang/mock/mockgen
 
 generate: setup-env
-	# TODO: check for protoc
 	go generate	./idl
 	go generate ./cli/bash
 
