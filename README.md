@@ -130,7 +130,7 @@ ggupgrade inits a fresh target cluster "next to" the source cluster, and upgrade
 ### Prerequisites
 
 - Golang. See the top of [go.mod](go.mod) for the current version used.
-- protoc. this is the compiler for the [grpc protobuf](https://grpc.io/)
+- protoc. This is the compiler for the [grpc protobuf](https://grpc.io/)
   system which can be installed from the github repository
   `https://github.com/protocolbuffers/protobuf/releases`.
 - other developer dependencies will be automatically installed when running `make`.
@@ -181,7 +181,7 @@ make unit                   # runs unit test
 ```
 
 When building ggupgrade for the first time, run the regular `make` command, as it will generate code from `.proto` files.
-Unless you modify `.proto` files, it is enough to do his step only once. So on subsequent build you can skip it and run only `make build`.
+Unless you modify `.proto` files, it is enough to do his step only once. So on all subsequent builds you can skip it and run only `make build`.
 
 After the regular `make`, cross-compile with:
 - `make build_linux`

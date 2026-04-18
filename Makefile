@@ -48,9 +48,9 @@ BUILD_ENV = $($(OS)_ENV)
 
 .PHONY: setup-env install-dependencies generate build build_linux build_mac
 
-# We don't have file dependencies for the following targets (meaning that they have to be be rebuilt for each `make` command)
+# We don't have file dependencies for the following targets (meaning that they have to be rebuilt for each `make` command)
 # because `go` command itself is a build tool, and it doesn't work with `make` recipes.
-# (an example of a conflict would be traking modules downloaded wia `go mod download` with `make`,
+# (an example of a conflict would be tracking modules downloaded via `go mod download` with `make`,
 #  or installing a different version of the tool with `go install`)
 
 TOOLS_DIR = dev-bin
@@ -63,8 +63,8 @@ setup-env:
 	export GOFLAGS='-mod=readonly'
 
 # Fetch all used binaries/modules.
-# Note, that these binaries should be present in `tools.go` file so their version can be recoreded in `mod.go`.
-# When adding a new tool, add its module to `tools.go` then run `go mod tidy` and finally put `go install` here.
+# Note, that these binaries should be present in the `tools.go` file so their version can be recoreded in `mod.go`.
+# When adding a new tool, add its module to `tools.go`, then run `go mod tidy`, and finally put `go install` here.
 install-dependencies: $(TOOLS_DIR) setup-env
 	go mod download
 	go install google.golang.org/protobuf/cmd/protoc-gen-go
