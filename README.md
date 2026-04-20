@@ -172,7 +172,7 @@ Checkout [vim-go](https://github.com/fatih/vim-go) and [go-delve](https://github
 
 ```
 make                        # fetches dependencies, creates auto-generated files and builds ggupgrade
-make install-dependencies   # installs neccessary developer dependencies and tools
+make install-dependencies   # installs necessary developer dependencies and tools
 make generate               # recompiles proto files to generate gRPC client and server code
 make build                  # build ggupgrade binary
 make install                # installs ggupgrade into $GOBIN
