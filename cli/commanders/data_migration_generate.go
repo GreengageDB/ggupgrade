@@ -74,7 +74,7 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 		return err
 	}
 
-	databases, err := GetDatabases(db, utils.System.DirFS(seedDir))
+	databases, err := GetDatabases(db)
 	if err != nil {
 		return err
 	}
@@ -88,9 +88,16 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(databases))
 
+	seedDirFS := utils.System.DirFS(seedDir)
 	for _, database := range databases {
 		wg.Add(1)
-		bar := progressBar.New(int64(database.NumSeedScripts),
+
+		numSeedScripts, err := countSeedScripts(database.Datname, seedDirFS)
+		if err != nil {
+			return err
+		}
+
+		bar := progressBar.New(int64(numSeedScripts),
 			mpb.NopStyle(),
 			mpb.PrependDecorators(decor.Name("  "+database.Datname, decor.WCSyncSpaceR)),
 			mpb.AppendDecorators(decor.NewPercentage("%d")))
@@ -398,10 +405,9 @@ func GenerateScriptsPerPhase(phase idl.Step, database DatabaseInfo, gphome strin
 type DatabaseInfo struct {
 	Datname        string
 	QuotedDatname  string
-	NumSeedScripts int
 }
 
-func GetDatabases(db *sql.DB, seedDirFS fs.FS) ([]DatabaseInfo, error) {
+func GetDatabases(db *sql.DB) ([]DatabaseInfo, error) {
 	rows, err := db.Query(`SELECT datname, quote_ident(datname) AS quoted_datname FROM pg_database WHERE datname != 'template0';`)
 	if err != nil {
 		return nil, err
@@ -415,13 +421,6 @@ func GetDatabases(db *sql.DB, seedDirFS fs.FS) ([]DatabaseInfo, error) {
 		if err != nil {
 			return nil, xerrors.Errorf("pg_database: %w", err)
 		}
-
-		numSeedScripts, cErr := countSeedScripts(database.Datname, seedDirFS)
-		if cErr != nil {
-			return nil, cErr
-		}
-
-		database.NumSeedScripts = numSeedScripts
 
 		databases = append(databases, database)
 	}
