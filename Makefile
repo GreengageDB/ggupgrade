@@ -1,7 +1,7 @@
 # Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 # SPDX-License-Identifier: Apache-2.0
 
-all: | install-dependencies generate build
+all: build
 
 .DEFAULT_GOAL := all
 MODULE_NAME=ggupgrade

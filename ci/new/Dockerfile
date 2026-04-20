@@ -45,5 +45,7 @@ RUN set -eux; \
     mkdir -p go/bin; \
     chown -R 1000:1000 go; \
     cd ggupgrade; \
+    make install-dependencies; \
+    make generate; \
     make; \
     make install

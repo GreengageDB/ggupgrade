@@ -171,7 +171,7 @@ Checkout [vim-go](https://github.com/fatih/vim-go) and [go-delve](https://github
 ### Build and Test
 
 ```
-make                        # fetches dependencies, creates auto-generated files and builds ggupgrade
+make                        # build ggupgrade binary (same as make build)
 make install-dependencies   # installs necessary developer dependencies and tools
 make generate               # recompiles proto files to generate gRPC client and server code
 make build                  # build ggupgrade binary
@@ -180,8 +180,14 @@ make lint                   # runs linter
 make unit                   # runs unit test
 ```
 
-When building ggupgrade for the first time, run the regular `make` command, as it will generate code from `.proto` files.
-Unless you modify `.proto` files, it is enough to do his step only once. So on all subsequent builds you can skip it and run only `make build`.
+When building ggupgrade for the first time, run the following series of commands:
+```
+make install-dependencies
+make generate
+make build
+```
+
+Unless you modify `.proto` files, it is enough to do his step only once. So on all subsequent builds you can run only `make build` (or just `make`).
 
 After the regular `make`, cross-compile with:
 - `make build_linux`
@@ -324,6 +330,6 @@ Logs are located on **_all hosts_**.
 to debug.
 - For faster iterations:
   - Make any local changes in the code
-  - Rebuild with `make build && make install` or `make && make install`
+  - Rebuild with `make && make install`
   - Reload the new code with `ggupgrade restart-services` or manually stop and restart the hub.
   - Repeat the above breakpoints and attaching to the new processes as their PIDs have changed.
