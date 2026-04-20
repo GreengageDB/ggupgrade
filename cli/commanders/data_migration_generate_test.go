@@ -811,16 +811,31 @@ func TestGetDatabases(t *testing.T) {
 			AddRow("template1", "template1").
 			AddRow("postgres", "postgres"))
 
-		databases, err := commanders.GetDatabases(db, seedDirFS)
+		databases, err := commanders.GetDatabases(db)
 		if err != nil {
 			t.Errorf("unexpected error: %#v", err)
 		}
 
-		expected := []commanders.DatabaseInfo{
-			{QuotedDatname: "template1", Datname: "template1", NumSeedScripts: 1},
-			{QuotedDatname: "postgres", Datname: "postgres", NumSeedScripts: 2}}
-		if !reflect.DeepEqual(databases, expected) {
-			t.Errorf("got %v, want %v", databases, expected)
+		expectedDatabases := []commanders.DatabaseInfo{
+			{QuotedDatname: "template1", Datname: "template1"},
+			{QuotedDatname: "postgres", Datname: "postgres"}}
+		expectedSeedScripts := []int{1, 2}
+
+		if !reflect.DeepEqual(databases, expectedDatabases) {
+			t.Errorf("got %v, want %v", databases, expectedDatabases)
+		}
+
+		for i, database := range databases {
+			expectedNumSeedScripts := expectedSeedScripts[i]
+
+			numSeedScripts, err := commanders.CountSeedScripts(database.Datname, seedDirFS)
+			if err != nil {
+				t.Errorf("Unexpected error in CountSeedScripts: %v", err)
+
+			}
+			if (numSeedScripts != expectedNumSeedScripts) {
+				t.Errorf("Unexpected amount of SeedScripts: got %v, want %v", numSeedScripts, expectedNumSeedScripts)
+			}
 		}
 	})
 
@@ -828,7 +843,7 @@ func TestGetDatabases(t *testing.T) {
 		expected := os.ErrPermission
 		expectPgDatabaseToReturn(mock).WillReturnError(expected)
 
-		databases, err := commanders.GetDatabases(db, seedDirFS)
+		databases, err := commanders.GetDatabases(db)
 		if !errors.Is(err, expected) {
 			t.Errorf("got %v want %v", err, expected)
 		}
@@ -842,7 +857,7 @@ func TestGetDatabases(t *testing.T) {
 		expectPgDatabaseToReturn(mock).WillReturnRows(sqlmock.NewRows([]string{}).
 			AddRow()) // return less fields than scan expects
 
-		databases, err := commanders.GetDatabases(db, seedDirFS)
+		databases, err := commanders.GetDatabases(db)
 		if !strings.Contains(err.Error(), "Scan") {
 			t.Errorf(`expected %v to contain "Scan"`, err)
 		}
@@ -858,7 +873,7 @@ func TestGetDatabases(t *testing.T) {
 			AddRow("postgres").
 			RowError(0, expected))
 
-		databases, err := commanders.GetDatabases(db, seedDirFS)
+		databases, err := commanders.GetDatabases(db)
 		if !errors.Is(err, expected) {
 			t.Errorf("got %v want %v", err, expected)
 		}

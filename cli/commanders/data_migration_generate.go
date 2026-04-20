@@ -92,7 +92,7 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 	for _, database := range databases {
 		wg.Add(1)
 
-		numSeedScripts, err := countSeedScripts(database.Datname, seedDirFS)
+		numSeedScripts, err := CountSeedScripts(database.Datname, seedDirFS)
 		if err != nil {
 			return err
 		}
@@ -433,7 +433,7 @@ func GetDatabases(db *sql.DB) ([]DatabaseInfo, error) {
 	return databases, nil
 }
 
-func countSeedScripts(database string, seedDirFS fs.FS) (int, error) {
+func CountSeedScripts(database string, seedDirFS fs.FS) (int, error) {
 	var numSeedScripts int
 
 	phasesEntries, err := utils.System.ReadDirFS(seedDirFS, ".")
