@@ -133,7 +133,6 @@ ggupgrade inits a fresh target cluster "next to" the source cluster, and upgrade
 - protoc. This is the compiler for the [grpc protobuf](https://grpc.io/)
   system which can be installed from the github repository.
   `https://github.com/protocolbuffers/protobuf/releases`.
-- other developer dependencies will be automatically installed when running `make`.
 
 ### Setting up your IDE
 
@@ -189,7 +188,7 @@ make build
 
 Unless you modify `.proto` files, it is enough to do his step only once. So on all subsequent builds you can run only `make build` (or just `make`).
 
-After the regular `make`, cross-compile with:
+After above setup, cross-compile with:
 - `make build_linux`
 - `make build_mac`
 
