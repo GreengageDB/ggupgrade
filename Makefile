@@ -172,6 +172,10 @@ clean:
 		rm -f CHECKSUM
 		rm -rf rpm
 		rm -f ggupgrade-$(VERSION)*.rpm
+		# Generated files
+		rm -f cli/bash/ggupgrade.bash
+		rm -f idl/*.pb.go
+		rm -f idl/mock_idl/*
 
 # You can override these from the command line.
 BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
