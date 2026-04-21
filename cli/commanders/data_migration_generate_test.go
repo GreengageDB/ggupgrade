@@ -831,7 +831,6 @@ func TestGetDatabases(t *testing.T) {
 			numSeedScripts, err := commanders.CountSeedScripts(database.Datname, seedDirFS)
 			if err != nil {
 				t.Errorf("Unexpected error in CountSeedScripts: %v", err)
-
 			}
 			if (numSeedScripts != expectedNumSeedScripts) {
 				t.Errorf("Unexpected amount of SeedScripts: got %v, want %v", numSeedScripts, expectedNumSeedScripts)
