@@ -26,7 +26,7 @@ func Run(stdout, stderr io.Writer, opts *idl.PgOptions) error {
 	upgradeDir, err := utils.GetPgUpgradeDir(
 		opts.GetRole(),
 		opts.GetContentID(),
-		opts.GetPgUpgradeTimeStamp(),
+		opts.GetPgUpgradeTimestamp(),
 		opts.GetTargetVersion(),
 	)
 	if err != nil {

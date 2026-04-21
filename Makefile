@@ -10,23 +10,6 @@ MODULE_NAME=ggupgrade
 LINUX_ENV := env GOOS=linux GOARCH=amd64
 MAC_ENV := env GOOS=darwin GOARCH=amd64
 
-# depend-dev will install the necessary Go dependencies for running `go
-# generate`. (This recipe does not have to be run in order to build the
-# project; only to rebuild generated files.) Note that developers must still
-# install the protoc compiler themselves; there is no way to version it from
-# within the Go module system.
-#
-# Though it's a little counter-intuitive, run this recipe AFTER running make for
-# the first time, so that Go will have already fetched the packages that are
-# pinned in tools.go.
-.PHONY: depend-dev
-depend-dev: export GOBIN := $(CURDIR)/dev-bin
-depend-dev: export GOFLAGS := -mod=readonly # do not update dependencies during installation
-depend-dev:
-	mkdir -p $(GOBIN)
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
-	go install github.com/golang/mock/mockgen
 
 # NOTE: goimports subsumes the standard formatting rules of gofmt, but gofmt is
 #       more flexible(custom rules) so we leave it in for this reason.
@@ -63,7 +46,34 @@ coverage:
 
 BUILD_ENV = $($(OS)_ENV)
 
-.PHONY: build build_linux build_mac
+.PHONY: install-dependencies generate build build_linux build_mac
+
+# We don't have file dependencies for the following targets (meaning that they have to be rebuilt for each `make` command)
+# because `go` command itself is a build tool, and it doesn't work with `make` recipes.
+# (an example of a conflict would be tracking modules downloaded via `go mod download` with `make`,
+#  or installing a different version of the tool with `go install`)
+
+TOOLS_DIR = dev-bin
+
+$(TOOLS_DIR):
+	mkdir $(TOOLS_DIR)
+
+# Setup $GOBIN and $PATH to point to installed modules
+export GOBIN := $(CURDIR)/$(TOOLS_DIR)
+export PATH  := $(PATH):$(GOBIN)
+
+# Fetch all used binaries/modules.
+# Note, that these binaries should be present in the `tools.go` file so their version can be recoreded in `mod.go`.
+# When adding a new tool, add its module to `tools.go`, then run `go mod tidy`, and finally put `go install` here.
+install-dependencies: $(TOOLS_DIR)
+	go mod download
+	go install google.golang.org/protobuf/cmd/protoc-gen-go
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+	go install github.com/golang/mock/mockgen
+
+generate:
+	go generate	./idl
+	go generate ./cli/bash
 
 build:
 	# For tagging a release see the "Upgrade Release Checklist" document.
@@ -78,7 +88,6 @@ build:
 	$(eval override BUILD_FLAGS += -ldflags "$(VERSION_LD_STR)")
 
 	$(BUILD_ENV) go build -o ggupgrade $(BUILD_FLAGS) github.com/GreengageDB/ggupgrade/cmd/ggupgrade
-	go generate ./cli/bash
 
 build_linux: OS := LINUX
 build_mac: OS := MAC
@@ -163,6 +172,10 @@ clean:
 		rm -f CHECKSUM
 		rm -rf rpm
 		rm -f ggupgrade-$(VERSION)*.rpm
+		# Generated files
+		rm -f cli/bash/ggupgrade.bash
+		rm -f idl/*.pb.go
+		rm -f idl/mock_idl/*
 
 # You can override these from the command line.
 BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)

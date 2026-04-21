@@ -7,3 +7,5 @@ ggupgrade-*.tar.gz
 CHECKSUM
 /ci/main/generated/
 /ci/functional/generated/
+/cli/bash/ggupgrade.bash
+*.pb.go
