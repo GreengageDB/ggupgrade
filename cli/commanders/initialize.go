@@ -160,7 +160,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 
 		const functionQuery = "SELECT c.proname FROM pg_catalog.pg_proc c JOIN pg_catalog.pg_language l ON c.prolang = l.oid WHERE l.lanname in ('plpythonu', 'plpython2u');"
 		rows, err := db.Query(functionQuery)
-		defer rows.close()
+		defer rows.Close()
 		if err != nil {
 			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 		}
