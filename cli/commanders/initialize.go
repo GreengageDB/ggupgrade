@@ -83,6 +83,8 @@ func IsHubRunning() (bool, error) {
 	return true, nil
 }
 
+const OutputFilePlpython = "databases_with_plpython2u.txt"
+
 const ErrorMessagePlpython =
 `Can not start migration because %v present in the cluster.
 
@@ -134,6 +136,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		if err != nil {
 			return err
 		}
+		defer db.Close()
 
 		const languageQuery = "SELECT EXISTS(SELECT * FROM pg_catalog.pg_language WHERE lanname = 'plpythonu') plpythonu, EXISTS(SELECT * FROM pg_catalog.pg_language WHERE lanname = 'plpython2u') plpython2u;"
 
@@ -160,10 +163,10 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 
 		const functionQuery = "SELECT c.proname FROM pg_catalog.pg_proc c JOIN pg_catalog.pg_language l ON c.prolang = l.oid WHERE l.lanname in ('plpythonu', 'plpython2u');"
 		rows, err := db.Query(functionQuery)
-		defer rows.Close()
 		if err != nil {
 			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 		}
+		defer rows.Close()
 
 		for rows.Next() {
 			var proname string
@@ -187,8 +190,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		return xerrors.Errorf("Internal error: unexpected condition")
 	}
 
-	const outputFile = "databases_with_plpython2u.txt"
-	filePath := filepath.Join(outputDir, outputFile)
+	filePath := filepath.Join(outputDir, OutputFilePlpython)
 	err = utils.System.WriteFile(filePath, contents.Bytes(), 0644)
 	if err != nil {
 		return err
