@@ -213,7 +213,7 @@ func initialize() *cobra.Command {
 			})
 
 			// Check for plpython/plpython2u for 6.x -> 7.x migration. Do it closer to the generation of
-			// migration scripts as it also requires scanning every database in the cluser
+			// migration scripts as it also requires scanning every database in the cluster
 			st.AlwaysRun(idl.Substep_check_for_obsolete_plpython, func(streams step.OutStreams) error {
 				return commanders.CheckForObsoletePlpython(streams, sourceGPHome, sourcePort, filepath.Clean(dataMigrationSeedDir))
 			})
