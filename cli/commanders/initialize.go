@@ -106,7 +106,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		return err
 	}
 
-	if (version.Major != 6) {
+	if version.Major != 6 {
 		// This check is relevant only for 6.x.
 		return nil;
 	}
@@ -152,11 +152,11 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		plpythonuIsPresent  = plpythonuIsPresent  || plpythonuIsPresentInDatabase
 		plpython2uIsPresent = plpython2uIsPresent || plpython2uIsPresentInDatabase
 
-		contents.WriteString(substeps.Divider);
-		contents.WriteString("\n");
-		contents.WriteString(fmt.Sprintf("Database: '%s'\n", dbInfo.Datname));
-		contents.WriteString(substeps.Divider);
-		contents.WriteString("\n");
+		contents.WriteString(substeps.Divider)
+		contents.WriteString("\n")
+		contents.WriteString(fmt.Sprintf("Database: '%s'\n", dbInfo.Datname))
+		contents.WriteString(substeps.Divider)
+		contents.WriteString("\n")
 
 		const functionQuery = "SELECT c.proname FROM pg_catalog.pg_proc c JOIN pg_catalog.pg_language l ON c.prolang = l.oid WHERE l.lanname in ('plpythonu', 'plpython2u');"
 		rows, err := db.Query(functionQuery)
