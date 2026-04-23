@@ -41,6 +41,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 
 		expectedErr := sql.ErrConnDone
 		expectPgDatabaseToReturn(mockTemplate1).WillReturnError(expectedErr)
+		mockTemplate1.ExpectClose()
 
 		err = commanders.CheckForObsoletePlpython(step.DevNullStream, "", 0, "")
 		if !errors.Is(err, expectedErr) {
@@ -77,6 +78,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 
 		expectedErr := sql.ErrConnDone
 		expectLanguageQuery(mockPostgres).WillReturnError(expectedErr)
+		mockPostgres.ExpectClose()
 
 		err = commanders.CheckForObsoletePlpython(step.DevNullStream, "", 0, "")
 		if !errors.Is(err, expectedErr) {
@@ -114,6 +116,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		expectedErr := sql.ErrConnDone
 		expectLanguageQueryToReturn(mockPostgres, true, true)
 		expectFunctionQuery(mockPostgres).WillReturnError(expectedErr)
+		mockPostgres.ExpectClose()
 
 		err = commanders.CheckForObsoletePlpython(step.DevNullStream, "", 0, "")
 		if !errors.Is(err, expectedErr) {

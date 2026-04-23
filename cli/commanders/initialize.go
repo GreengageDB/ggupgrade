@@ -119,11 +119,12 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 	}
 
 	databases, err := GetDatabases(db)
-	if err != nil {
-		return err
-	}
 
-	err = db.Close()
+	// Whether the above call succeeds or not, close the database first
+	dbErr := db.Close()
+	if dbErr != nil {
+		return dbErr
+	}
 	if err != nil {
 		return err
 	}
