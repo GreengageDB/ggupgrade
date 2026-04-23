@@ -37,6 +37,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int, database string) (*sql.DB, error) {
 			return dbTemplate1, nil
 		})
+		defer commanders.ResetBootstrapConnectionFunction()
 
 		expectedErr := sql.ErrConnDone
 		expectPgDatabaseToReturn(mockTemplate1).WillReturnError(expectedErr)
