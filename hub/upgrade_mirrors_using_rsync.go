@@ -25,7 +25,7 @@ func UpgradeMirrorsUsingRsync(agentConns []*idl.Connection, source *greengage.Cl
 		return err
 	}
 
-	if cErr := db.Close(); cErr != nil {
+	if err := db.Close(); err != nil {
 		return err
 	}
 
