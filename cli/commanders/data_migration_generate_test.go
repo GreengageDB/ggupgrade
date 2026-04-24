@@ -832,7 +832,7 @@ func TestGetDatabases(t *testing.T) {
 			if err != nil {
 				t.Errorf("Unexpected error in CountSeedScripts: %v", err)
 			}
-			if (numSeedScripts != expectedNumSeedScripts) {
+			if numSeedScripts != expectedNumSeedScripts {
 				t.Errorf("Unexpected amount of SeedScripts: got %v, want %v", numSeedScripts, expectedNumSeedScripts)
 			}
 		}
