@@ -4,10 +4,10 @@
 package commanders
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
-	"bytes"
 	"os/exec"
 	"database/sql"
 	"path/filepath"
@@ -15,10 +15,10 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/GreengageDB/ggupgrade/greengage"
-	"github.com/GreengageDB/ggupgrade/substeps"
-	"github.com/GreengageDB/ggupgrade/step"
-	"github.com/GreengageDB/ggupgrade/utils"
 	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/substeps"
+	"github.com/GreengageDB/ggupgrade/utils"
 )
 
 var execCommandHubStart = exec.Command
@@ -86,8 +86,7 @@ func IsHubRunning() (bool, error) {
 
 const OutputFilePlpython = "databases_with_plpython2u.txt"
 
-const ErrorMessagePlpython =
-`Can not start migration because %v present in the cluster.
+const ErrorMessagePlpython = `Can not start migration because %v present in the cluster.
 
 We don't support plpython2u in Greengage 7 because Python 2 has been deprecated for a while.
 
@@ -111,7 +110,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 
 	if version.Major != 6 {
 		// This check is relevant only for 6.x.
-		return nil;
+		return nil
 	}
 
 	db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port, "template1")
@@ -154,7 +153,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 			continue
 		}
 
-		plpythonuIsPresent  = plpythonuIsPresent  || plpythonuIsPresentInDatabase
+		plpythonuIsPresent = plpythonuIsPresent || plpythonuIsPresentInDatabase
 		plpython2uIsPresent = plpython2uIsPresent || plpython2uIsPresentInDatabase
 
 		contents.WriteString(substeps.Divider)
