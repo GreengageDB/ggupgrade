@@ -17,10 +17,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/blang/semver/v4"
 	"github.com/vbauerster/mpb/v8"
 	"github.com/vbauerster/mpb/v8/decor"
 	"golang.org/x/xerrors"
-	"github.com/blang/semver/v4"
 
 
 	"github.com/GreengageDB/ggupgrade/greengage"
@@ -403,8 +403,8 @@ func GenerateScriptsPerPhase(phase idl.Step, database DatabaseInfo, gphome strin
 }
 
 type DatabaseInfo struct {
-	Datname        string
-	QuotedDatname  string
+	Datname       string
+	QuotedDatname string
 }
 
 func GetDatabases(db *sql.DB) ([]DatabaseInfo, error) {
