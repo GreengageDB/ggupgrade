@@ -9,6 +9,7 @@ import (
 	"os"
 	"bytes"
 	"os/exec"
+	"database/sql"
 	"path/filepath"
 
 	"golang.org/x/xerrors"
@@ -162,7 +163,14 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		contents.WriteString(substeps.Divider)
 		contents.WriteString("\n")
 
-		const functionQuery = "SELECT c.proname FROM pg_catalog.pg_proc c JOIN pg_catalog.pg_language l ON c.prolang = l.oid WHERE l.lanname in ('plpythonu', 'plpython2u');"
+		const functionQuery =
+`
+SELECT c.proname, pg_catalog.pg_get_function_arguments(c.oid), n.nspname
+    FROM pg_catalog.pg_proc c
+    JOIN pg_catalog.pg_language l ON c.prolang = l.oid
+    LEFT JOIN pg_catalog.pg_namespace n ON c.pronamespace = n.oid
+    WHERE l.lanname in ('plpythonu', 'plpython2u');
+`
 		rows, err := db.Query(functionQuery)
 		if err != nil {
 			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
@@ -171,13 +179,22 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 
 		for rows.Next() {
 			var proname string
-			err = rows.Scan(&proname)
+			var args string
+			var nspnameOrNull sql.NullString
+			err = rows.Scan(&proname, &args, &nspnameOrNull)
 			if err != nil {
 				return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 			}
 
-			contents.WriteString(proname)
-			contents.WriteString("\n")
+			// psql uses LEFT JOIN, suggesting that a schema can be absent.
+			// Not sure how this can happen, but let's handle this case
+			nspname := ""
+			if nspnameOrNull.Valid {
+				nspname = nspnameOrNull.String + "."
+			}
+
+			functionSignature := fmt.Sprintf("%s%s(%s)\n", nspname, proname, args)
+			contents.WriteString(functionSignature)
 		}
 	}
 

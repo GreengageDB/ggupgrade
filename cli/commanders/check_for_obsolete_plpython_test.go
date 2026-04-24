@@ -130,7 +130,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 				name:                "postgres",
 				plpythonuIsPresent:  false,
 				plpython2uIsPresent: false,
-				functions:           []string{},
+				functions:           []FunctionSignature{},
 			},
 		}
 		MockCheckForObsoletePlpython(t, databaseInfos)
@@ -142,18 +142,34 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 				name:                "postgres",
 				plpythonuIsPresent:  true,
 				plpython2uIsPresent: false,
-				functions: []string{
-					"some_plpythonu_function_1",
-					"some_plpythonu_function_376",
+				functions: []FunctionSignature{
+					{
+						name: "some_plpythonu_function_1",
+						args: "string",
+						schema: sql.NullString{"public", true},
+					},
+					{
+						name: "some_plpythonu_function_376",
+						args: "int",
+						schema: sql.NullString{"public", true},
+					},
 				},
 			},
 			{
 				name:                "another database",
 				plpythonuIsPresent:  true,
 				plpython2uIsPresent: false,
-				functions: []string{
-					"other_plpythonu_function_1",
-					"other_plpythonu_function_376",
+				functions: []FunctionSignature{
+					{
+						name: "some_plpythonu_function_1",
+						args: "string",
+						schema: sql.NullString{"public", true},
+					},
+					{
+						name: "some_plpythonu_function_376",
+						args: "int",
+						schema: sql.NullString{"public", true},
+					},
 				},
 			},
 		}
@@ -166,18 +182,34 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 				name:                "postgres",
 				plpythonuIsPresent:  false,
 				plpython2uIsPresent: true,
-				functions: []string{
-					"some_plpython2u_function_1",
-					"some_plpython2u_function_376",
+				functions: []FunctionSignature{
+					{
+						name: "some_plpython2u_function_1",
+						args: "string",
+						schema: sql.NullString{"public", true},
+					},
+					{
+						name: "some_plpython2u_function_376",
+						args: "int",
+						schema: sql.NullString{"public", true},
+					},
 				},
 			},
 			{
 				name:                "another database",
 				plpythonuIsPresent:  false,
 				plpython2uIsPresent: true,
-				functions: []string{
-					"other_plpython2u_function_1",
-					"other_plpython2u_function_376",
+				functions: []FunctionSignature{
+					{
+						name: "some_plpython2u_function_1",
+						args: "string",
+						schema: sql.NullString{"public", true},
+					},
+					{
+						name: "some_plpython2u_function_376",
+						args: "int",
+						schema: sql.NullString{"public", true},
+					},
 				},
 			},
 		}
@@ -190,22 +222,54 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 				name:                "postgres",
 				plpythonuIsPresent:  true,
 				plpython2uIsPresent: true,
-				functions: []string{
-					"some_plpythonu_function_1",
-					"some_plpythonu_function_376",
-					"some_plpython2u_function_2",
-					"some_plpython2u_function_377",
+				functions: []FunctionSignature{
+					{
+						name: "some_plpython2u_function_2",
+						args: "oid, oidvector",
+						schema: sql.NullString{"myschema", true},
+					},
+					{
+						name: "some_plpython2u_function_377",
+						args: "int2vector",
+						schema: sql.NullString{"myschema", true},
+					},
+					{
+						name: "some_plpythonu_function_1",
+						args: "string",
+						schema: sql.NullString{"public", true},
+					},
+					{
+						name: "some_plpythonu_function_376",
+						args: "int",
+						schema: sql.NullString{"public", true},
+					},
 				},
 			},
 			{
 				name:                "another database",
 				plpythonuIsPresent:  true,
 				plpython2uIsPresent: true,
-				functions: []string{
-					"other_plpythonu_function_1",
-					"other_plpythonu_function_376",
-					"other_plpython2u_function_2",
-					"other_plpython2u_function_377",
+				functions: []FunctionSignature{
+					{
+						name: "some_plpython2u_function_2",
+						args: "oid, oidvector",
+						schema: sql.NullString{"myschema", true},
+					},
+					{
+						name: "some_plpython2u_function_377",
+						args: "int2vector",
+						schema: sql.NullString{"myschema", true},
+					},
+					{
+						name: "some_plpythonu_function_1",
+						args: "string",
+						schema: sql.NullString{"public", true},
+					},
+					{
+						name: "some_plpythonu_function_376",
+						args: "int",
+						schema: sql.NullString{"public", true},
+					},
 				},
 			},
 		}
@@ -218,18 +282,34 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 				name:                "postgres",
 				plpythonuIsPresent:  false,
 				plpython2uIsPresent: true,
-				functions: []string{
-					"some_plpython2u_function_2",
-					"some_plpython2u_function_377",
+				functions: []FunctionSignature{
+					{
+						name: "some_plpython2u_function_2",
+						args: "oid, oidvector",
+						schema: sql.NullString{"myschema", true},
+					},
+					{
+						name: "some_plpython2u_function_377",
+						args: "int2vector",
+						schema: sql.NullString{"myschema", true},
+					},
 				},
 			},
 			{
 				name:                "another database",
 				plpythonuIsPresent:  true,
 				plpython2uIsPresent: false,
-				functions: []string{
-					"other_plpythonu_function_1",
-					"other_plpythonu_function_376",
+				functions: []FunctionSignature{
+					{
+						name: "other_plpythonu_function_1",
+						args: "string",
+						schema: sql.NullString{"ignore me", false},
+					},
+					{
+						name: "other_plpythonu_function_376",
+						args: "int",
+						schema: sql.NullString{"ignore me", false},
+					},
 				},
 			},
 		}
@@ -241,7 +321,7 @@ type MockDatabase struct {
 	name                string
 	plpythonuIsPresent  bool
 	plpython2uIsPresent bool
-	functions           []string
+	functions           []FunctionSignature
 }
 
 func MockCheckForObsoletePlpython(t *testing.T, databaseInfos []MockDatabase) {
@@ -348,14 +428,29 @@ func expectLanguageQueryToReturn(mock sqlmock.Sqlmock, plpythonu bool, plpython2
 	return expectLanguageQuery(mock).WillReturnRows(rows)
 }
 
-func expectFunctionQuery(mock sqlmock.Sqlmock) *sqlmock.ExpectedQuery {
-	return mock.ExpectQuery(`SELECT c\.proname FROM pg_catalog\.pg_proc c JOIN pg_catalog\.pg_language l ON c\.prolang = l\.oid WHERE l\.lanname in \('plpythonu', 'plpython2u'\);`)
+type FunctionSignature struct {
+	name string;
+	args string;
+	schema sql.NullString;
 }
 
-func expectFunctionQueryToReturn(mock sqlmock.Sqlmock, functions []string) *sqlmock.ExpectedQuery {
-	rows := sqlmock.NewRows([]string{"c.proname"})
+func expectFunctionQuery(mock sqlmock.Sqlmock) *sqlmock.ExpectedQuery {
+	const functionQuery =
+`
+SELECT c\.proname, pg_catalog\.pg_get_function_arguments\(c\.oid\), n\.nspname
+    FROM pg_catalog\.pg_proc c
+    JOIN pg_catalog\.pg_language l ON c\.prolang = l\.oid
+    LEFT JOIN pg_catalog\.pg_namespace n ON c\.pronamespace = n\.oid
+    WHERE l.lanname in \('plpythonu', 'plpython2u'\);
+`
+
+	return mock.ExpectQuery(functionQuery)
+}
+
+func expectFunctionQueryToReturn(mock sqlmock.Sqlmock, functions []FunctionSignature) *sqlmock.ExpectedQuery {
+	rows := sqlmock.NewRows([]string{"c.proname", "pg_catalog.pg_get_function_arguments", "n.nspname"})
 	for _, function := range functions {
-		rows.AddRow(function)
+		rows.AddRow(function.name, function.args, function.schema)
 	}
 
 	return expectFunctionQuery(mock).WillReturnRows(rows)
@@ -407,8 +502,13 @@ func formatOutputFile(databaseInfos []MockDatabase) string {
 		contents.WriteString("\n")
 
 		for _, function := range info.functions {
-			contents.WriteString(function)
-			contents.WriteString("\n")
+			schema := ""
+			if function.schema.Valid {
+				schema = function.schema.String + "."
+			}
+
+			signatureString := fmt.Sprintf("%s%s(%s)\n", schema, function.name, function.args)
+			contents.WriteString(signatureString)
 		}
 	}
 
