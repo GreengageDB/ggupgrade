@@ -145,7 +145,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		row := db.QueryRow(languageQuery)
 		err = row.Scan(&plpythonuIsPresentInDatabase, &plpython2uIsPresentInDatabase)
 		if err != nil {
-			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
+			return xerrors.Errorf("database %v: %w", dbInfo.QuotedDatname, err)
 		}
 
 		if !plpython2uIsPresentInDatabase && !plpythonuIsPresentInDatabase {
@@ -157,12 +157,12 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 
 		contents.WriteString(substeps.Divider)
 		contents.WriteString("\n")
-		contents.WriteString(fmt.Sprintf("Database: '%s'\n", dbInfo.Datname))
+		contents.WriteString(fmt.Sprintf("Database: %s\n", dbInfo.QuotedDatname))
 		contents.WriteString(substeps.Divider)
 		contents.WriteString("\n")
 
 		const functionQuery = `
-SELECT c.proname, pg_catalog.pg_get_function_arguments(c.oid), n.nspname
+SELECT quote_ident(c.proname) proname, pg_catalog.pg_get_function_arguments(c.oid) args, quote_ident(n.nspname) nspname
     FROM pg_catalog.pg_proc c
     JOIN pg_catalog.pg_language l ON c.prolang = l.oid
     JOIN pg_catalog.pg_namespace n ON c.pronamespace = n.oid
@@ -170,7 +170,7 @@ SELECT c.proname, pg_catalog.pg_get_function_arguments(c.oid), n.nspname
 `
 		rows, err := db.Query(functionQuery)
 		if err != nil {
-			return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
+			return xerrors.Errorf("database %v: %w", dbInfo.QuotedDatname, err)
 		}
 		defer rows.Close()
 
@@ -180,7 +180,7 @@ SELECT c.proname, pg_catalog.pg_get_function_arguments(c.oid), n.nspname
 			var nspname string
 			err = rows.Scan(&proname, &args, &nspname)
 			if err != nil {
-				return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
+				return xerrors.Errorf("database %v: %w", dbInfo.QuotedDatname, err)
 			}
 
 			functionSignature := fmt.Sprintf("%s.%s(%s)\n", nspname, proname, args)

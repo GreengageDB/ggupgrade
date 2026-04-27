@@ -436,18 +436,18 @@ type FunctionSignature struct {
 
 func expectFunctionQuery(mock sqlmock.Sqlmock) *sqlmock.ExpectedQuery {
 	const functionQuery = `
-SELECT c\.proname, pg_catalog\.pg_get_function_arguments\(c\.oid\), n\.nspname
+SELECT quote_ident\(c\.proname\) proname, pg_catalog\.pg_get_function_arguments\(c\.oid\) args, quote_ident\(n\.nspname\) nspname
     FROM pg_catalog\.pg_proc c
     JOIN pg_catalog\.pg_language l ON c\.prolang = l\.oid
     JOIN pg_catalog\.pg_namespace n ON c\.pronamespace = n\.oid
-    WHERE l.lanname in \('plpythonu', 'plpython2u'\);
+    WHERE l\.lanname in \('plpythonu', 'plpython2u'\);
 `
 
 	return mock.ExpectQuery(functionQuery)
 }
 
 func expectFunctionQueryToReturn(mock sqlmock.Sqlmock, functions []FunctionSignature) *sqlmock.ExpectedQuery {
-	rows := sqlmock.NewRows([]string{"c.proname", "pg_catalog.pg_get_function_arguments", "n.nspname"})
+	rows := sqlmock.NewRows([]string{"proname", "args", "nspname"})
 	for _, function := range functions {
 		rows.AddRow(function.name, function.args, function.schema)
 	}
@@ -496,7 +496,7 @@ func formatOutputFile(databaseInfos []MockDatabase) string {
 	for _, info := range databaseInfos {
 		contents.WriteString(substeps.Divider)
 		contents.WriteString("\n")
-		contents.WriteString(fmt.Sprintf("Database: '%s'\n", info.name))
+		contents.WriteString(fmt.Sprintf("Database: %s\n", info.name))
 		contents.WriteString(substeps.Divider)
 		contents.WriteString("\n")
 
