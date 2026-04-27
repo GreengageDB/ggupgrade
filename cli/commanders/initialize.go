@@ -5,7 +5,6 @@ package commanders
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -166,7 +165,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 SELECT c.proname, pg_catalog.pg_get_function_arguments(c.oid), n.nspname
     FROM pg_catalog.pg_proc c
     JOIN pg_catalog.pg_language l ON c.prolang = l.oid
-    LEFT JOIN pg_catalog.pg_namespace n ON c.pronamespace = n.oid
+    JOIN pg_catalog.pg_namespace n ON c.pronamespace = n.oid
     WHERE l.lanname in ('plpythonu', 'plpython2u');
 `
 		rows, err := db.Query(functionQuery)
@@ -178,20 +177,13 @@ SELECT c.proname, pg_catalog.pg_get_function_arguments(c.oid), n.nspname
 		for rows.Next() {
 			var proname string
 			var args string
-			var nspnameOrNull sql.NullString
-			err = rows.Scan(&proname, &args, &nspnameOrNull)
+			var nspname string
+			err = rows.Scan(&proname, &args, &nspname)
 			if err != nil {
 				return xerrors.Errorf("database '%v': %w", dbInfo.Datname, err)
 			}
 
-			// psql uses LEFT JOIN, suggesting that a schema can be absent.
-			// Not sure how this can happen, but let's handle this case
-			nspname := ""
-			if nspnameOrNull.Valid {
-				nspname = nspnameOrNull.String + "."
-			}
-
-			functionSignature := fmt.Sprintf("%s%s(%s)\n", nspname, proname, args)
+			functionSignature := fmt.Sprintf("%s.%s(%s)\n", nspname, proname, args)
 			contents.WriteString(functionSignature)
 		}
 	}

@@ -439,7 +439,7 @@ func expectFunctionQuery(mock sqlmock.Sqlmock) *sqlmock.ExpectedQuery {
 SELECT c\.proname, pg_catalog\.pg_get_function_arguments\(c\.oid\), n\.nspname
     FROM pg_catalog\.pg_proc c
     JOIN pg_catalog\.pg_language l ON c\.prolang = l\.oid
-    LEFT JOIN pg_catalog\.pg_namespace n ON c\.pronamespace = n\.oid
+    JOIN pg_catalog\.pg_namespace n ON c\.pronamespace = n\.oid
     WHERE l.lanname in \('plpythonu', 'plpython2u'\);
 `
 
