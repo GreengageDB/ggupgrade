@@ -5,11 +5,11 @@ package commanders
 
 import (
 	"bytes"
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
-	"database/sql"
 	"path/filepath"
 
 	"golang.org/x/xerrors"
@@ -162,8 +162,7 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		contents.WriteString(substeps.Divider)
 		contents.WriteString("\n")
 
-		const functionQuery =
-`
+		const functionQuery = `
 SELECT c.proname, pg_catalog.pg_get_function_arguments(c.oid), n.nspname
     FROM pg_catalog.pg_proc c
     JOIN pg_catalog.pg_language l ON c.prolang = l.oid
