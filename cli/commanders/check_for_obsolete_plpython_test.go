@@ -146,12 +146,12 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 					{
 						name:   "some_plpythonu_function_1",
 						args:   "string",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 					{
 						name:   "some_plpythonu_function_376",
 						args:   "int",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 				},
 			},
@@ -163,12 +163,12 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 					{
 						name:   "some_plpythonu_function_1",
 						args:   "string",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 					{
 						name:   "some_plpythonu_function_376",
 						args:   "int",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 				},
 			},
@@ -186,12 +186,12 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 					{
 						name:   "some_plpython2u_function_1",
 						args:   "string",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 					{
 						name:   "some_plpython2u_function_376",
 						args:   "int",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 				},
 			},
@@ -203,12 +203,12 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 					{
 						name:   "some_plpython2u_function_1",
 						args:   "string",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 					{
 						name:   "some_plpython2u_function_376",
 						args:   "int",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 				},
 			},
@@ -226,22 +226,22 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 					{
 						name:   "some_plpython2u_function_2",
 						args:   "oid, oidvector",
-						schema: sql.NullString{"myschema", true},
+						schema: "myschema",
 					},
 					{
 						name:   "some_plpython2u_function_377",
 						args:   "int2vector",
-						schema: sql.NullString{"myschema", true},
+						schema: "myschema",
 					},
 					{
 						name:   "some_plpythonu_function_1",
 						args:   "string",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 					{
 						name:   "some_plpythonu_function_376",
 						args:   "int",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 				},
 			},
@@ -253,22 +253,22 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 					{
 						name:   "some_plpython2u_function_2",
 						args:   "oid, oidvector",
-						schema: sql.NullString{"myschema", true},
+						schema: "myschema",
 					},
 					{
 						name:   "some_plpython2u_function_377",
 						args:   "int2vector",
-						schema: sql.NullString{"myschema", true},
+						schema: "myschema",
 					},
 					{
 						name:   "some_plpythonu_function_1",
 						args:   "string",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 					{
 						name:   "some_plpythonu_function_376",
 						args:   "int",
-						schema: sql.NullString{"public", true},
+						schema: "public",
 					},
 				},
 			},
@@ -286,12 +286,12 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 					{
 						name:   "some_plpython2u_function_2",
 						args:   "oid, oidvector",
-						schema: sql.NullString{"myschema", true},
+						schema: "myschema",
 					},
 					{
 						name:   "some_plpython2u_function_377",
 						args:   "int2vector",
-						schema: sql.NullString{"myschema", true},
+						schema: "myschema",
 					},
 				},
 			},
@@ -303,12 +303,12 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 					{
 						name:   "other_plpythonu_function_1",
 						args:   "string",
-						schema: sql.NullString{"ignore me", false},
+						schema: "my schema",
 					},
 					{
 						name:   "other_plpythonu_function_376",
 						args:   "int",
-						schema: sql.NullString{"ignore me", false},
+						schema: "my schema",
 					},
 				},
 			},
@@ -431,7 +431,7 @@ func expectLanguageQueryToReturn(mock sqlmock.Sqlmock, plpythonu bool, plpython2
 type FunctionSignature struct {
 	name   string
 	args   string
-	schema sql.NullString
+	schema string
 }
 
 func expectFunctionQuery(mock sqlmock.Sqlmock) *sqlmock.ExpectedQuery {
@@ -501,12 +501,7 @@ func formatOutputFile(databaseInfos []MockDatabase) string {
 		contents.WriteString("\n")
 
 		for _, function := range info.functions {
-			schema := ""
-			if function.schema.Valid {
-				schema = function.schema.String + "."
-			}
-
-			signatureString := fmt.Sprintf("%s%s(%s)\n", schema, function.name, function.args)
+			signatureString := fmt.Sprintf("%s.%s(%s)\n", function.schema, function.name, function.args)
 			contents.WriteString(signatureString)
 		}
 	}
