@@ -73,7 +73,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		})
 		defer commanders.ResetBootstrapConnectionFunction()
 
-		expectDatabaseQueryToReturn(mockTemplate1, []string{"postgres"})
+		expectDatabaseQueryToReturn(mockTemplate1, []MockDatabase{{name: "postgres", quotedName: "postgres"}})
 		mockTemplate1.ExpectClose()
 
 		expectedErr := sql.ErrConnDone
@@ -110,7 +110,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		})
 		defer commanders.ResetBootstrapConnectionFunction()
 
-		expectDatabaseQueryToReturn(mockTemplate1, []string{"postgres"})
+		expectDatabaseQueryToReturn(mockTemplate1, []MockDatabase{{name: "postgres", quotedName: "postgres"}})
 		mockTemplate1.ExpectClose()
 
 		expectedErr := sql.ErrConnDone
@@ -128,6 +128,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		databaseInfos := []MockDatabase{
 			{
 				name:                "postgres",
+				quotedName:          "postgres",
 				plpythonuIsPresent:  false,
 				plpython2uIsPresent: false,
 				functions:           []FunctionSignature{},
@@ -140,6 +141,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		databaseInfos := []MockDatabase{
 			{
 				name:                "postgres",
+				quotedName:          "postgres",
 				plpythonuIsPresent:  true,
 				plpython2uIsPresent: false,
 				functions: []FunctionSignature{
@@ -157,6 +159,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 			},
 			{
 				name:                "another database",
+				quotedName:          "\"another database\"",
 				plpythonuIsPresent:  true,
 				plpython2uIsPresent: false,
 				functions: []FunctionSignature{
@@ -180,6 +183,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		databaseInfos := []MockDatabase{
 			{
 				name:                "postgres",
+				quotedName:          "postgres",
 				plpythonuIsPresent:  false,
 				plpython2uIsPresent: true,
 				functions: []FunctionSignature{
@@ -197,6 +201,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 			},
 			{
 				name:                "another database",
+				quotedName:          "\"another database\"",
 				plpythonuIsPresent:  false,
 				plpython2uIsPresent: true,
 				functions: []FunctionSignature{
@@ -220,6 +225,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		databaseInfos := []MockDatabase{
 			{
 				name:                "postgres",
+				quotedName:          "postgres",
 				plpythonuIsPresent:  true,
 				plpython2uIsPresent: true,
 				functions: []FunctionSignature{
@@ -247,6 +253,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 			},
 			{
 				name:                "another database",
+				quotedName:          "\"another database\"",
 				plpythonuIsPresent:  true,
 				plpython2uIsPresent: true,
 				functions: []FunctionSignature{
@@ -280,6 +287,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		databaseInfos := []MockDatabase{
 			{
 				name:                "postgres",
+				quotedName:          "postgres",
 				plpythonuIsPresent:  false,
 				plpython2uIsPresent: true,
 				functions: []FunctionSignature{
@@ -297,18 +305,19 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 			},
 			{
 				name:                "another database",
+				quotedName:          "\"another database\"",
 				plpythonuIsPresent:  true,
 				plpython2uIsPresent: false,
 				functions: []FunctionSignature{
 					{
 						name:   "other_plpythonu_function_1",
 						args:   "string",
-						schema: "my schema",
+						schema: "\"my schema\"",
 					},
 					{
 						name:   "other_plpythonu_function_376",
 						args:   "int",
-						schema: "my schema",
+						schema: "\"my schema\"",
 					},
 				},
 			},
@@ -319,6 +328,7 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 
 type MockDatabase struct {
 	name                string
+	quotedName          string
 	plpythonuIsPresent  bool
 	plpython2uIsPresent bool
 	functions           []FunctionSignature
@@ -335,7 +345,6 @@ func MockCheckForObsoletePlpython(t *testing.T, databaseInfos []MockDatabase) {
 	errorShouldContainPlpythonu := false
 	errorShouldContainPlpython2u := false
 
-	var databaseNames []string
 	var databaseMocks []sqlmock.Sqlmock
 	databaseMapping := make(map[string]*sql.DB)
 
@@ -355,7 +364,6 @@ func MockCheckForObsoletePlpython(t *testing.T, databaseInfos []MockDatabase) {
 		}
 		mock.ExpectClose()
 
-		databaseNames = append(databaseNames, info.name)
 		databaseMocks = append(databaseMocks, mock)
 		databaseMapping[info.name] = db
 	}
@@ -374,7 +382,7 @@ func MockCheckForObsoletePlpython(t *testing.T, databaseInfos []MockDatabase) {
 	})
 	defer commanders.ResetBootstrapConnectionFunction()
 
-	expectDatabaseQueryToReturn(mockTemplate1, databaseNames)
+	expectDatabaseQueryToReturn(mockTemplate1, databaseInfos)
 	mockTemplate1.ExpectClose()
 
 	plpythonErr := commanders.CheckForObsoletePlpython(step.DevNullStream, "", 0, "")
@@ -455,12 +463,12 @@ func expectFunctionQueryToReturn(mock sqlmock.Sqlmock, functions []FunctionSigna
 	return expectFunctionQuery(mock).WillReturnRows(rows)
 }
 
-func expectDatabaseQueryToReturn(mock sqlmock.Sqlmock, databases []string) {
+func expectDatabaseQueryToReturn(mock sqlmock.Sqlmock, databases []MockDatabase) {
 	// We assume that datname and quoted datname are the same string,
 	// which is not true. In any case, database names in this test are arbitrary
 	rows := sqlmock.NewRows([]string{"datname", "quoted_datname"})
 	for _, database := range databases {
-		rows.AddRow(database, database)
+		rows.AddRow(database.name, database.quotedName)
 	}
 	expectPgDatabaseToReturn(mock).WillReturnRows(rows)
 }
@@ -496,7 +504,7 @@ func formatOutputFile(databaseInfos []MockDatabase) string {
 	for _, info := range databaseInfos {
 		contents.WriteString(substeps.Divider)
 		contents.WriteString("\n")
-		contents.WriteString(fmt.Sprintf("Database: %s\n", info.name))
+		contents.WriteString(fmt.Sprintf("Database: %s\n", info.quotedName))
 		contents.WriteString(substeps.Divider)
 		contents.WriteString("\n")
 
