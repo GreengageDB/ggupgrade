@@ -185,7 +185,7 @@ func initialize() *cobra.Command {
 					return err
 				}
 
-				db, err := connection.Bootstrap(idl.ClusterDestination_source, sourceGPHome, sourcePort)
+				db, err := connection.Bootstrap(idl.ClusterDestination_source, sourceGPHome, sourcePort, "template1")
 				if err != nil {
 					return err
 				}
@@ -210,6 +210,12 @@ func initialize() *cobra.Command {
 
 			st.Run(idl.Substep_start_hub, func(streams step.OutStreams) error {
 				return commanders.StartHub(streams)
+			})
+
+			// Check for plpython/plpython2u for 6.x -> 7.x migration. Do it closer to the generation of
+			// migration scripts as it also requires scanning every database in the cluster
+			st.AlwaysRun(idl.Substep_check_for_obsolete_plpython, func(streams step.OutStreams) error {
+				return commanders.CheckForObsoletePlpython(streams, sourceGPHome, sourcePort, filepath.Clean(dataMigrationSeedDir))
 			})
 
 			generatedScriptsOutputDir, err := utils.GetDefaultGeneratedDataMigrationScriptsDir()
