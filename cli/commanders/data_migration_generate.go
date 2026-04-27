@@ -22,7 +22,6 @@ import (
 	"github.com/vbauerster/mpb/v8/decor"
 	"golang.org/x/xerrors"
 
-
 	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/greengage/connection"
 	"github.com/GreengageDB/ggupgrade/idl"
