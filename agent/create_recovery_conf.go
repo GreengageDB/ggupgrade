@@ -46,21 +46,25 @@ primary_slot_name = 'internal_wal_replication_slot'`, connReq.GetUser(), connReq
 				err := os.WriteFile(filepath.Join(connReq.GetMirrorDataDir(), "recovery.conf"), []byte(config), 0644)
 				if err != nil {
 					errs <- err
+					return
 				}
 			case connReq.GetTargetMajorVersion() == 7:
 				f, err := os.OpenFile(filepath.Join(connReq.GetMirrorDataDir(), "postgresql.auto.conf"), os.O_APPEND|os.O_WRONLY, 0644)
 				if err != nil {
 					errs <- err
+					return
 				}
 				defer f.Close()
 				_, err = f.WriteString(common_config)
 				if err != nil {
 					errs <- err
+					return
 				}
 
 				f, err = os.Create(filepath.Join(connReq.GetMirrorDataDir(), "standby.signal"))
 				if err != nil {
 					errs <- err
+					return
 				}
 				defer f.Close()
 			default:

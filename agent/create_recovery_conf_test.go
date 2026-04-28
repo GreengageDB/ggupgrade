@@ -80,41 +80,46 @@ primary_slot_name = 'internal_wal_replication_slot'`
 	})
 
 	t.Run("returns multiple errors when failing to write recovery.conf", func(t *testing.T) {
-		connReqs := []*idl.CreateRecoveryConfRequest_Connection{
-			{
-				MirrorDataDir:      "/does/not/exist",
-				User:               "gpadmin",
-				PrimaryHost:        "sdw1",
-				PrimaryPort:        int32(123),
-				TargetMajorVersion: 6,
-			},
-			{
-				MirrorDataDir:      "/also/does/not/exist",
-				User:               "gpadmin",
-				PrimaryHost:        "sdw2",
-				PrimaryPort:        int32(456),
-				TargetMajorVersion: 6,
-			}}
+		versions := []uint64{6, 7}
+		for _, version := range versions {
+			t.Run("returns multiple errors when failing to write recovery.conf", func(t *testing.T) {
+				connReqs := []*idl.CreateRecoveryConfRequest_Connection{
+					{
+						MirrorDataDir:      "/does/not/exist",
+						User:               "gpadmin",
+						PrimaryHost:        "sdw1",
+						PrimaryPort:        int32(123),
+						TargetMajorVersion: version,
+					},
+					{
+						MirrorDataDir:      "/also/does/not/exist",
+						User:               "gpadmin",
+						PrimaryHost:        "sdw2",
+						PrimaryPort:        int32(456),
+						TargetMajorVersion: version,
+					}}
 
-		_, err := agentServer.CreateRecoveryConf(context.Background(), &idl.CreateRecoveryConfRequest{Connections: connReqs})
-		if err == nil {
-			t.Error("expected error, returned nil")
-		}
+				_, err := agentServer.CreateRecoveryConf(context.Background(), &idl.CreateRecoveryConfRequest{Connections: connReqs})
+				if err == nil {
+					t.Error("expected error, returned nil")
+				}
 
-		var errs errorlist.Errors
-		if !errors.As(err, &errs) {
-			t.Fatalf("got error %#v, want type %T", err, errs)
-		}
+				var errs errorlist.Errors
+				if !errors.As(err, &errs) {
+					t.Fatalf("got error %#v, want type %T", err, errs)
+				}
 
-		if len(errs) != 2 {
-			t.Errorf("got %d errors want 2", len(errs))
-		}
+				if len(errs) != 2 {
+					t.Errorf("got %d errors want 2", len(errs))
+				}
 
-		for _, err := range errs {
-			var pathError *os.PathError
-			if !errors.As(err, &pathError) {
-				t.Errorf("got type %T want %T", err, pathError)
-			}
+				for _, err := range errs {
+					var pathError *os.PathError
+					if !errors.As(err, &pathError) {
+						t.Errorf("got type %T want %T", err, pathError)
+					}
+				}
+			})
 		}
 	})
 }
