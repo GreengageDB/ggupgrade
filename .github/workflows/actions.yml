@@ -65,8 +65,10 @@ jobs:
           tags: gpdb7_ggupgrade:latest
 
       - name: acceptance test
+        env:
+          IMAGE: gpdb7_ggupgrade:latest
         run: |
-          bash ./ci/new/run_test_in_demo_cluster.bash make ${{ matrix.test }}
+          docker run --rm -v "$(pwd)/logs:/logs" "$IMAGE" bash ggupgrade/ci/new/run_test_in_demo_cluster.bash make ${{ matrix.test }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -103,10 +105,14 @@ jobs:
           tags: gpdb7_ggupgrade:latest
 
       - name: setup cluster
+        env:
+          IMAGE: gpdb7_ggupgrade:latest
         run: |
           bash ./ci/new/setup_dist_cluster.bash
 
       - name: acceptance test
+        env:
+          IMAGE: gpdb7_ggupgrade:latest
         run: |
           docker compose -p ggupgrade -f ./ci/new/docker-compose.yaml exec -u gpadmin -T coordinator bash ggupgrade/ci/new/run_test_in_dist_cluster.bash make ${{ matrix.test }}
 
