@@ -48,7 +48,7 @@ primary_slot_name = 'internal_wal_replication_slot'`
 		}
 	})
 
-	t.Run("appends to postgresql.auto.conf and creates signal file for 6.x -> 7.x", func (t *testing.T) {
+	t.Run("appends to postgresql.auto.conf and creates signal file for 6.x -> 7.x", func(t *testing.T) {
 		mirrorDataDir := testutils.GetTempDir(t, "")
 		defer testutils.MustRemoveAll(t, mirrorDataDir)
 
