@@ -17,6 +17,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/blang/semver/v4"
 	"github.com/vbauerster/mpb/v8"
 	"github.com/vbauerster/mpb/v8/decor"
 	"golang.org/x/xerrors"
@@ -48,7 +49,7 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 		return fmt.Errorf("failed to find seed scripts for Greengage version %s under %q", version, seedDir)
 	}
 
-	db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port)
+	db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port, "template1")
 	if err != nil {
 		return err
 	}
@@ -72,7 +73,7 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 		return err
 	}
 
-	databases, err := GetDatabases(db, utils.System.DirFS(seedDir))
+	databases, err := GetDatabases(db)
 	if err != nil {
 		return err
 	}
@@ -86,9 +87,16 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(databases))
 
+	seedDirFS := utils.System.DirFS(seedDir)
 	for _, database := range databases {
 		wg.Add(1)
-		bar := progressBar.New(int64(database.NumSeedScripts),
+
+		numSeedScripts, err := CountSeedScripts(database.Datname, seedDirFS)
+		if err != nil {
+			return err
+		}
+
+		bar := progressBar.New(int64(numSeedScripts),
 			mpb.NopStyle(),
 			mpb.PrependDecorators(decor.Name("  "+database.Datname, decor.WCSyncSpaceR)),
 			mpb.AppendDecorators(decor.NewPercentage("%d")))
@@ -96,7 +104,7 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 		go func(streams step.OutStreams, database DatabaseInfo, gphome string, port int, seedDir string, outputDir string, bar *mpb.Bar) {
 			defer wg.Done()
 
-			err = GenerateScriptsPerDatabase(streams, database, gphome, port, seedDir, outputDir, bar)
+			err = GenerateScriptsPerDatabase(streams, database, gphome, port, seedDir, outputDir, version, bar)
 			if err != nil {
 				errChan <- err
 				bar.Abort(false)
@@ -132,7 +140,7 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 var bootstrapConnectionFunc = connection.Bootstrap
 
 // XXX: for internal testing only
-func SetBootstrapConnectionFunction(connectionFunc func(destination idl.ClusterDestination, gphome string, port int) (*sql.DB, error)) {
+func SetBootstrapConnectionFunction(connectionFunc func(destination idl.ClusterDestination, gphome string, port int, database string) (*sql.DB, error)) {
 	bootstrapConnectionFunc = connectionFunc
 }
 
@@ -238,8 +246,18 @@ Select: `)
 	}
 }
 
-func GenerateScriptsPerDatabase(streams step.OutStreams, database DatabaseInfo, gphome string, port int, seedDir string, outputDir string, bar *mpb.Bar) error {
-	output, err := executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpythonu;`)
+func GenerateScriptsPerDatabase(streams step.OutStreams, database DatabaseInfo, gphome string, port int, seedDir string, outputDir string, version semver.Version, bar *mpb.Bar) error {
+	var output []byte
+	var err error
+	switch {
+	case version.Major == 5:
+		output, err = executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpythonu;`)
+	case version.Major == 6:
+		output, err = executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpython3u;`)
+	default:
+		return fmt.Errorf("Internal error: unsupported source cluster version %v", version)
+	}
+
 	if err != nil && !strings.Contains(err.Error(), "already exists") {
 		return err
 	}
@@ -384,12 +402,11 @@ func GenerateScriptsPerPhase(phase idl.Step, database DatabaseInfo, gphome strin
 }
 
 type DatabaseInfo struct {
-	Datname        string
-	QuotedDatname  string
-	NumSeedScripts int
+	Datname       string
+	QuotedDatname string
 }
 
-func GetDatabases(db *sql.DB, seedDirFS fs.FS) ([]DatabaseInfo, error) {
+func GetDatabases(db *sql.DB) ([]DatabaseInfo, error) {
 	rows, err := db.Query(`SELECT datname, quote_ident(datname) AS quoted_datname FROM pg_database WHERE datname != 'template0';`)
 	if err != nil {
 		return nil, err
@@ -404,13 +421,6 @@ func GetDatabases(db *sql.DB, seedDirFS fs.FS) ([]DatabaseInfo, error) {
 			return nil, xerrors.Errorf("pg_database: %w", err)
 		}
 
-		numSeedScripts, cErr := countSeedScripts(database.Datname, seedDirFS)
-		if cErr != nil {
-			return nil, cErr
-		}
-
-		database.NumSeedScripts = numSeedScripts
-
 		databases = append(databases, database)
 	}
 
@@ -422,7 +432,7 @@ func GetDatabases(db *sql.DB, seedDirFS fs.FS) ([]DatabaseInfo, error) {
 	return databases, nil
 }
 
-func countSeedScripts(database string, seedDirFS fs.FS) (int, error) {
+func CountSeedScripts(database string, seedDirFS fs.FS) (int, error) {
 	var numSeedScripts int
 
 	phasesEntries, err := utils.System.ReadDirFS(seedDirFS, ".")

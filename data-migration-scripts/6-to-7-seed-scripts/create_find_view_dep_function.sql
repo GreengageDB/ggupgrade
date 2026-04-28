@@ -112,7 +112,7 @@ for row in rows:
 while True:
     view_order += 1
     new_checklist = {}
-    for depender, dependee in view2view.iteritems():
+    for depender, dependee in view2view.items():
         if dependee in checklist and depender not in checklist:
             new_checklist[depender] = view_order
     if len(new_checklist) == 0:
@@ -125,7 +125,7 @@ plpy.execute("CREATE TABLE  __ggupgrade_tmp_generator.__temp_views_list (full_vi
 for v, view_order in checklist.items():
     sql = "INSERT INTO  __ggupgrade_tmp_generator.__temp_views_list VALUES('{0}.{1}', '{2}', {3})".format(v[0],v[1],v[2],view_order)
     plpy.execute(sql)
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpython3u;
 
 SELECT __ggupgrade_tmp_generator.find_view_dependencies();
 
