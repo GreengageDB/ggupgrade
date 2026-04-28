@@ -36,13 +36,35 @@ func createRecoveryConf(connReqs []*idl.CreateRecoveryConfRequest_Connection) er
 		go func(connReq *idl.CreateRecoveryConfRequest_Connection) {
 			defer wg.Done()
 
-			config := fmt.Sprintf(`standby_mode = 'on'
+			common_config := fmt.Sprintf(`
 primary_conninfo = 'user=%s host=%s port=%d sslmode=disable sslcompression=1 krbsrvname=postgres application_name=gp_walreceiver'
 primary_slot_name = 'internal_wal_replication_slot'`, connReq.GetUser(), connReq.GetPrimaryHost(), connReq.GetPrimaryPort())
 
-			err := os.WriteFile(filepath.Join(connReq.GetMirrorDataDir(), "recovery.conf"), []byte(config), 0644)
-			if err != nil {
-				errs <- err
+			switch {
+			case connReq.GetTargetMajorVersion() == 6:
+				config := `standby_mode = 'on'` + common_config
+				err := os.WriteFile(filepath.Join(connReq.GetMirrorDataDir(), "recovery.conf"), []byte(config), 0644)
+				if err != nil {
+					errs <- err
+				}
+			case connReq.GetTargetMajorVersion() == 7:
+				f, err := os.OpenFile(filepath.Join(connReq.GetMirrorDataDir(), "postgresql.auto.conf"), os.O_APPEND|os.O_WRONLY, 0644)
+				if err != nil {
+					errs <- err
+				}
+				defer f.Close()
+				_, err = f.WriteString(common_config)
+				if err != nil {
+					errs <- err
+				}
+
+				f, err = os.Create(filepath.Join(connReq.GetMirrorDataDir(), "standby.signal"))
+				if err != nil {
+					errs <- err
+				}
+				defer f.Close()
+			default:
+				errs <- fmt.Errorf("Unexpected target version")
 			}
 		}(connReq)
 	}

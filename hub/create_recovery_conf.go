@@ -27,10 +27,11 @@ func CreateRecoveryConfOnSegments(agentConns []*idl.Connection, intermediate *gr
 			intermediatePrimary := intermediate.Primaries[intermediateMirror.ContentID]
 
 			connReq := &idl.CreateRecoveryConfRequest_Connection{
-				MirrorDataDir: intermediateMirror.DataDir,
-				User:          user.Username,
-				PrimaryHost:   intermediatePrimary.Hostname,
-				PrimaryPort:   int32(intermediatePrimary.Port),
+				MirrorDataDir:      intermediateMirror.DataDir,
+				User:               user.Username,
+				PrimaryHost:        intermediatePrimary.Hostname,
+				PrimaryPort:        int32(intermediatePrimary.Port),
+				TargetMajorVersion: intermediate.Version.Major,
 			}
 
 			connReqs = append(connReqs, connReq)

@@ -67,7 +67,7 @@ func TestUpdatePostgresqlConfOnSegments(t *testing.T) {
 				Options: []*idl.UpdateFileConfOptions{
 					{
 						Path:        "/data/dbfast_mirror2/seg2/postgresql.conf",
-						Pattern:     fmt.Sprintf(pattern, 50436),
+						Pattern:     fmt.Sprintf(pattern, 50437),
 						Replacement: fmt.Sprintf(replacement, 25436),
 					},
 					{
@@ -85,7 +85,7 @@ func TestUpdatePostgresqlConfOnSegments(t *testing.T) {
 				Options: []*idl.UpdateFileConfOptions{
 					{
 						Path:        "/data/dbfast_mirror1/seg1/postgresql.conf",
-						Pattern:     fmt.Sprintf(pattern, 50434),
+						Pattern:     fmt.Sprintf(pattern, 50435),
 						Replacement: fmt.Sprintf(replacement, 25434),
 					},
 					{
