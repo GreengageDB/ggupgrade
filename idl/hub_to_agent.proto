@@ -181,7 +181,6 @@ message CreateRecoveryConfRequest {
     string user = 1;
     string primaryHost = 3;
     int32 primaryPort = 4;
-    uint64 targetMajorVersion = 5;
   }
 
   repeated Connection connections = 1;

@@ -13,6 +13,7 @@ import (
 	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/step"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 func UpgradeMirrorsUsingRsync(agentConns []*idl.Connection, source *greengage.Cluster, intermediate *greengage.Cluster, useHbaHostnames bool) error {
@@ -20,12 +21,13 @@ func UpgradeMirrorsUsingRsync(agentConns []*idl.Connection, source *greengage.Cl
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if cErr := db.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
 
 	if err := CreateReplicationSlots(db); err != nil {
-		return err
-	}
-
-	if cErr := db.Close(); cErr != nil {
 		return err
 	}
 
@@ -54,10 +56,6 @@ func UpgradeMirrorsUsingRsync(agentConns []*idl.Connection, source *greengage.Cl
 	}
 
 	if err := UpdateInternalAutoConfOnMirrors(agentConns, intermediate); err != nil {
-		return err
-	}
-
-	if err := UpdateIntermediateMirrorConfig(agentConns, intermediate); err != nil {
 		return err
 	}
 
