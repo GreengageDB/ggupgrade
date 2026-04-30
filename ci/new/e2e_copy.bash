@@ -12,5 +12,5 @@ load_dump
 
 gpcheckcat -A
 
-source gpupgrade_src/testutils/validate_mirrors_and_standby/validate_mirrors_and_standby.bash
+source testutils/validate_mirrors_and_standby/validate_mirrors_and_standby.bash
 validate_mirrors_and_standby /usr/local/greenplum-db-target cdw 5432
