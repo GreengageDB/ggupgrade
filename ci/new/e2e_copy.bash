@@ -4,7 +4,7 @@ SQL_DUMP_URL=${SQL_DUMP_URL:-"https://github.com/GreengageDB/greengage/actions/r
 
 function load_dump() {
     echo "Loading SQL Dump"
-    psql -d postgres -f ci/new/basic_sql_dump.sql 2>sql_load.log
+    psql -d postgres -f ci/new/basic_sql_dump.sql &> sql_load.log
     echo "SQL Dump load complete"
 }
 

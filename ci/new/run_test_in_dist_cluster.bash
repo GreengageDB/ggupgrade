@@ -49,6 +49,7 @@ source /usr/local/greengage-db-6X/greengage_path.sh
 gpinitsystem -a -c init_config -h hostfile_segment_hosts $STANDBY_INIT_OPTS </dev/null || true
 
 source ggupgrade/ci/new/common.bash
+export MASTER_DATA_DIRECTORY="/data/coordinator/gpseg-1"
 export PGPORT=5432
 
 set +e
