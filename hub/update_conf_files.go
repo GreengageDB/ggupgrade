@@ -79,7 +79,7 @@ func UpdatePostgresqlConfOnSegments(agentConns []*idl.Connection, intermediate *
 		for _, mirror := range mirrors {
 			opt := &idl.UpdateFileConfOptions{
 				Path:        filepath.Join(mirror.DataDir, "postgresql.conf"),
-				Pattern:     fmt.Sprintf(pattern, intermediate.Primaries[mirror.ContentID].Port),
+				Pattern:     fmt.Sprintf(pattern, intermediate.Mirrors[mirror.ContentID].Port),
 				Replacement: fmt.Sprintf(replacement, mirror.Port),
 			}
 
@@ -178,6 +178,38 @@ func UpdateInternalAutoConfOnMirrors(agentConns []*idl.Connection, intermediate 
 
 			opts = append(opts, opt)
 
+		}
+
+		req := &idl.UpdateConfigurationRequest{Options: opts}
+		_, err := conn.AgentClient.UpdateConfiguration(context.Background(), req)
+		return err
+	}
+
+	return ExecuteRPC(agentConns, request)
+}
+
+func UpdateIntermediateMirrorConfig(agentConns []*idl.Connection, intermediate *greengage.Cluster) error {
+	pattern := `(^port=)%d([^0-9]|$)`
+	replacement := `\1%d\2`
+
+	request := func(conn *idl.Connection) error {
+		intermediateMirrors := intermediate.SelectSegments(func(seg *greengage.SegConfig) bool {
+			return seg.IsOnHost(conn.Hostname) && !seg.IsStandby() && seg.IsMirror()
+		})
+
+		if len(intermediateMirrors) == 0 {
+			return nil
+		}
+
+		var opts []*idl.UpdateFileConfOptions
+		for _, mirror := range intermediateMirrors {
+			opt := &idl.UpdateFileConfOptions{
+				Path:        filepath.Join(mirror.DataDir, "postgresql.conf"),
+				Pattern:     fmt.Sprintf(pattern, intermediate.Primaries[mirror.ContentID].Port),
+				Replacement: fmt.Sprintf(replacement, intermediate.Mirrors[mirror.ContentID].Port),
+			}
+
+			opts = append(opts, opt)
 		}
 
 		req := &idl.UpdateConfigurationRequest{Options: opts}
