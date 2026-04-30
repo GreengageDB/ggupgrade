@@ -17,6 +17,8 @@ jobs:
           go-version: '1.20'
       - uses: actions/checkout@v4
       - run: |
+          apt-get update;
+          apt-get install -y protobuf-compiler;
           make install-dependencies
           make generate
       - name: golangci-lint
@@ -35,6 +37,8 @@ jobs:
           mkdir -p /home/runner/work/gpbackup/gpbackup/go/bin/
       - uses: actions/checkout@v4
       - run: |
+          apt-get update;
+          apt-get install -y protobuf-compiler;
           make install-dependencies
           make generate
       - run: make unit
