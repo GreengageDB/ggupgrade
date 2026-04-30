@@ -79,6 +79,15 @@ jobs:
 # These tests require a distributed cluster
   dist_tests:
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - test: acceptance
+            command: |
+              go test --cover -count=1 -timeout 30m -v -run "^TestRevert$" ./test/acceptance/ggupgrade
+          - test: e2e_copy
+            command: ci/new/e2e_copy.bash
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -110,11 +119,11 @@ jobs:
         env:
           IMAGE: gpdb7_ggupgrade:latest
         run: |
-          docker compose -p ggupgrade -f ./ci/new/docker-compose.yaml exec -u gpadmin -T coordinator bash ggupgrade/ci/new/run_test_in_dist_cluster.bash go test --cover -count=1 -timeout 30m -v -run "^TestRevert$" ./test/acceptance/ggupgrade
+          docker compose -p ggupgrade -f ./ci/new/docker-compose.yaml exec -u gpadmin -T coordinator bash ggupgrade/ci/new/run_test_in_dist_cluster.bash ${{ matrix.command }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ggupgrade_${{ matrix.test }}_demo_logs
+          name: ggupgrade_${{ matrix.test }}_dist_logs
           path: ./logs_*
