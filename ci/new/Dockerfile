@@ -28,7 +28,7 @@ RUN set -eux; \
     chown -R 1000:1000 /usr/local/greengage-db-7X
 
 RUN set -eux; \
-    wget https://golang.org/dl/go1.20.5.linux-amd64.tar.gz -q -O - | tar -C /opt -xz; \
+    wget https://golang.org/dl/go1.21.13.linux-amd64.tar.gz -q -O - | tar -C /opt -xz; \
     apt update; \
     apt install -y jq; \
     . /etc/os-release; \
