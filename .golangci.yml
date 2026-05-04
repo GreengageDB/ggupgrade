@@ -12,4 +12,5 @@ linters:
         - "-ST1022"
         # Disabled checks
         - "-ST1005"
+        - "-QF1005"
         - "-QF1012"
