@@ -140,8 +140,8 @@ jobs:
           IMAGE: gpdb7_ggupgrade:latest
         run: |
           docker compose -p ggupgrade -f ./ci/new/docker-compose.yaml exec \
-                 -e WITH_MIRRORS ${{ matrix.with_mirrors || 'true'}} \
-                 -e WITH_STANDBY ${{ matrix.with_standby || 'true'}} \
+                 -e WITH_MIRRORS=${{ matrix.with_mirrors || 'true'}} \
+                 -e WITH_STANDBY=${{ matrix.with_standby || 'true'}} \
                  -u gpadmin -T coordinator \
                  bash ggupgrade/ci/new/run_test_in_dist_cluster.bash ${{ matrix.command }}
 
