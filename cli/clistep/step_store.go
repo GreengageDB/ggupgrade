@@ -91,7 +91,7 @@ type stepCondition struct {
 	nextAction string
 }
 
-var StepErr = errors.New(`ggupgrade commands must be issued in correct order
+var ErrStep = errors.New(`ggupgrade commands must be issued in correct order
 
   1. initialize   runs pre-upgrade checks and prepares the cluster for upgrade
   2. execute      upgrades the master and primary segments to the target
@@ -143,7 +143,7 @@ func (s *StepStoreFileStore) ValidateStep(currentStep idl.Step) (err error) {
 		}
 
 		if !status {
-			return utils.NewNextActionErr(StepErr, c.nextAction)
+			return utils.NewNextActionErr(ErrStep, c.nextAction)
 		}
 	}
 

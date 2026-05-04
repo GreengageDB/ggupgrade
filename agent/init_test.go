@@ -20,7 +20,7 @@ func FailedMain() {
 }
 
 func FailedRsync() {
-	os.Stderr.WriteString("rsync failed cause I said so")
+	_, _ = os.Stderr.WriteString("rsync failed cause I said so")
 	os.Exit(2)
 }
 

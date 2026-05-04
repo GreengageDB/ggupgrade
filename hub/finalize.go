@@ -97,7 +97,7 @@ func (s *Server) Finalize(req *idl.FinalizeRequest, stream idl.CliToHub_Finalize
 		}
 
 		logArchiveDir = GetLogArchiveDir(logDir, s.UpgradeID, time.Now())
-		return ArchiveLogDirectories(logDir, logArchiveDir, s.agentConns, s.Config.Target.CoordinatorHostname())
+		return ArchiveLogDirectories(logDir, logArchiveDir, s.agentConns, s.Target.CoordinatorHostname())
 	})
 
 	st.Run(idl.Substep_delete_backupdir, func(streams step.OutStreams) error {
@@ -117,8 +117,8 @@ func (s *Server) Finalize(req *idl.FinalizeRequest, stream idl.CliToHub_Finalize
 		FinalizeResponse: &idl.FinalizeResponse{
 			Target:                                 encodedTarget,
 			LogArchiveDirectory:                    logArchiveDir,
-			ArchivedSourceCoordinatorDataDirectory: s.Config.Intermediate.CoordinatorDataDir() + upgrade.OldSuffix,
-			UpgradeID:                              s.Config.UpgradeID,
+			ArchivedSourceCoordinatorDataDirectory: s.Intermediate.CoordinatorDataDir() + upgrade.OldSuffix,
+			UpgradeID:                              s.UpgradeID,
 		},
 	}}}}
 

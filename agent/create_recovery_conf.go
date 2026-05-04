@@ -54,19 +54,30 @@ primary_slot_name = 'internal_wal_replication_slot'`, connReq.GetUser(), connReq
 					errs <- err
 					return
 				}
-				defer f.Close()
+
+				defer func() {
+					if cErr := f.Close(); cErr != nil {
+						errs <- errorlist.Append(err, cErr)
+					}
+				}()
+
 				_, err = f.WriteString(common_config)
 				if err != nil {
 					errs <- err
 					return
 				}
 
-				f, err = os.Create(filepath.Join(connReq.GetMirrorDataDir(), "standby.signal"))
+				fSignal, err := os.Create(filepath.Join(connReq.GetMirrorDataDir(), "standby.signal"))
 				if err != nil {
 					errs <- err
 					return
 				}
-				defer f.Close()
+
+				defer func() {
+					if cErr := fSignal.Close(); cErr != nil {
+						errs <- errorlist.Append(err, cErr)
+					}
+				}()
 			default:
 				errs <- fmt.Errorf("Unexpected target version")
 			}

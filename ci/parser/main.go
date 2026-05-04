@@ -200,7 +200,8 @@ func main() {
 
 func setJobs() {
 	pipelineVersion := os.Getenv("PIPELINE_VERSION")
-	if pipelineVersion == "6" {
+	switch pipelineVersion {
+	case "6":
 		versions = []Version{
 			{
 				Source:          "5",
@@ -225,7 +226,7 @@ func setJobs() {
 				AppendImageName: "-golang",
 			},
 		}
-	} else if pipelineVersion == "7" {
+	case "7":
 		versions = []Version{
 			{
 				Source:      "6",
@@ -241,7 +242,7 @@ func setJobs() {
 				RpmVersion: "el8",
 			},
 		}
-	} else {
+	default:
 		log.Fatalf("unknown pipeline version")
 	}
 }

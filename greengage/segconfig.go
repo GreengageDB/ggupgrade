@@ -6,6 +6,7 @@ package greengage
 import (
 	"database/sql"
 
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 	"github.com/blang/semver/v4"
 	"golang.org/x/xerrors"
 )
@@ -95,7 +96,11 @@ ORDER BY s.content, s.role;`
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if cErr := rows.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
 
 	results := make(SegConfigs, 0)
 	for rows.Next() {

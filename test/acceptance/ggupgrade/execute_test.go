@@ -97,7 +97,7 @@ func TestExecute(t *testing.T) {
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
 			// see comment in revert.go on why we ignore gpstart failures
-			if !(exitErr.ExitCode() == 1 && len(exitErr.Stderr) == 0 && source.Version.Major == 5) {
+			if exitErr.ExitCode() != 1 || len(exitErr.Stderr) != 0 || source.Version.Major != 5 {
 				t.Fatal(err)
 			}
 		}
@@ -197,7 +197,11 @@ CREATE FUNCTION pg_temp.gp_relation_filepath(tbl text)
 	if err != nil {
 		t.Fatalf("querying sql failed: %v", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if cErr := rows.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
 
 	var relfilenodes []string
 	for rows.Next() {

@@ -408,6 +408,6 @@ func MakeDaemonizable(cmd *cobra.Command, shouldDaemonize *bool) {
 func Daemonize() {
 	// TODO: Research daemonize to see what else may need to be done for the
 	// child process to safely detach from the parent
-	os.Stderr.Close()
-	os.Stdout.Close()
+	_ = os.Stderr.Close()
+	_ = os.Stdout.Close()
 }

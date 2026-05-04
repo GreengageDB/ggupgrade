@@ -34,7 +34,7 @@ func ggupgrade_remote_version() {
 }
 
 func ggupgrade_version_fails() {
-	os.Stderr.WriteString("oops")
+	_, _ = os.Stderr.WriteString("oops")
 	os.Exit(1)
 }
 
