@@ -161,7 +161,9 @@ func TestPrimaryHostnames(t *testing.T) {
 	testlog.SetupTestLogger()
 
 	defer func() {
-		os.RemoveAll(testStateDir)
+		if err := os.RemoveAll(testStateDir); err != nil {
+			t.Errorf("removing temp directory: %v", err)
+		}
 	}()
 
 	t.Run("returns a list of hosts for only the primaries", func(t *testing.T) {
@@ -184,7 +186,9 @@ func TestClusterFromDB(t *testing.T) {
 	testlog.SetupTestLogger()
 
 	defer func() {
-		os.RemoveAll(testStateDir)
+		if err := os.RemoveAll(testStateDir); err != nil {
+			t.Errorf("removing temp directory: %v", err)
+		}
 	}()
 
 	t.Run("returns an error if connection fails", func(t *testing.T) {

@@ -67,14 +67,14 @@ primary_slot_name = 'internal_wal_replication_slot'`, connReq.GetUser(), connReq
 					return
 				}
 
-				f, err = os.Create(filepath.Join(connReq.GetMirrorDataDir(), "standby.signal"))
+				fSignal, err := os.Create(filepath.Join(connReq.GetMirrorDataDir(), "standby.signal"))
 				if err != nil {
 					errs <- err
 					return
 				}
 
 				defer func() {
-					if cErr := f.Close(); cErr != nil {
+					if cErr := fSignal.Close(); cErr != nil {
 						errs <- errorlist.Append(err, cErr)
 					}
 				}()

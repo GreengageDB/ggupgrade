@@ -16,7 +16,11 @@ import (
 func TestWriteAddMirrorsConfig(t *testing.T) {
 	t.Run("writes gpaddmirrors_config", func(t *testing.T) {
 		stateDir := testutils.GetTempDir(t, "")
-		defer os.RemoveAll(stateDir)
+		defer func() {
+			if err := os.RemoveAll(stateDir); err != nil {
+				t.Errorf("removing temp directory: %v", err)
+			}
+		}()
 
 		resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
 		defer resetEnv()
