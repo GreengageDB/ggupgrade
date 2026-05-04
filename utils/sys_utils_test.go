@@ -66,7 +66,11 @@ func TestJSONFile(t *testing.T) {
 func TestMove(t *testing.T) {
 	t.Run("move run successfully", func(t *testing.T) {
 		src := testutils.GetTempDir(t, "")
-		defer os.RemoveAll(src)
+		defer func() {
+			if err := os.RemoveAll(src); err != nil {
+				t.Errorf("removing temp directory: %v", err)
+			}
+		}()
 
 		file := "file.txt"
 		srcFile := filepath.Join(src, file)
@@ -80,7 +84,11 @@ func TestMove(t *testing.T) {
 		if err != nil {
 			t.Errorf("unexpected error %#v", err)
 		}
-		defer os.RemoveAll(dst)
+		defer func() {
+			if err := os.RemoveAll(dst); err != nil {
+				t.Errorf("removing temp directory: %v", err)
+			}
+		}()
 
 		dstFile := filepath.Join(dst, file)
 		_, err = os.Stat(dstFile)
@@ -97,7 +105,11 @@ func TestMove(t *testing.T) {
 	t.Run("move fails", func(t *testing.T) {
 		src := ""
 		dst := testutils.GetTempDir(t, "")
-		defer os.RemoveAll(dst)
+		defer func() {
+			if err := os.RemoveAll(dst); err != nil {
+				t.Errorf("removing temp directory: %v", err)
+			}
+		}()
 
 		err := utils.Move(src, dst)
 		if err == nil {

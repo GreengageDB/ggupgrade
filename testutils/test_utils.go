@@ -157,7 +157,7 @@ func MustListenOnPort(t *testing.T, port int) func() {
 	t.Logf("listening on port %d...", port)
 
 	return func() {
-		listener.Close()
+		_ = listener.Close()
 	}
 }
 

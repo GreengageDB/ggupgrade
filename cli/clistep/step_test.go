@@ -286,8 +286,16 @@ func TestSubstep(t *testing.T) {
 		substepStderr := "oops!"
 		st.Run(idl.Substep_saving_source_cluster_config, func(streams step.OutStreams) error {
 			if verbose {
-				os.Stdout.WriteString(substepStdout)
-				os.Stderr.WriteString(substepStderr)
+				_, err = os.Stdout.WriteString(substepStdout)
+				if err != nil {
+					d.Close()
+					t.Errorf("unexpected err %#v", err)
+				}
+				_, err = os.Stderr.WriteString(substepStderr)
+				if err != nil {
+					d.Close()
+					t.Errorf("unexpected err %#v", err)
+				}
 			}
 
 			return nil

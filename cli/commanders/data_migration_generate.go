@@ -411,7 +411,11 @@ func GetDatabases(db *sql.DB) ([]DatabaseInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if cErr := rows.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
 
 	var databases []DatabaseInfo
 	for rows.Next() {

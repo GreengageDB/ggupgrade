@@ -23,7 +23,7 @@ func init() {
 func Success() {}
 
 func Failure() {
-	os.Stderr.WriteString(os.ErrPermission.Error())
+	_, _ = os.Stderr.WriteString(os.ErrPermission.Error())
 	os.Exit(1)
 }
 
