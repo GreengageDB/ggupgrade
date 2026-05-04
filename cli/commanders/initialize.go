@@ -49,7 +49,10 @@ func StartHub(streams step.OutStreams) (err error) {
 	}
 
 	if running {
-		fmt.Fprint(streams.Stdout(), "Hub already running. Skipping.")
+		_, err = fmt.Fprint(streams.Stdout(), "Hub already running. Skipping.")
+		if err != nil {
+			return err
+		}
 		return step.Skip
 	}
 

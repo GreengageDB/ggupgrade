@@ -18,19 +18,19 @@ import (
 func Success() {}
 
 func FailedMain() {
-	os.Stderr.WriteString("oops!")
+	_, _ = os.Stderr.WriteString("oops!")
 	os.Exit(1)
 }
 
 const SuccessScriptOutput = "successfully executed data migration SQL script"
 
 func SuccessScript() {
-	os.Stdout.WriteString(SuccessScriptOutput)
+	_, _ = os.Stdout.WriteString(SuccessScriptOutput)
 	os.Exit(0)
 }
 
 func FailedSqlAlreadyExists() {
-	os.Stdout.WriteString("ERROR:  language \"plpythonu\" already exists\n")
+	_, _ = os.Stdout.WriteString("ERROR:  language \"plpythonu\" already exists\n")
 	os.Exit(1)
 }
 

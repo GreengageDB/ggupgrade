@@ -167,7 +167,10 @@ func TestCreateStateDir(t *testing.T) {
 	oldStateDir, isSet := os.LookupEnv("GPUGRADE_HOME")
 	defer func() {
 		if isSet {
-			os.Setenv("GGUPGRADE_HOME", oldStateDir)
+			err = os.Setenv("GGUPGRADE_HOME", oldStateDir)
+			if err != nil {
+				t.Fatalf("failed to reset GGUPGRADE_HOME %#v", err)
+			}
 		}
 	}()
 
