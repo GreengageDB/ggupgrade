@@ -106,8 +106,8 @@ func (s *Server) InitializeCreateCluster(req *idl.InitializeCreateClusterRequest
 			return err
 		}
 
-		s.Config.Intermediate.CatalogVersion = catalogVersion
-		return s.Config.Write()
+		s.Intermediate.CatalogVersion = catalogVersion
+		return s.Write()
 	})
 
 	st.RunConditionally(idl.Substep_setting_dynamic_library_path_on_target_cluster, req.GetDynamicLibraryPath() != upgrade.DefaultDynamicLibraryPath, func(stream step.OutStreams) error {
@@ -146,7 +146,7 @@ func (s *Server) InitializeCreateCluster(req *idl.InitializeCreateClusterRequest
 
 	message := &idl.Message{Contents: &idl.Message_Response{Response: &idl.Response{Contents: &idl.Response_InitializeResponse{
 		InitializeResponse: &idl.InitializeResponse{
-			HasAllMirrorsAndStandby: s.Config.Source.HasAllMirrorsAndStandby(),
+			HasAllMirrorsAndStandby: s.Source.HasAllMirrorsAndStandby(),
 		},
 	}}}}
 
