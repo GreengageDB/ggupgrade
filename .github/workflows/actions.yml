@@ -102,12 +102,12 @@ jobs:
             command: ci/new/e2e.bash link
           - test: e2e_link_primaries_only
             command: ci/new/e2e.bash link
-            with_mirrors: false
-            with_standby: false
+            with_mirrors: 'false'
+            with_standby: 'false'
           - test: e2e_link_no_standby
             command: ci/new/e2e.bash link
-            with_mirrors: true
-            with_standby: false
+            with_mirrors: 'true'
+            with_standby: 'false'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
