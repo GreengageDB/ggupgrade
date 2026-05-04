@@ -165,8 +165,8 @@ func verifyFinalize(t *testing.T, source greengage.Cluster, conf *config.Config,
 	verifyPgHbaConfHostnames(t, source, conf.Target, useHbaHostnames)
 
 	for _, host := range conf.Target.Hosts() {
-		testutils.RemoteProcessMustNotBeRunning(t, host, "[g]pupgrade hub")
-		testutils.RemoteProcessMustNotBeRunning(t, host, "[g]pupgrade agent")
+		testutils.RemoteProcessMustNotBeRunning(t, host, "[g]gupgrade hub")
+		testutils.RemoteProcessMustNotBeRunning(t, host, "[g]gupgrade agent")
 
 		testutils.RemotePathMustNotExist(t, host, utils.GetStateDir())
 

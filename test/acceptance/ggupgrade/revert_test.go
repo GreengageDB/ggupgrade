@@ -82,8 +82,8 @@ func TestRevert(t *testing.T) {
 		testutils.RemotePathMustExist(t, conf.Intermediate.CoordinatorHostname(), logArchiveDir)
 
 		for _, host := range conf.Intermediate.Hosts() {
-			testutils.RemoteProcessMustNotBeRunning(t, host, "[g]pupgrade hub")
-			testutils.RemoteProcessMustNotBeRunning(t, host, "[g]pupgrade agent")
+			testutils.RemoteProcessMustNotBeRunning(t, host, "[g]gupgrade hub")
+			testutils.RemoteProcessMustNotBeRunning(t, host, "[g]gupgrade agent")
 
 			testutils.RemotePathMustNotExist(t, host, utils.GetStateDir())
 		}
@@ -260,8 +260,8 @@ func verifyRevert(t *testing.T, source greengage.Cluster, intermediate *greengag
 	}
 
 	for _, host := range intermediate.Hosts() {
-		testutils.RemoteProcessMustNotBeRunning(t, host, "[g]pupgrade hub")
-		testutils.RemoteProcessMustNotBeRunning(t, host, "[g]pupgrade agent")
+		testutils.RemoteProcessMustNotBeRunning(t, host, "[g]gupgrade hub")
+		testutils.RemoteProcessMustNotBeRunning(t, host, "[g]gupgrade agent")
 
 		testutils.RemotePathMustNotExist(t, host, utils.GetStateDir())
 
