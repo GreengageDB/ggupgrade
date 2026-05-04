@@ -197,7 +197,11 @@ CREATE FUNCTION pg_temp.gp_relation_filepath(tbl text)
 	if err != nil {
 		t.Fatalf("querying sql failed: %v", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if cErr := rows.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
 
 	var relfilenodes []string
 	for rows.Next() {

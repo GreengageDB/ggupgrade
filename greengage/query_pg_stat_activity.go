@@ -12,6 +12,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 type StatActivity struct {
@@ -57,7 +58,11 @@ func QueryPgStatActivity(db *sql.DB, cluster *Cluster) error {
 	if err != nil {
 		return err
 	}
-	defer rows.Close()
+	defer func() {
+		if cErr := rows.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
 
 	var activities StatActivities
 	for rows.Next() {

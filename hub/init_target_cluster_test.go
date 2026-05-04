@@ -138,7 +138,11 @@ func TestGetCheckpointSegmentsAndEncoding(t *testing.T) {
 				t.Fatalf("sqlmock: %v", err)
 			}
 			defer testutils.FinishMock(mock, t)
-			defer db.Close()
+			defer func() {
+				if cErr := db.Close(); cErr != nil {
+					t.Logf("error during Close: %+v", cErr)
+				}
+			}()
 
 			var expected []string
 			for _, query := range c.query {

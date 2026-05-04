@@ -18,6 +18,7 @@ import (
 	"github.com/GreengageDB/ggupgrade/step"
 	"github.com/GreengageDB/ggupgrade/substeps"
 	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 var execCommandHubStart = exec.Command
@@ -136,7 +137,12 @@ func CheckForObsoletePlpython(streams step.OutStreams, gphome string, port int, 
 		if err != nil {
 			return err
 		}
-		defer db.Close()
+
+		defer func() {
+			if cErr := db.Close(); cErr != nil {
+				err = errorlist.Append(err, cErr)
+			}
+		}()
 
 		const languageQuery = "SELECT EXISTS(SELECT * FROM pg_catalog.pg_language WHERE lanname = 'plpythonu') plpythonu, EXISTS(SELECT * FROM pg_catalog.pg_language WHERE lanname = 'plpython2u') plpython2u;"
 
@@ -172,7 +178,11 @@ SELECT quote_ident(c.proname) proname, pg_catalog.pg_get_function_arguments(c.oi
 		if err != nil {
 			return xerrors.Errorf("database %v: %w", dbInfo.QuotedDatname, err)
 		}
-		defer rows.Close()
+		defer func() {
+			if cErr := rows.Close(); cErr != nil {
+				err = errorlist.Append(err, cErr)
+			}
+		}()
 
 		for rows.Next() {
 			var proname string
