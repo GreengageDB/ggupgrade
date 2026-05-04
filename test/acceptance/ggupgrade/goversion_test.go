@@ -18,7 +18,6 @@ import (
 )
 
 func TestGoVersion(t *testing.T) {
-	return
 	t.Run("ggupgrade is compiled with the expected golang version from go.mod", func(t *testing.T) {
 		// Since the go mod version contains the minimum required go version it
 		// must be less than or equal to the compiled version.
