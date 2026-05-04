@@ -100,6 +100,14 @@ jobs:
             command: ci/new/e2e.bash copy
           - test: e2e_link
             command: ci/new/e2e.bash link
+          - test: e2e_link_primaries_only
+            command: ci/new/e2e.bash link
+            with_mirrors: false
+            with_standby: false
+          - test: e2e_link_no_standby
+            command: ci/new/e2e.bash link
+            with_mirrors: true
+            with_standby: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -131,7 +139,11 @@ jobs:
         env:
           IMAGE: gpdb7_ggupgrade:latest
         run: |
-          docker compose -p ggupgrade -f ./ci/new/docker-compose.yaml exec -u gpadmin -T coordinator bash ggupgrade/ci/new/run_test_in_dist_cluster.bash ${{ matrix.command }}
+          docker compose -p ggupgrade -f ./ci/new/docker-compose.yaml exec \
+                 -e WITH_MIRRORS ${{ matrix.with_mirrors || 'true'}} \
+                 -e WITH_STANDBY ${{ matrix.with_standby || 'true'}} \
+                 -u gpadmin -T coordinator \
+                 bash ggupgrade/ci/new/run_test_in_dist_cluster.bash ${{ matrix.command }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
