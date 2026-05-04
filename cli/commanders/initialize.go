@@ -68,7 +68,7 @@ func StartHub(streams step.OutStreams) (err error) {
 }
 
 func IsHubRunning() (bool, error) {
-	script := `ps -ef | grep -wGc "[g]pupgrade hub"` // use square brackets to avoid finding yourself in matches
+	script := `ps -ef | grep -wGc "[g]gupgrade hub"` // use square brackets to avoid finding yourself in matches
 	_, err := execCommandHubCount("bash", "-c", script).Output()
 
 	if exitError, ok := err.(*exec.ExitError); ok {
