@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SQL_DUMP_URL=${SQL_DUMP_URL:-"https://github.com/GreengageDB/greengage/actions/runs/25043750463/artifacts/6682503262"}
-MODE=${MODE:-"copy"}
+MODE=$1
 
 function load_dump() {
     echo "Loading SQL Dump"
