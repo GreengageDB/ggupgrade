@@ -151,13 +151,15 @@ func verifyFinalize(t *testing.T, source greengage.Cluster, conf *config.Config,
 		t.Fatalf("expected %q to contain %v", finalizeOutput, expectedRegex)
 	}
 
-	// Ensure gpperfmon configuration file has been modified to reflect new
-	// data directory location.
-	contents := testutils.MustReadFile(t, filepath.Join(conf.Target.CoordinatorDataDir(), "gpperfmon", "conf", "gpperfmon.conf"))
-	expected := fmt.Sprintf("log_location = %s", filepath.Join(conf.Target.CoordinatorDataDir(), "gpperfmon", "logs"))
-	if !strings.Contains(contents, expected) {
-		t.Error("Expected gpperfmon.conf to contain the target cluster coordinator data directory.")
-		t.Errorf("expected %s to contain %q", contents, conf.Target.CoordinatorDataDir())
+	if conf.Target.Version.Major < 7 {
+		// Ensure gpperfmon configuration file has been modified to reflect new
+		// data directory location.
+		contents := testutils.MustReadFile(t, filepath.Join(conf.Target.CoordinatorDataDir(), "gpperfmon", "conf", "gpperfmon.conf"))
+		expected := fmt.Sprintf("log_location = %s", filepath.Join(conf.Target.CoordinatorDataDir(), "gpperfmon", "logs"))
+		if !strings.Contains(contents, expected) {
+			t.Error("Expected gpperfmon.conf to contain the target cluster coordinator data directory.")
+			t.Errorf("expected %s to contain %q", contents, conf.Target.CoordinatorDataDir())
+		}
 	}
 
 	verifyPgHbaConfHostnames(t, source, conf.Target, useHbaHostnames)
