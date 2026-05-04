@@ -68,7 +68,7 @@ func Begin(currentStep idl.Step, verbose bool, nonInteractive bool, confirmation
 	stepStore, err := NewStepFileStore()
 	if err != nil {
 		context := fmt.Sprintf("Note: If commands were issued in order, ensure ggupgrade can write to %s", utils.GetStateDir())
-		wrappedErr := xerrors.Errorf("%v\n\n%v", StepErr, context)
+		wrappedErr := xerrors.Errorf("%v\n\n%v", ErrStep, context)
 		return &Step{}, utils.NewNextActionErr(wrappedErr, RunInitialize)
 	}
 

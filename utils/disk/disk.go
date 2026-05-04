@@ -142,19 +142,19 @@ var Local = local{}
 
 type local struct{}
 
-func (_ local) Filesystems() (sigar.FileSystemList, error) {
+func (local) Filesystems() (sigar.FileSystemList, error) {
 	var list sigar.FileSystemList
 	err := list.Get()
 	return list, err
 }
 
-func (_ local) Usage(path string) (sigar.FileSystemUsage, error) {
+func (local) Usage(path string) (sigar.FileSystemUsage, error) {
 	var usage sigar.FileSystemUsage
 	err := usage.Get(path)
 	return usage, err
 }
 
-func (_ local) Stat(path string) (*unix.Stat_t, error) {
+func (local) Stat(path string) (*unix.Stat_t, error) {
 	stat := new(unix.Stat_t)
 	err := unix.Stat(path, stat)
 	return stat, err

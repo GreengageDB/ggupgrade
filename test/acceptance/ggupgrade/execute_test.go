@@ -97,7 +97,7 @@ func TestExecute(t *testing.T) {
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
 			// see comment in revert.go on why we ignore gpstart failures
-			if !(exitErr.ExitCode() == 1 && len(exitErr.Stderr) == 0 && source.Version.Major == 5) {
+			if exitErr.ExitCode() != 1 || len(exitErr.Stderr) != 0 || source.Version.Major != 5 {
 				t.Fatal(err)
 			}
 		}

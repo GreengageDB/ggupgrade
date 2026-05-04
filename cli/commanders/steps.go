@@ -139,9 +139,10 @@ func UILoop(stream receiver, verbose bool) (*idl.Response, error) {
 				continue
 			}
 
-			if x.Chunk.Type == idl.Chunk_stdout {
+			switch x.Chunk.Type {
+			case idl.Chunk_stdout:
 				_, err = os.Stdout.Write(x.Chunk.Buffer)
-			} else if x.Chunk.Type == idl.Chunk_stderr {
+			case idl.Chunk_stderr:
 				_, err = os.Stderr.Write(x.Chunk.Buffer)
 			}
 

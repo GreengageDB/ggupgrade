@@ -76,7 +76,7 @@ func IsHubRunning() (bool, error) {
 	_, err := execCommandHubCount("bash", "-c", script).Output()
 
 	if exitError, ok := err.(*exec.ExitError); ok {
-		if exitError.ProcessState.ExitCode() == 1 { // hub not found
+		if exitError.ExitCode() == 1 { // hub not found
 			return false, nil
 		}
 	}

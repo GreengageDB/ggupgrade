@@ -73,7 +73,7 @@ func TestRenameTablespaces(t *testing.T) {
 		for _, err := range errs {
 			var pathError *os.PathError
 			var linkError *os.LinkError
-			if !(errors.As(err, &pathError) || errors.As(err, &linkError)) {
+			if !errors.As(err, &pathError) && !errors.As(err, &linkError) {
 				t.Errorf("got type %T want %T or %T", err, pathError, linkError)
 			}
 		}

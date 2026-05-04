@@ -63,11 +63,12 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		defer testutils.FinishMock(mockPostgres, t)
 
 		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int, database string) (*sql.DB, error) {
-			if database == "template1" {
+			switch database {
+			case "template1":
 				return dbTemplate1, nil
-			} else if database == "postgres" {
+			case "postgres":
 				return dbPostgres, nil
-			} else {
+			default:
 				return nil, fmt.Errorf("Internal test failure: no database with the name %v was created", database)
 			}
 		})
@@ -100,11 +101,12 @@ func TestCheckForObsoletePlpython(t *testing.T) {
 		defer testutils.FinishMock(mockPostgres, t)
 
 		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int, database string) (*sql.DB, error) {
-			if database == "template1" {
+			switch database {
+			case "template1":
 				return dbTemplate1, nil
-			} else if database == "postgres" {
+			case "postgres":
 				return dbPostgres, nil
-			} else {
+			default:
 				return nil, fmt.Errorf("Internal test failure: no database with the name %v was created", database)
 			}
 		})
