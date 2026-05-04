@@ -99,6 +99,18 @@ jobs:
         include:
           - test: acceptance
             command: "go test --cover -count=1 -timeout 30m -v -run '^TestRevert$' ./test/acceptance/ggupgrade"
+          - test: e2e_copy
+            command: ci/new/e2e.bash copy
+          - test: e2e_link
+            command: ci/new/e2e.bash link
+          - test: e2e_link_primaries_only
+            command: ci/new/e2e.bash link
+            with_mirrors: 'false'
+            with_standby: 'false'
+          - test: e2e_link_no_standby
+            command: ci/new/e2e.bash link
+            with_mirrors: 'true'
+            with_standby: 'false'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

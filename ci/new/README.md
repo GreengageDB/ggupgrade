@@ -30,3 +30,7 @@ docker compose -p ggupgrade -f ./ci/new/docker-compose.yaml exec \
                ggupgrade/ci/new/run_test_in_dist_cluster.bash \
                go test --cover -count=1 -timeout 30m -v -run '^TestRevert$' ./test/acceptance/ggupgrade
 ```
+
+## End to end tests
+
+The test command must be `ci/new/e2e.bash copy` or `ci/new/e2e.bash link` respectively.
