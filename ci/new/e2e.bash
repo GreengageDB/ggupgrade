@@ -29,7 +29,7 @@ ggupgrade initialize \
 ggupgrade execute --non-interactive --skip-pg-upgrade-checks
 ggupgrade finalize --non-interactive
 
-if [ "${WITH_MIRRORS}" == "true" && "${WITH_STANDBY}" == "true" ]; then
+if [ "${WITH_MIRRORS}" == "true" ] && [ "${WITH_STANDBY}" == "true" ]; then
     source testutils/validate_mirrors_and_standby/validate_mirrors_and_standby.bash
     validate_mirrors_and_standby /usr/local/greengage-db-7X coordinator 5432
 fi
