@@ -17,6 +17,7 @@ ENV PATH=$PATH:/opt/go/bin:/home/gpadmin/go/bin \
     GPHOME_SOURCE=/usr/local/greengage-db-6X \
     GPHOME_TARGET=/usr/local/greengage-db-7X \
     PGHOST=/tmp \
+    LANG=en_US.UTF-8 \
     ISOLATION2_PATH=/usr/local/greengage-db-7X/lib/postgresql/pgxs/src/test/isolation2/
 
 RUN set -eux; \
