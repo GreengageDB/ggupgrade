@@ -55,7 +55,7 @@ CREATE VIEW
 -- start_ignore
 -- end_ignore
 (exited with code 1)
-! find $(ls -dt ~/gpAdminLogs/ggupgrade/pg_upgrade_*/ | head -1) -name "views_with_removed_functions.txt" -exec cat {} +;
+! find $(ls -dt ~/gpAdminLogs/ggupgrade/pg_upgrade_*/ | head -1) -name "views_with_changed_function_signatures.txt" -exec cat {} +;
 Database: isolation2test
   functions_with_changed_signature.v01
   functions_with_changed_signature.v02
