@@ -1,6 +1,7 @@
 #!/bin/bash
 
-SQL_DUMP_URL=${SQL_DUMP_URL:-"https://github.com/GreengageDB/greengage/actions/runs/25043750463/artifacts/6682503262"}
+set -eux -o pipefail
+
 MODE=$1
 WITH_MIRRORS="${WITH_MIRRORS:-true}"
 WITH_STANDBY="${WITH_STANDBY:-true}"
@@ -14,8 +15,6 @@ function load_dump() {
 load_dump
 
 gpcheckcat -A
-
-set -eux -o pipefail
 
 ggupgrade initialize \
           --non-interactive \
