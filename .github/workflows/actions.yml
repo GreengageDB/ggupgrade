@@ -28,16 +28,11 @@ jobs:
   unit_and_integration:
     name: Unit and Integration tests
     runs-on: ubuntu-22.04
-    env:
-      GOPATH: ${{ github.workspace }}/go
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v6
         with:
           go-version: '1.21'
-      - run: |
-          echo "$GOPATH/bin" >> $GITHUB_PATH
-          mkdir -p "$GOPATH/bin"
       - run: |
           sudo apt-get update;
           sudo apt-get install -y protobuf-compiler;
