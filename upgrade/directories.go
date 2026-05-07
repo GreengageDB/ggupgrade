@@ -221,7 +221,10 @@ func DeleteDirectories(directories []string, requiredPaths []string, streams ste
 		}
 
 		if !directoryExist {
-			fmt.Fprintf(streams.Stdout(), "directory: %q does not exist on host %q\n", directory, hostname)
+			_, err = fmt.Fprintf(streams.Stdout(), "directory: %q does not exist on host %q\n", directory, hostname)
+			if err != nil {
+				return err
+			}
 			continue
 		}
 

@@ -73,7 +73,11 @@ func TestGetSegmentConfiguration(t *testing.T) {
 			t.Fatalf("couldn't create sqlmock: %v", err)
 		}
 		defer testutils.FinishMock(mock, t)
-		defer db.Close()
+		defer func() {
+			if cErr := db.Close(); cErr != nil {
+				t.Logf("error during Close: %+v", cErr)
+			}
+		}()
 
 		rows := sqlmock.NewRows([]string{"dbid", "contentid", "port", "hostname", "address", "datadir", "role"})
 		rows.AddRow(1, -1, 15432, "mdw", "mdw-1", "/data/qddir/seg-1", greengage.PrimaryRole)
@@ -110,7 +114,11 @@ func TestGetSegmentConfiguration(t *testing.T) {
 			t.Fatalf("couldn't create sqlmock: %v", err)
 		}
 		defer testutils.FinishMock(mock, t)
-		defer db.Close()
+		defer func() {
+			if cErr := db.Close(); cErr != nil {
+				t.Logf("error during Close: %+v", cErr)
+			}
+		}()
 
 		rows := sqlmock.NewRows([]string{"dbid", "contentid", "port", "hostname", "address", "datadir", "role"})
 		rows.AddRow(1, -1, 15432, "mdw", "mdw-1", "/data/qddir/seg-1", greengage.PrimaryRole)
@@ -153,7 +161,9 @@ func TestPrimaryHostnames(t *testing.T) {
 	testlog.SetupTestLogger()
 
 	defer func() {
-		os.RemoveAll(testStateDir)
+		if err := os.RemoveAll(testStateDir); err != nil {
+			t.Errorf("removing temp directory: %v", err)
+		}
 	}()
 
 	t.Run("returns a list of hosts for only the primaries", func(t *testing.T) {
@@ -176,7 +186,9 @@ func TestClusterFromDB(t *testing.T) {
 	testlog.SetupTestLogger()
 
 	defer func() {
-		os.RemoveAll(testStateDir)
+		if err := os.RemoveAll(testStateDir); err != nil {
+			t.Errorf("removing temp directory: %v", err)
+		}
 	}()
 
 	t.Run("returns an error if connection fails", func(t *testing.T) {

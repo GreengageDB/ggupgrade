@@ -79,7 +79,7 @@ func checkRemotePath(t *testing.T, host string, path string, shouldExist bool) {
 	output, err := cmd.CombinedOutput()
 	var exitError *exec.ExitError
 	if errors.As(err, &exitError) {
-		exists := exitError.ProcessState.ExitCode() == 0
+		exists := exitError.ExitCode() == 0
 		if shouldExist && !exists {
 			t.Fatalf("expected path %q to exist on host %q", path, host)
 		}

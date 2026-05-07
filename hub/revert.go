@@ -71,7 +71,7 @@ Cannot revert and restore the source cluster. Please contact support.`)
 	})
 
 	st.RunConditionally(idl.Substep_delete_tablespaces, configCreated, func(streams step.OutStreams) error {
-		return DeleteTargetTablespaces(streams, s.agentConns, s.Config.Intermediate, s.Intermediate.CatalogVersion, s.Source.Tablespaces)
+		return DeleteTargetTablespaces(streams, s.agentConns, s.Intermediate, s.Intermediate.CatalogVersion, s.Source.Tablespaces)
 	})
 
 	// See "Reverting to old cluster" from https://www.postgresql.org/docs/9.4/pgupgrade.html
@@ -129,7 +129,7 @@ Cannot revert and restore the source cluster. Please contact support.`)
 		}
 
 		logArchiveDir = GetLogArchiveDir(logDir, s.UpgradeID, time.Now())
-		return ArchiveLogDirectories(logDir, logArchiveDir, s.agentConns, s.Config.Source.CoordinatorHostname())
+		return ArchiveLogDirectories(logDir, logArchiveDir, s.agentConns, s.Source.CoordinatorHostname())
 	})
 
 	st.RunConditionally(idl.Substep_delete_backupdir, configCreated, func(streams step.OutStreams) error {

@@ -23,7 +23,7 @@ func IsPostmasterRunningCmd_MatchesNoProcesses() {
 }
 
 func IsPostmasterRunningCmd_Errors() {
-	os.Stderr.WriteString("exit status 2")
+	_, _ = os.Stderr.WriteString("exit status 2")
 	os.Exit(2)
 }
 

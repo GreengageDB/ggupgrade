@@ -14,6 +14,7 @@ import (
 
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 const tablespacesQuery = `
@@ -80,7 +81,11 @@ func GetTablespaceTuples(db *sql.DB) (TablespaceTuples, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if cErr := rows.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
 
 	results := make([]Tablespace, 0)
 	for rows.Next() {
@@ -159,7 +164,11 @@ func TablespacesFromDB(db *sql.DB, tablespacesFile string) (Tablespaces, error) 
 	if err != nil {
 		return nil, xerrors.Errorf("create tablespace file %q: %w", tablespacesFile, err)
 	}
-	defer file.Close()
+	defer func() {
+		if cErr := file.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
 	if err := tablespaceTuples.Write(file); err != nil {
 		return nil, xerrors.Errorf("populate tablespace mapping file: %w", err)
 	}

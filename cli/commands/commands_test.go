@@ -27,7 +27,7 @@ func TestGetHubPort(t *testing.T) {
 		// save the expected port value to the conf file
 		expected := 12345
 		hubServer := hub.New(&config.Config{HubPort: expected})
-		err := hubServer.Config.Write()
+		err := hubServer.Write()
 		if err != nil {
 			t.Errorf("got unexpected error %#v", err)
 		}

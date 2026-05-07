@@ -30,12 +30,12 @@ import (
 )
 
 func gpinitsystem_Exits1() {
-	os.Stdout.WriteString("[WARN]:-Coordinator open file limit is 256 should be >= 65535")
+	_, _ = os.Stdout.WriteString("[WARN]:-Coordinator open file limit is 256 should be >= 65535")
 	os.Exit(1)
 }
 
 func pg_controldata() {
-	os.Stdout.WriteString(`
+	_, _ = os.Stdout.WriteString(`
 pg_control version number:            9420600
 Catalog version number:               301908232
 Database system identifier:           6849079892457217099
@@ -138,7 +138,11 @@ func TestGetCheckpointSegmentsAndEncoding(t *testing.T) {
 				t.Fatalf("sqlmock: %v", err)
 			}
 			defer testutils.FinishMock(mock, t)
-			defer db.Close()
+			defer func() {
+				if cErr := db.Close(); cErr != nil {
+					t.Logf("error during Close: %+v", cErr)
+				}
+			}()
 
 			var expected []string
 			for _, query := range c.query {
