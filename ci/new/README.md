@@ -1,7 +1,7 @@
 # Tests
 
 ```bash
-export IMAGE=gpdb7_ggupgrade:latest
+export IMAGE=ggdb7_ggupgrade:latest
 docker build -t "$IMAGE" -f ci/new/Dockerfile .
 
 # test with demo cluster
