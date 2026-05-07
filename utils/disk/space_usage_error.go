@@ -41,12 +41,12 @@ func (d SpaceUsageErr) Error() string {
 
 	for _, row := range d.Table() {
 		for _, col := range row {
-			fmt.Fprintf(&t, "%s\t", col)
+			_, _ = fmt.Fprintf(&t, "%s\t", col)
 		}
-		fmt.Fprintln(&t)
+		_, _ = fmt.Fprintln(&t)
 	}
 
-	t.Flush()
+	_ = t.Flush()
 	return b.String()
 }
 

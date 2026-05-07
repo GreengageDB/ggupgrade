@@ -37,12 +37,12 @@ func GenerateDataMigrationScripts(streams step.OutStreams, nonInteractive bool, 
 		return err
 	}
 
-	switch {
-	case version.Major == 5:
+	switch version.Major {
+	case 5:
 		seedDir = filepath.Join(seedDir, "5-to-6-seed-scripts")
-	case version.Major == 6:
+	case 6:
 		seedDir = filepath.Join(seedDir, "6-to-7-seed-scripts")
-	case version.Major == 7:
+	case 7:
 		// seedDir = filepath.Join(seedDir, "7-to-8-seed-scripts")
 		return nil // TODO: Remove once there are 7 > 8 data migration scripts
 	default:
@@ -249,10 +249,10 @@ Select: `)
 func GenerateScriptsPerDatabase(streams step.OutStreams, database DatabaseInfo, gphome string, port int, seedDir string, outputDir string, version semver.Version, bar *mpb.Bar) error {
 	var output []byte
 	var err error
-	switch {
-	case version.Major == 5:
+	switch version.Major {
+	case 5:
 		output, err = executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpythonu;`)
-	case version.Major == 6:
+	case 6:
 		output, err = executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpython3u;`)
 	default:
 		return fmt.Errorf("Internal error: unsupported source cluster version %v", version)
@@ -411,7 +411,11 @@ func GetDatabases(db *sql.DB) ([]DatabaseInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if cErr := rows.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
 
 	var databases []DatabaseInfo
 	for rows.Next() {

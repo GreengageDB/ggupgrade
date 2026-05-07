@@ -17,7 +17,7 @@ import (
 func Success() {}
 
 func FailedMain() {
-	os.Stderr.WriteString("oops!")
+	_, _ = os.Stderr.WriteString("oops!")
 	os.Exit(1)
 }
 

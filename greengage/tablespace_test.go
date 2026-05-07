@@ -27,7 +27,11 @@ func TestGetTablespaces(t *testing.T) {
 			t.Fatalf("couldn't create sqlmock: %v", err)
 		}
 		defer testutils.FinishMock(mock, t)
-		defer db.Close()
+		defer func() {
+			if cErr := db.Close(); cErr != nil {
+				t.Logf("error during Close: %+v", cErr)
+			}
+		}()
 
 		rows := sqlmock.NewRows([]string{"dbid", "oid", "name", "location", "userdefined"})
 		rows.AddRow(1, 1234, "pg_default", "/tmp/pg_default_tablespace", 0)
@@ -87,7 +91,11 @@ func TestGetTablespaces(t *testing.T) {
 				t.Fatalf("couldn't create sqlmock: %v", err)
 			}
 			defer testutils.FinishMock(mock, t)
-			defer db.Close()
+			defer func() {
+				if cErr := db.Close(); cErr != nil {
+					t.Logf("error during Close: %+v", cErr)
+				}
+			}()
 
 			mock.ExpectQuery("SELECT").WillReturnError(c.error)
 
@@ -290,7 +298,11 @@ func TestTablespacesFromDB(t *testing.T) {
 			createCalled = true
 			return write, nil
 		}
-		defer write.Close()
+		defer func() {
+			if cErr := write.Close(); cErr != nil {
+				t.Logf("error during Close: %+v", cErr)
+			}
+		}()
 
 		expectedFileName := "/tmp/mappingFile.txt"
 		tablespaces, err := greengage.TablespacesFromDB(db, expectedFileName)

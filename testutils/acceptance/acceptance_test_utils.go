@@ -548,7 +548,11 @@ schema = dummy_gp_toolkit`
 	if err != nil {
 		t.Fatalf("failed to create dummy gp_toolkit control file: %v", err)
 	}
-	defer controlFile.Close()
+	defer func() {
+		if cErr := controlFile.Close(); cErr != nil {
+			t.Logf("error during Close: %+v", cErr)
+		}
+	}()
 
 	_, err = controlFile.WriteString(content)
 	if err != nil {
@@ -566,7 +570,11 @@ schema = dummy_gp_toolkit`
 	if err != nil {
 		t.Fatalf("failed to create dummy gp_toolkit sql file: %v", err)
 	}
-	defer sqlFile.Close()
+	defer func() {
+		if cErr := sqlFile.Close(); cErr != nil {
+			t.Logf("error during Close: %+v", cErr)
+		}
+	}()
 }
 
 func TeardownDummyGpToolKit(t *testing.T, sourceVersion semver.Version) {

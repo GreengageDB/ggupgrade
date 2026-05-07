@@ -12,6 +12,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
 type StatActivity struct {
@@ -29,14 +30,14 @@ func (s StatActivities) Error() string {
 	tw.Init(&sb, 0, 0, 1, ' ', 0)
 
 	for _, activity := range s {
-		fmt.Fprintf(&tw, "Application:\t%s\n", activity.Application_name.String)
-		fmt.Fprintf(&tw, "User:\t%s\n", activity.User.String)
-		fmt.Fprintf(&tw, "Database:\t%s\n", activity.Datname.String)
-		fmt.Fprintf(&tw, "Query:\t%s\n", activity.Query.String)
-		fmt.Fprintln(&tw)
+		_, _ = fmt.Fprintf(&tw, "Application:\t%s\n", activity.Application_name.String)
+		_, _ = fmt.Fprintf(&tw, "User:\t%s\n", activity.User.String)
+		_, _ = fmt.Fprintf(&tw, "Database:\t%s\n", activity.Datname.String)
+		_, _ = fmt.Fprintf(&tw, "Query:\t%s\n", activity.Query.String)
+		_, _ = fmt.Fprintln(&tw)
 	}
 
-	tw.Flush()
+	_ = tw.Flush()
 	return sb.String()
 }
 
@@ -57,7 +58,11 @@ func QueryPgStatActivity(db *sql.DB, cluster *Cluster) error {
 	if err != nil {
 		return err
 	}
-	defer rows.Close()
+	defer func() {
+		if cErr := rows.Close(); cErr != nil {
+			err = errorlist.Append(err, cErr)
+		}
+	}()
 
 	var activities StatActivities
 	for rows.Next() {

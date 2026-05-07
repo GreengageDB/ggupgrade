@@ -27,25 +27,25 @@ import (
 
 // Prints the strings "stdout" and "stderr" to the respective streams.
 func PrintMain() {
-	fmt.Fprint(os.Stdout, "stdout")
-	fmt.Fprint(os.Stderr, "stderr")
+	_, _ = fmt.Fprint(os.Stdout, "stdout")
+	_, _ = fmt.Fprint(os.Stderr, "stderr")
 }
 
 // Writes the current working directory to stdout.
 func WorkingDirectoryMain() {
 	wd, err := os.Getwd()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to get working directory: %v", err)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to get working directory: %v", err)
 		os.Exit(1)
 	}
 
-	fmt.Print(wd)
+	_, _ = fmt.Print(wd)
 }
 
 // Prints the environment, one variable per line, in NAME=VALUE format.
 func EnvironmentMain() {
 	for _, e := range os.Environ() {
-		fmt.Println(e)
+		_, _ = fmt.Println(e)
 	}
 }
 

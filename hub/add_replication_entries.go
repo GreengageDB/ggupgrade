@@ -29,7 +29,7 @@ func AddReplicationEntriesOnPrimaries(agentConns []*idl.Connection, intermediate
 
 			mirrorHostAddrs := []string{intermediateMirror.Hostname}
 			if useHbaHostnames {
-				err, mirrorIps := getIpAddresses(intermediateMirror.Hostname)
+				mirrorIps, err := getIpAddresses(intermediateMirror.Hostname)
 				if err != nil {
 					return err
 				}
@@ -56,10 +56,10 @@ func AddReplicationEntriesOnPrimaries(agentConns []*idl.Connection, intermediate
 
 // getIpAddresses returns a list of ip addresses with CIDR notation for use in
 // pg_hba.conf.
-func getIpAddresses(host string) (error, []string) {
+func getIpAddresses(host string) ([]string, error) {
 	ips, err := utils.System.LookupIP(host)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
 	var cidrs []string
@@ -72,5 +72,5 @@ func getIpAddresses(host string) (error, []string) {
 		cidrs = append(cidrs, cidr.String())
 	}
 
-	return nil, cidrs
+	return cidrs, nil
 }

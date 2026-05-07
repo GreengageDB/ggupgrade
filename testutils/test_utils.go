@@ -157,7 +157,7 @@ func MustListenOnPort(t *testing.T, port int) func() {
 	t.Logf("listening on port %d...", port)
 
 	return func() {
-		listener.Close()
+		_ = listener.Close()
 	}
 }
 
@@ -499,7 +499,7 @@ func VerifyClusterIsStopped(t *testing.T, cluster greengage.Cluster) {
 	err = cluster.RunGreengageCmd(step.DevNullStream, "pg_isready", "-q", "-p", strconv.Itoa(cluster.CoordinatorPort()))
 	var exitError *exec.ExitError
 	if errors.As(err, &exitError) {
-		if exitError.ProcessState.ExitCode() != 2 {
+		if exitError.ExitCode() != 2 {
 			t.Fatalf("expected cluster to be stopped")
 		}
 	}
