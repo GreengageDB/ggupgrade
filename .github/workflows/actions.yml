@@ -70,11 +70,11 @@ jobs:
           file: ./ci/new/Dockerfile
           load: true
           push: false
-          tags: gpdb7_ggupgrade:latest
+          tags: ggdb7_ggupgrade:latest
 
       - name: Run test
         env:
-          IMAGE: gpdb7_ggupgrade:latest
+          IMAGE: ggdb7_ggupgrade:latest
         run: |
           docker run --rm -v "$(pwd)/logs:/logs" "$IMAGE" bash ggupgrade/ci/new/run_test_in_demo_cluster.bash make ${{ matrix.test }}
 
@@ -113,17 +113,17 @@ jobs:
           file: ./ci/new/Dockerfile
           load: true
           push: false
-          tags: gpdb7_ggupgrade:latest
+          tags: ggdb7_ggupgrade:latest
 
       - name: Setup cluster
         env:
-          IMAGE: gpdb7_ggupgrade:latest
+          IMAGE: ggdb7_ggupgrade:latest
         run: |
           bash ./ci/new/setup_dist_cluster.bash
 
       - name: Run test
         env:
-          IMAGE: gpdb7_ggupgrade:latest
+          IMAGE: ggdb7_ggupgrade:latest
         run: |
           docker compose -p ggupgrade -f ./ci/new/docker-compose.yaml exec \
                  -u gpadmin -T coordinator env \
