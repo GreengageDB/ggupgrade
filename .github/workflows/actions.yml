@@ -40,6 +40,7 @@ jobs:
           make generate
       - run: make unit
       - run: |
+          export GOPATH=$(go env GOPATH)
           make
           make install
           make integration

@@ -17,6 +17,7 @@ ENV PATH=$PATH:/opt/go/bin:/home/gpadmin/go/bin \
     GPHOME_SOURCE=/usr/local/greengage-db-6X \
     GPHOME_TARGET=/usr/local/greengage-db-7X \
     PGHOST=/tmp \
+    LANG=en_US.UTF-8 \
     ISOLATION2_PATH=/usr/local/greengage-db-7X/lib/postgresql/pgxs/src/test/isolation2/
 
 RUN set -eux; \
@@ -27,8 +28,9 @@ RUN set -eux; \
     chown -R 1000:1000 /usr/local/greengage-db-7X
 
 RUN set -eux; \
-    wget https://golang.org/dl/go1.20.5.linux-amd64.tar.gz -q -O - | tar -C /opt -xz; \
+    wget https://golang.org/dl/go1.21.13.linux-amd64.tar.gz -q -O - | tar -C /opt -xz; \
     apt update; \
+    apt install -y jq; \
     . /etc/os-release; \
     if [ "$VERSION_ID" = "22.04" ]; then \
       apt install python2 python2-dev python-pip -y; \

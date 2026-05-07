@@ -50,6 +50,7 @@ gpinitsystem -a -c init_config -h hostfile_segment_hosts $STANDBY_INIT_OPTS </de
 
 source ggupgrade/ci/new/common.bash
 export PGPORT=5432
+export MASTER_DATA_DIRECTORY="/data/coordinator/gpseg-1"
 
 set +e
 pushd ggupgrade
