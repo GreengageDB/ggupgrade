@@ -196,7 +196,11 @@ func TestFileStore(t *testing.T) {
 		if err != nil {
 			t.Fatalf("opening file: %+v", err)
 		}
-		defer f.Close()
+		defer func() {
+			if cErr := f.Close(); cErr != nil {
+				t.Logf("error during Close: %+v", cErr)
+			}
+		}()
 
 		dec := json.NewDecoder(f)
 		raw := make(map[string]map[string]string)

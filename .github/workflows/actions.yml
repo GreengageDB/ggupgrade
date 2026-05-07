@@ -13,10 +13,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v6
         with:
           go-version: '1.21'
-      - uses: actions/checkout@v4
       - run: |
           sudo apt-get update;
           sudo apt-get install -y protobuf-compiler;
@@ -29,15 +29,10 @@ jobs:
     name: Unit and Integration tests
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v6
         with:
           go-version: '1.21'
-      - name: Set Environment
-        run: |
-          echo "GOPATH=/home/runner/work/gpbackup/gpbackup/go" >> $GITHUB_ENV
-          echo "/home/runner/work/gpbackup/gpbackup/go/bin" >> $GITHUB_PATH
-          mkdir -p /home/runner/work/gpbackup/gpbackup/go/bin/
-      - uses: actions/checkout@v4
       - run: |
           sudo apt-get update;
           sudo apt-get install -y protobuf-compiler;
@@ -45,6 +40,7 @@ jobs:
           make generate
       - run: make unit
       - run: |
+          export GOPATH=$(go env GOPATH)
           make
           make install
           make integration

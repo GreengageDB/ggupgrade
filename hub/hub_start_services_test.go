@@ -31,7 +31,7 @@ func ggupgrade_agent() {
 }
 
 func ggupgrade_agent_Errors() {
-	os.Stderr.WriteString("could not find state-directory")
+	_, _ = os.Stderr.WriteString("could not find state-directory")
 	os.Exit(1)
 }
 
@@ -179,5 +179,5 @@ func TestRestartAgent(t *testing.T) {
 // temporary...
 type immediateFailure struct{}
 
-func (_ immediateFailure) Error() string   { return "failing fast" }
-func (_ immediateFailure) Temporary() bool { return false }
+func (immediateFailure) Error() string   { return "failing fast" }
+func (immediateFailure) Temporary() bool { return false }

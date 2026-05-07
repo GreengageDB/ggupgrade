@@ -60,12 +60,12 @@ Failure, exiting
 `
 
 func PgCheckFailure() {
-	os.Stdout.WriteString(FailureStdout)
+	_, _ = os.Stdout.WriteString(FailureStdout)
 	os.Exit(1)
 }
 
 func PgCheckFailureWithTiming() {
-	os.Stdout.WriteString(FailureWithTimingStdout)
+	_, _ = os.Stdout.WriteString(FailureWithTimingStdout)
 	os.Exit(1)
 }
 

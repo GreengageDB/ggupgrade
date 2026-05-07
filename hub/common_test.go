@@ -34,7 +34,7 @@ func init() {
 func Success() {}
 
 func Failure() {
-	os.Stderr.WriteString(os.ErrPermission.Error())
+	_, _ = os.Stderr.WriteString(os.ErrPermission.Error())
 	os.Exit(1)
 }
 
@@ -56,8 +56,8 @@ func StreamingMain() {
 	stderr := bytes.NewBufferString(StreamingMainStderr)
 
 	for stdout.Len() > 0 || stderr.Len() > 0 {
-		os.Stdout.Write(stdout.Next(5))
-		os.Stderr.Write(stderr.Next(5))
+		_, _ = os.Stdout.Write(stdout.Next(5))
+		_, _ = os.Stderr.Write(stderr.Next(5))
 	}
 }
 
