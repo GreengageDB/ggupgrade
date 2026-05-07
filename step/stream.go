@@ -28,11 +28,11 @@ var DevNullStream = devNullStream{}
 
 type devNullStream struct{}
 
-func (_ devNullStream) Stdout() io.Writer {
+func (devNullStream) Stdout() io.Writer {
 	return io.Discard
 }
 
-func (_ devNullStream) Stderr() io.Writer {
+func (devNullStream) Stderr() io.Writer {
 	return io.Discard
 }
 
@@ -160,8 +160,8 @@ type logMessageSenderWriter struct {
 }
 
 func (l *logMessageSenderWriter) Write(p []byte) (int, error) {
-	l.logMessageSender.mutex.Lock()
-	defer l.logMessageSender.mutex.Unlock()
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
 
 	scanner := bufio.NewScanner(bytes.NewReader(p))
 	for scanner.Scan() {
@@ -173,7 +173,7 @@ func (l *logMessageSenderWriter) Write(p []byte) (int, error) {
 		return 0, xerrors.Errorf("scanning: %w", err)
 	}
 
-	if l.logMessageSender.sender != nil {
+	if l.sender != nil {
 		// Attempt to send the chunk to the client. Since the client may close
 		// the connection at any point, errors here are logged and otherwise
 		// ignored. After the first send error, no more attempts are made.
@@ -183,13 +183,13 @@ func (l *logMessageSenderWriter) Write(p []byte) (int, error) {
 			Type:   l.cType,
 		}
 
-		err := l.logMessageSender.sender.Send(&idl.Message{
+		err := l.sender.Send(&idl.Message{
 			Contents: &idl.Message_Chunk{Chunk: chunk},
 		})
 
 		if err != nil {
 			log.Printf("halting client sender: %v", err)
-			l.logMessageSender.sender = nil
+			l.sender = nil
 		}
 	}
 

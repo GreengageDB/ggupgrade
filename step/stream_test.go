@@ -24,8 +24,8 @@ func ExampleDevNullStream() {
 		stderr = "there are some warnings..."
 	)
 	stream := DevNullStream
-	fmt.Fprintf(stream.Stdout(), "%s", stdout)
-	fmt.Fprintf(stream.Stderr(), "%s", stderr)
+	_, _ = fmt.Fprintf(stream.Stdout(), "%s", stdout)
+	_, _ = fmt.Fprintf(stream.Stderr(), "%s", stderr)
 	// Output:
 }
 
@@ -37,8 +37,14 @@ func TestBufStream(t *testing.T) {
 		)
 
 		stream := new(BufferedStreams)
-		fmt.Fprintf(stream.Stdout(), "%s", stdout)
-		fmt.Fprintf(stream.Stderr(), "%s", stderr)
+		_, err := fmt.Fprintf(stream.Stdout(), "%s", stdout)
+		if err != nil {
+			t.Errorf("writing stdout: %#v", err)
+		}
+		_, err = fmt.Fprintf(stream.Stderr(), "%s", stderr)
+		if err != nil {
+			t.Errorf("writing stderr: %#v", err)
+		}
 
 		if stdout != stream.StdoutBuf.String() {
 			t.Errorf("expected %s got %s", stdout, stream.StdoutBuf.String())
@@ -74,8 +80,14 @@ func TestMultiplexedStream(t *testing.T) {
 			}}})
 
 		stream := newLogMessageSender(mockStream)
-		fmt.Fprint(stream.Stdout(), expectedStdout)
-		fmt.Fprint(stream.Stderr(), expectedStderr)
+		_, err := fmt.Fprint(stream.Stdout(), expectedStdout)
+		if err != nil {
+			t.Errorf("writing stdout: %#v", err)
+		}
+		_, err = fmt.Fprint(stream.Stderr(), expectedStderr)
+		if err != nil {
+			t.Errorf("writing stderr: %#v", err)
+		}
 	})
 
 	t.Run("also writes all data to the log", func(t *testing.T) {

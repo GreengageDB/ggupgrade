@@ -76,7 +76,11 @@ func TestUpdateGpSegmentConfiguration(t *testing.T) {
 				t.Fatalf("sqlmock: %v", err)
 			}
 			defer testutils.FinishMock(mock, t)
-			defer db.Close()
+			defer func() {
+				if cErr := db.Close(); cErr != nil {
+					t.Logf("error during Close: %+v", cErr)
+				}
+			}()
 
 			mock.MatchExpectationsInOrder(false) // since we iterate over maps for which golang does not guarantee order
 
@@ -200,7 +204,11 @@ func TestUpdateGpSegmentConfiguration(t *testing.T) {
 				t.Fatalf("sqlmock: %v", err)
 			}
 			defer testutils.FinishMock(mock, t)
-			defer db.Close()
+			defer func() {
+				if cErr := db.Close(); cErr != nil {
+					t.Logf("error during Close: %+v", cErr)
+				}
+			}()
 
 			c.expectations(mock)
 			err = hub.UpdateGpSegmentConfiguration(db, target)
