@@ -15,9 +15,9 @@ VACUUM
 
 -- should be able to create a new table without any warnings related to vacuum
 CREATE TABLE upgraded_vf_tbl_heap (LIKE vf_tbl_heap);
-CREATE
+CREATE TABLE
 INSERT INTO upgraded_vf_tbl_heap SELECT * FROM vf_tbl_heap;
-INSERT 10
+INSERT 0 10
 VACUUM FREEZE upgraded_vf_tbl_heap;
 VACUUM
 SELECT * FROM upgraded_vf_tbl_heap;
