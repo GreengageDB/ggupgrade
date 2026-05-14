@@ -4,6 +4,7 @@ function collect_logs {
       "$1 d log"
       "$1 d pg_log"
       "ggupgrade/test/acceptance/pg_upgrade/6-to-7/ d results"
+      "./ f sql_load.log"
     )
 
     shift
