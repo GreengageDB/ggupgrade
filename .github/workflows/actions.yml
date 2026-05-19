@@ -119,7 +119,7 @@ jobs:
         with:
           version: latest
       
-      - name: Fetch SQL dump for ${{ matrix.feature }}
+      - name: Fetch SQL dump for ${{ matrix.test }}
         if: startsWith(matrix.test, 'e2e')
         continue-on-error: true
         env:
@@ -129,7 +129,7 @@ jobs:
           artifact_archive_name="$ubuntu_postgres_sqldump.tar"
 
           run_ids=$(gh run list --workflow "Greengage SQL Dump" \
-            --repo GreengageDB/greengage
+            --repo GreengageDB/greengage \
             --limit 100 \
             --json conclusion,status,databaseId \
             --jq 'map(select(.status=="completed" and .conclusion=="success")) | .[].databaseId')
