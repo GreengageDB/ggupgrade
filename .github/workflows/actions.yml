@@ -118,6 +118,36 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           version: latest
+      
+      - name: Fetch SQL dump for ${{ matrix.feature }}
+        if: startsWith(matrix.test, 'e2e')
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          artifact_name="sqldump_ggdb6_ubuntu"
+          artifact_archive_name="$ubuntu_postgres_sqldump.tar"
+
+          run_ids=$(gh run list --workflow "Greengage SQL Dump" \
+            --repo GreengageDB/greengage
+            --limit 100 \
+            --json conclusion,status,databaseId \
+            --jq 'map(select(.status=="completed" and .conclusion=="success")) | .[].databaseId')
+
+          for run_id in $run_ids; do
+            if gh run download "$run_id" --repo GreengageDB/greengage --name "$artifact_name" 2>/dev/null ; then
+              echo "SQL Dump $artifact_name found at $run_id finished workflow"
+              break
+            fi
+          done
+
+          if tar -xf $artifact_archive_name 2>/dev/null ; then
+            rm -f $artifact_archive_name
+            echo "SQL Dump $artifact_archive_name sucessfully unpacked and removed"
+          else
+            echo "::error::Artifact '$artifact_name' not found in any completed workflow run"
+            exit 1
+          fi
 
       - name: Build
         uses: docker/build-push-action@v6
