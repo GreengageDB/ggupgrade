@@ -150,4 +150,15 @@ drop extension gp_subtransaction_overflow;
 ALTER DATABASE dsp1 RESET gp_default_storage_options;
 ALTER DATABASE dsp2 RESET gp_default_storage_options;
 
--- We are hitting an assertions because of the 
+-- GG-432
+\c regression
+drop table alter_ao_part_exch_column.ao_part;
+
+\c isolation2test
+drop table public.lineitem;
+
+\c dsp3
+drop table public.dsp_partition1;
+
+\c incrementalanalyze
+drop table public.foo;
