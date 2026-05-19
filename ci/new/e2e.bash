@@ -5,10 +5,11 @@ set -eux -o pipefail
 MODE=$1
 WITH_MIRRORS="${WITH_MIRRORS:-true}"
 WITH_STANDBY="${WITH_STANDBY:-true}"
+SQL_DUMP_PATH=/home/gpadmin/sqldump/dump.sql
 
 function load_dump() {
     echo "Loading SQL Dump"
-    psql -d postgres -f ci/new/basic_sql_dump.sql &> sql_load.log
+    psql -d postgres -f $SQL_DUMP_PATH &> sql_load.log
     echo "SQL Dump load complete"
 }
 
