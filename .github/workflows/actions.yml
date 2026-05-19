@@ -126,7 +126,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           artifact_name="sqldump_ggdb6_ubuntu"
-          artifact_archive_name="$ubuntu_postgres_sqldump.tar"
+          artifact_archive_name="ubuntu_postgres_sqldump.tar"
 
           run_ids=$(gh run list --workflow "Greengage SQL Dump" \
             --repo GreengageDB/greengage \
