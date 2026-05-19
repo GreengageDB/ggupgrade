@@ -10,6 +10,8 @@ SQL_DUMP_PATH=/home/gpadmin/sqldump/dump.sql
 function load_dump() {
     echo "Loading SQL Dump"
     psql -d postgres -f $SQL_DUMP_PATH &> sql_load.log
+    echo "Cleaning up SQL Dump"
+    psql -d postgres -f ci/new/cleanup_sql_dump.sql &> sql_clean.log
     echo "SQL Dump load complete"
 }
 

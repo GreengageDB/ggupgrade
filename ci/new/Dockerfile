@@ -1,4 +1,4 @@
-ARG GGDB6_IMAGE=ghcr.io/greengagedb/greengage/ggdb6_ubuntu24.04:db987c3ae04fcfe3bf0d5cbc0e3634ed38802e9e
+ARG GGDB6_IMAGE=ghcr.io/greengagedb/greengage/ggdb6_ubuntu:latest
 ARG GGDB7_IMAGE=ghcr.io/greengagedb/greengage/ggdb7_ubuntu:latest
 
 FROM $GGDB6_IMAGE AS ggdb6
