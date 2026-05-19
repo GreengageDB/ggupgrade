@@ -143,6 +143,10 @@ drop table public.test_issue_12936;
 \c contrib_regression
 drop extension gp_subtransaction_overflow;
 
+-- Non set-returning functions with EXECUTE ON MASTER
+\c regression_sort
+drop extension orafce;
+
 
 -- NOMERGE: Start of the workarouds. These are legit bugs, but right now I want to see more of them
 
@@ -156,9 +160,12 @@ drop table alter_ao_part_exch_column.ao_part;
 
 \c isolation2test
 drop table public.lineitem;
+drop table public.part_tbl_upd_del;
 
 \c dsp3
 drop table public.dsp_partition1;
 
 \c incrementalanalyze
 drop table public.foo;
+drop table public.hll_part;
+drop table public.hll_part_def;
