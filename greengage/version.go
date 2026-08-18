@@ -39,10 +39,11 @@ func Version(gphome string) (semver.Version, error) {
 		return semver.Version{}, fmt.Errorf("%q failed with %q: %w", cmd.String(), string(output), err)
 	}
 
+	re := regexp.MustCompile(`postgres \(Green(gage|plum) Database\) `)
 	rawVersion := string(output)
-	parts := strings.SplitN(strings.TrimSpace(rawVersion), "postgres (Greengage Database) ", 2)
+	parts := re.Split(strings.TrimSpace(rawVersion), 2)
 	if len(parts) != 2 {
-		return semver.Version{}, xerrors.Errorf(`Greengage version %q is not of the form "postgres (Greengage Database) #.#.#"`, rawVersion)
+		return semver.Version{}, xerrors.Errorf(`Greengage version %q is not of the form "postgres (Green(gage|plum) Database) #.#.#"`, rawVersion)
 	}
 
 	pattern := regexp.MustCompile(`\d+\.\d+\.\d+`)
