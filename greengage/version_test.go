@@ -51,6 +51,10 @@ func PostgresGPVersion_Greenplum_6_27_1_dev() {
 	fmt.Println("postgres (Greenplum Database) 6.27.1+dev.1012.g77259690767 build dev")
 }
 
+func PostgresGPVersion_6_2() {
+	fmt.Println("postgres (Greenplum Database) 6.2")
+}
+
 func EmptyString() {
 	fmt.Println("")
 }
@@ -75,6 +79,7 @@ func init() {
 		EmptyString,
 		MarkerOnly,
 		PostgresGPVersion_Greenplum_6_27_1_dev,
+		PostgresGPVersion_6_2,
 		FailedMain,
 	)
 }
@@ -118,6 +123,7 @@ func TestVersion_Parsing(t *testing.T) {
 	}{
 		{name: "handles empty version", versionCommand: EmptyString, expected: errors.New(`Greengage version "\n" is not of the form "postgres (Green(gage|plum) Database) #.#.#"`)},
 		{name: "handles only marker string", versionCommand: MarkerOnly, expected: errors.New(`Greengage version "postgres (Greengage Database)\n" is not of the form "postgres (Green(gage|plum) Database) #.#.#"`)},
+		{name: "handles not 3 number version", versionCommand: PostgresGPVersion_6_2, expected: errors.New(`Greengage version "postgres (Greenplum Database) 6.2\n" is not of the form "postgres (Green(gage|plum) Database) #.#.#"`)},
 	}
 
 	for _, c := range errCases {

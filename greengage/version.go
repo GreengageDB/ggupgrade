@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strings"
 
 	"github.com/blang/semver/v4"
 	"golang.org/x/xerrors"
@@ -39,20 +38,15 @@ func Version(gphome string) (semver.Version, error) {
 		return semver.Version{}, fmt.Errorf("%q failed with %q: %w", cmd.String(), string(output), err)
 	}
 
-	re := regexp.MustCompile(`postgres \(Green(gage|plum) Database\) `)
+	pattern := regexp.MustCompile(`postgres \(Green(?:gage|plum) Database\) (\d+\.\d+\.\d+)`)
 	rawVersion := string(output)
-	parts := re.Split(strings.TrimSpace(rawVersion), 2)
-	if len(parts) != 2 {
+	matches := pattern.FindStringSubmatch(rawVersion)
+
+	if len(matches) < 1 {
 		return semver.Version{}, xerrors.Errorf(`Greengage version %q is not of the form "postgres (Green(gage|plum) Database) #.#.#"`, rawVersion)
 	}
 
-	pattern := regexp.MustCompile(`\d+\.\d+\.\d+`)
-	matches := pattern.FindStringSubmatch(parts[1])
-	if len(matches) < 1 {
-		return semver.Version{}, xerrors.Errorf("parsing Greengage version %q: %w", rawVersion, err)
-	}
-
-	version, err := semver.Parse(matches[0])
+	version, err := semver.Parse(matches[1])
 	if err != nil {
 		return semver.Version{}, xerrors.Errorf("parsing Greengage version %q: %w", rawVersion, err)
 	}
