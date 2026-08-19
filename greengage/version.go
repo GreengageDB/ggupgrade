@@ -42,7 +42,7 @@ func Version(gphome string) (semver.Version, error) {
 	rawVersion := string(output)
 	matches := pattern.FindStringSubmatch(rawVersion)
 
-	if len(matches) < 1 {
+	if len(matches) < 2 {
 		return semver.Version{}, xerrors.Errorf(`Greengage version %q is not of the form "postgres (Green(gage|plum) Database) #.#.#"`, rawVersion)
 	}
 
