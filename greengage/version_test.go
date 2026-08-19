@@ -47,8 +47,8 @@ func PostgresGPVersion_0_0_0() {
 	fmt.Println("postgres (Greengage Database) 0.0.0 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
 }
 
-func PostgresGPVersion_Greenplum_6_7_1() {
-	fmt.Println("postgres (Greenplum Database) 6.7.1 build commit:a21de286045072d8d1df64fa48752b7dfac8c1b7")
+func PostgresGPVersion_Greenplum_6_27_1_dev() {
+	fmt.Println("postgres (Greenplum Database) 6.27.1+dev.1012.g77259690767 build dev")
 }
 
 func EmptyString() {
@@ -74,7 +74,7 @@ func init() {
 		PostgresGPVersion_0_0_0,
 		EmptyString,
 		MarkerOnly,
-		PostgresGPVersion_Greenplum_6_7_1,
+		PostgresGPVersion_Greenplum_6_27_1_dev,
 		FailedMain,
 	)
 }
@@ -92,7 +92,7 @@ func TestVersion_Parsing(t *testing.T) {
 		{"handles release versions", PostgresGPVersion_6_7_1, semver.MustParse("6.7.1")},
 		{"handles large versions", PostgresGPVersion_11_341_31, semver.MustParse("11.341.31")},
 		{"handles multi line versions", PostgresGPVersion_MultiLine, semver.MustParse("6.18.2")},
-		{"handles Greenplum versions", PostgresGPVersion_Greenplum_6_7_1, semver.MustParse("6.7.1")},
+		{"handles Greenplum versions", PostgresGPVersion_Greenplum_6_27_1_dev, semver.MustParse("6.27.1")},
 	}
 
 	for _, c := range cases {
