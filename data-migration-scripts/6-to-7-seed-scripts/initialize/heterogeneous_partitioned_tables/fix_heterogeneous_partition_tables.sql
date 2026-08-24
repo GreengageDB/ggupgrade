@@ -1,3 +1,15 @@
+-- Copyright (c) 2017-2023 VMware, Inc. or its affiliates
+-- SPDX-License-Identifier: Apache-2.0
+
+-- Detect heterogenous partition tables and CTAS the affected leaf tables
+-- The detection query is based on the GPDB pg_upgrade code from 6X at:
+-- contrib/pg_upgrade/greengage/check_gp.h
+-- check_heterogeneous_partition() in contrib/pg_upgrade/greengage/check_gp.c
+-- We only handle scenario 1 referenced in check_heterogeneous_partition().
+-- Detection query used: CHECK_PARTITION_TABLE_DROPPED_COLUMN_REFERENCES
+
+SET client_min_messages TO WARNING;
+
 CREATE OR REPLACE FUNCTION __ggupgrade_tmp_generator.raise_partition_error(schemaname TEXT, relname TEXT) RETURNS TEXT
 LANGUAGE plpgsql AS
 $$
