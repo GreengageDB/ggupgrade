@@ -127,17 +127,23 @@ commands AS (
         JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE parparentrule = 0
 )
-SELECT FORMAT (
-    '
-        SET gp_enable_exchange_default_partition = on;
-        SET optimizer_enable_ctas = off;
-        CREATE SCHEMA __ggupgrade_tmp_executor;
-        DROP TABLE IF EXISTS __ggupgrade_tmp_executor.scratch_table;
-        %s
-        DROP SCHEMA __ggupgrade_tmp_executor CASCADE;
-        RESET gp_enable_exchange_default_partition;
-        RESET optimizer_enable_ctas;
-    ',
-    string_agg(command, '')
-)
-FROM commands;
+SELECT CASE
+    WHEN (SELECT COUNT(*) FROM commands) > 0 THEN (
+        SELECT FORMAT (
+            '
+                SET gp_enable_exchange_default_partition = on;
+                SET optimizer_enable_ctas = off;
+                CREATE SCHEMA __ggupgrade_tmp_executor;
+                DROP TABLE IF EXISTS __ggupgrade_tmp_executor.scratch_table;
+                %s
+                DROP SCHEMA __ggupgrade_tmp_executor CASCADE;
+                RESET gp_enable_exchange_default_partition;
+                RESET optimizer_enable_ctas;
+            ',
+            string_agg(command, '')
+        )
+        FROM commands
+    )
+    ELSE
+        ''
+END;
