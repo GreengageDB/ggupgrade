@@ -1,0 +1,64 @@
+# FILE:    ci/Dockerfile.ubuntu
+# CONTEXT: Build binaries and deb-package on Ubuntu 22.04
+# PURPOSE: Multi-stage Docker build for ggupgrade
+
+# hadolint global ignore=DL3008 # We need the newest packages for develop
+
+ARG OS_VERSION=22.04
+
+FROM ubuntu:${OS_VERSION} AS base
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN useradd -md /home/gpadmin gpadmin
+WORKDIR /home/gpadmin
+
+ARG GO_VERSION=1.21.13 \
+    DEBIAN_FRONTEND=noninteractive
+
+RUN set -eux; \
+    apt-get update -q; \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        debhelper \
+        devscripts \
+        fakeroot \
+        git \
+        lsb-release \
+        curl \
+        ca-certificates \
+        protobuf-compiler \
+        perl; \
+    apt-get clean ; \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/* /var/log/*
+
+RUN set -eux; \
+    curl -fsSL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz \
+        | tar -C /usr/local -xz
+
+ENV GOPATH=/home/gpadmin/go \
+    GO111MODULE=on \
+    CGO_ENABLED=1 \
+    GOFLAGS=-buildvcs=false
+ENV PATH=/usr/local/go/bin:$GOPATH/bin:$PATH
+
+FROM base AS build
+
+RUN mkdir bin deb-packages && chown gpadmin:gpadmin bin deb-packages
+COPY --chown=gpadmin:gpadmin . src
+
+USER gpadmin
+
+RUN make -C src install-dependencies generate pkg VERSION
+RUN cp src/ggupgrade bin/ggupgrade
+
+FROM base AS code
+# Use --exclude, when it will be available in stable syntax.
+COPY --chown=gpadmin:gpadmin . src
+RUN rm -rf src/.git*
+
+FROM base AS clean
+USER gpadmin
+
+COPY --from=code  /home/gpadmin/src src
+COPY --from=build /home/gpadmin/src/VERSION src
+COPY --from=build /home/gpadmin/bin bin
+COPY --from=build /home/gpadmin/deb-packages deb-packages

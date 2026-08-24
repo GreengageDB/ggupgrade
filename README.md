@@ -9,13 +9,13 @@ We warmly welcome any feedback and
 **Purpose:**
 
 Greengage has multiple ways of upgrading including backup & restore and gpcopy.
-These methods usually require additional diskspace for the required copy and 
-significant downtime. ggupgrade can do fast in-place upgrades without the need 
-for additional hardware, disk space, and with less downtime. 
+These methods usually require additional diskspace for the required copy and
+significant downtime. ggupgrade can do fast in-place upgrades without the need
+for additional hardware, disk space, and with less downtime.
 
-Creating an easy upgrade path enables users to quickly and confidently upgrade. 
-This enables Greengage to have faster release cycles with faster user feedback. 
-Most importantly it allows Greengage to reduce its reliance on supporting legacy 
+Creating an easy upgrade path enables users to quickly and confidently upgrade.
+This enables Greengage to have faster release cycles with faster user feedback.
+Most importantly it allows Greengage to reduce its reliance on supporting legacy
 versions.
 
 **Supported Versions:**
@@ -24,7 +24,7 @@ versions.
 | --- | ---
 | 5 | 6
 | 6 | 7 (future work)
- 
+
 **Architecture:**
 
 ggupgrade consists of three processes that communicate using gRPC and protocol buffers:
@@ -35,13 +35,13 @@ ggupgrade consists of three processes that communicate using gRPC and protocol b
   - Runs on the coordinator host
   - Upgrades the coordinator
   - Coordinates the agent processes
-  - Consists of a gRPC client and server 
+  - Consists of a gRPC client and server
 - Agents
   - Run on all segment hosts
   - Upgrade the standby, primary, and mirror segments
   - Execute commands received from the hub
   - Consist of a gRPC server
- 
+
 ```
        CLI                     Hub                     Agent
       ------                  ------                  -------
@@ -57,13 +57,13 @@ ggupgrade consists of three processes that communicate using gRPC and protocol b
 Running ggupgrade consists of several steps (ie: commands):
 - ggupgrade initialize
   - The source cluster can still be running. No downtime.
-  - Substeps include creating the ggupgrade state directory, starting the hub and agents, creating the target cluster, 
+  - Substeps include creating the ggupgrade state directory, starting the hub and agents, creating the target cluster,
     and running pre-upgrade checks.
 - ggupgrade execute
   - This step will stop the source cluster. Downtime is needed.
   - Substeps include upgrading the coordinator, copying the coordinator catalog to the segments, and upgrading the primaries.
-  - The coordinator contains only catalog information and no data, and is used to upgrade the catalog of the primaries. 
-    That is, after the target cluster coordinator is upgraded it's copied to each of the primary data directories on 
+  - The coordinator contains only catalog information and no data, and is used to upgrade the catalog of the primaries.
+    That is, after the target cluster coordinator is upgraded it's copied to each of the primary data directories on
     the target cluster to upgrade their catalog. Next, the target cluster primaries data is upgraded using pg_upgrade.
 - ggupgrade finalize
   - After finalizing the upgrade cannot be reverted.
@@ -73,7 +73,7 @@ Optional steps (ie: commands):
 - ggupgrade revert
   - To restore the cluster to the state before the upgrade.
   - Can be run after initialize or execute, but *not* finalize.
-  - Substeps include deleting the target cluster, archiving the ggupgrade log 
+  - Substeps include deleting the target cluster, archiving the ggupgrade log
     directory, and restoring the source cluster.
   - Reverting in copy mode consists of simply removing the target cluster.
     However, due to a GPDB 5X bug gprecoverseg is needed.
@@ -99,7 +99,7 @@ initialize ---> revert ----
     V
  finalize
     |
-run migration 
+run migration
   scripts
     |
     V
@@ -107,13 +107,13 @@ run migration
 ```
 
 Each substep within a step implements [crash-only idempotence](https://en.wikipedia.org/wiki/Crash-only_software).
-This means that if an error occurs and is fixed then on rerun the step will 
-succeed. This requires each substep to clean up any side effects it creates, 
+This means that if an error occurs and is fixed then on rerun the step will
+succeed. This requires each substep to clean up any side effects it creates,
 or possibly check if the work has been done.
 
 **Link vs. Copy Mode:**
 
-ggupgrade inits a fresh target cluster "next to" the source cluster, and upgrades 
+ggupgrade inits a fresh target cluster "next to" the source cluster, and upgrades
 "into it" in-place using pg_upgrade's copy or link mode.
 
 | Attribute | Copy Mode | Link Mode
@@ -129,10 +129,26 @@ ggupgrade inits a fresh target cluster "next to" the source cluster, and upgrade
 
 ### Prerequisites
 
+#### Build ggupgrade binary
 - Golang. See the top of [go.mod](go.mod) for the current version used.
 - protoc. This is the compiler for the [grpc protobuf](https://grpc.io/)
   system which can be installed from the github repository.
   `https://github.com/protocolbuffers/protobuf/releases`.
+
+#### Build ggupgrade deb package
+- debhelper
+- devscripts
+- fakeroot
+- lsb-release
+- perl
+
+On Debian/Ubuntu these can be installed with:
+```
+sudo apt-get install -y debhelper devscripts fakeroot lsb-release perl
+```
+
+Alternatively, build the package inside Docker without installing anything locally —
+see [ci/Dockerfile.ubuntu](ci/Dockerfile.ubuntu).
 
 ### Setting up your IDE
 
@@ -174,6 +190,7 @@ make                        # build ggupgrade binary (same as make build)
 make install-dependencies   # installs necessary developer dependencies and tools
 make generate               # recompiles proto files to generate gRPC client and server code
 make build                  # build ggupgrade binary
+make pkg-deb                # build ggupgrade deb package
 make install                # installs ggupgrade into $GOBIN
 make lint                   # runs linter
 make unit                   # runs unit test
@@ -210,8 +227,8 @@ make unit
 ```
 
 #### Integration tests
-Tests that run against the ggupgrade binary to verify the interaction between 
-components. Before writing a new integration test please review the 
+Tests that run against the ggupgrade binary to verify the interaction between
+components. Before writing a new integration test please review the
 [README](https://github.com/GreengageDB/ggupgrade/blob/main/test/integration/README.md).
 ```
 make integration
@@ -244,7 +261,7 @@ make test --keep-going
 ```
 
 #### End-to-End tests
-Creates a Concourse pipeline that includes various multi-host X-to-Y upgrade and 
+Creates a Concourse pipeline that includes various multi-host X-to-Y upgrade and
 functional tests. These cannot be run locally.
 ```
 make pipeline
@@ -252,7 +269,7 @@ make pipeline
 
 #### Functional tests
 Creates a Concourse pipeline for testing metadata and _any_ other SQL dump file.
-See [ci/functional/README.md](https://github.com/GreengageDB/ggupgrade/blob/main/ci/functional/README.md) 
+See [ci/functional/README.md](https://github.com/GreengageDB/ggupgrade/blob/main/ci/functional/README.md)
 for specifics. These cannot be run locally.
 ```
 make functional-pipeline
@@ -260,39 +277,39 @@ make functional-pipeline
 
 ## Concourse Pipeline
 
-To update the pipeline edit the yaml files in the `ci` directory and run 
-`make pipeline`. 
+To update the pipeline edit the yaml files in the `ci` directory and run
+`make pipeline`.
 
-The yaml files in the `ci` directory are concatenated to 
-create `ci/generated/template.yml`. Next, `go generate ./ci` is executed which 
+The yaml files in the `ci` directory are concatenated to
+create `ci/generated/template.yml`. Next, `go generate ./ci` is executed which
 runs `go run ./parser/parse_template.go generated/template.yml generated/pipeline.yml`
-to create `ci/generated/pipeline.yml`. None of the generated files `template.yml` 
+to create `ci/generated/pipeline.yml`. None of the generated files `template.yml`
 or `pipeline.yml` are checked in.
 
-To update the production pipeline locally checkout main and be sure to pull 
+To update the production pipeline locally checkout main and be sure to pull
 the latest code and fly with `PIPELINE_NAME=ggupgrade FLY_TARGET=prod make pipeline`
 
-To make the pipeline publicly visible run `make expose-pipeline`. This will 
-allow anyone to see the pipeline and its status. However, the task details will 
+To make the pipeline publicly visible run `make expose-pipeline`. This will
+allow anyone to see the pipeline and its status. However, the task details will
 not be visible unless one logs into Concourse.
 
-*Note:* If your dev pipeline is failing on the build job while verifying the rpm 
-then the most likely cause is needing to sync the latest tags on origin with 
-your remote. This allows the GPDB test rpm to have the correct version number. 
+*Note:* If your dev pipeline is failing on the build job while verifying the rpm
+then the most likely cause is needing to sync the latest tags on origin with
+your remote. This allows the GPDB test rpm to have the correct version number.
 On your GPDB branch run the following:
 ```
 $ git fetch --tags origin
 $ git push --tags <yourRemoteName>
 ```
-If you already flew a pipeline *before* pushing tags you will likely 
-need to delete it, push tags, and re-fly as Concourse has some weird caching 
+If you already flew a pipeline *before* pushing tags you will likely
+need to delete it, push tags, and re-fly as Concourse has some weird caching
 issues.
 
 
 ## Bash Completion
 
 To enable tab completion of ggupgrade commands source the `cli/bash/ggupgrade.bash`
-script from your `~/.bash_completion` config, or copy it into your system's 
+script from your `~/.bash_completion` config, or copy it into your system's
 completions directory such as  `/etc/bash_completion.d`.
 
 ## Log Locations
@@ -325,7 +342,7 @@ Logs are located on **_all hosts_**.
 - Run ggupgrade to hit the breakpoint in the CLI and start the hub process.
 - When using intellij "Attach to Process" and select the hub and/or agent processes.
 - Set additional breakpoints in the hub or agent code to aid in debugging.
-- Continue execution on the CLI until the additional breakpoints in the hub or agent code are hit. Step through the code 
+- Continue execution on the CLI until the additional breakpoints in the hub or agent code are hit. Step through the code
 to debug.
 - For faster iterations:
   - Make any local changes in the code

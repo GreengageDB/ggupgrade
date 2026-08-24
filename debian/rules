@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+DH_VERBOSE = 1
+
+export DEB_BUILD_OPTIONS = nocheck
+
+export CGO_ENABLED = 1
+export GOPATH ?= $(HOME)/go
+export GOFLAGS = -buildvcs=false
+export PATH := /usr/local/go/bin:$(PATH)
+
+BIN ?= ggupgrade
+INSTALL_ROOT = $(CURDIR)/debian/tmp/$(PACKAGE_NAME)$(GPROOT)/$(PACKAGE_NAME)
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	@echo "Skipping 'make clean': it removes idl/*.pb.go and cli/bash/ggupgrade.bash generated for this build"
+
+override_dh_auto_install:
+	@echo "=== Installing $(PACKAGE_NAME) to $(PACKAGE_NAME)$(GPROOT)/$(PACKAGE_NAME) ==="
+	@install -D -m 755 $(CURDIR)/$(BIN) $(INSTALL_ROOT)/$(BIN)
+	@install -D -m 644 $(CURDIR)/cli/bash/ggupgrade.bash $(INSTALL_ROOT)/ggupgrade.bash
+	@install -D -m 644 $(CURDIR)/ggupgrade_config $(INSTALL_ROOT)/ggupgrade_config
+	@install -D -m 644 $(CURDIR)/open_source_licenses.txt $(INSTALL_ROOT)/open_source_licenses.txt
+	@mkdir -p $(INSTALL_ROOT)/data-migration-scripts
+	@cp -a $(CURDIR)/data-migration-scripts/. $(INSTALL_ROOT)/data-migration-scripts/
+	@rm -f $(INSTALL_ROOT)/data-migration-scripts/README.md
+	@find $(INSTALL_ROOT)/data-migration-scripts -path '*/test' -type d -exec rm -rf {} +
+
+override_dh_dwz:
+	@echo "Skipping debug symbols compression (not working properly with Golang)"

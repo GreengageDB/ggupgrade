@@ -1,0 +1,23 @@
+Source: ggupgrade
+Maintainer: Greengage <greengage@greengagedb.org>
+Section: database
+Build-Depends: debhelper (>= 13),
+	 lsb-release
+Standards-Version: 4.6.0
+
+Package: ggupgrade
+Architecture: any
+Depends: ${shlibs:Depends},
+	 greengage6,
+	 greengage7,
+	 openssh-client,
+	 rsync (>= 3.0)
+Description: In-place upgrade utility for Greengage Database
+	ggupgrade runs pg_upgrade across all segments to upgrade a Greengage
+	cluster across major versions. Greengage has multiple ways of upgrading
+	including backup & restore and gpcopy. These methods usually require
+	additional disk space for the required copy and significant downtime.
+	ggupgrade can do fast in-place upgrades without the need for additional
+	hardware, disk space, and with less downtime. The package installs the
+	ggupgrade binary along with its data migration scripts and supporting
+	configuration files.
