@@ -268,13 +268,6 @@ func TestGenerateScriptsPerDatabase(t *testing.T) {
 
 			actualSql := args[7:8]
 			if numCalls == 1 {
-				expected := []string{"CREATE LANGUAGE plpython3u;"}
-				if !reflect.DeepEqual(actualSql, expected) {
-					t.Errorf("got sql %q, want %q", actualSql, expected)
-				}
-			}
-
-			if numCalls == 2 {
 				expected := []string{"DROP SCHEMA IF EXISTS __ggupgrade_tmp_generator CASCADE; CREATE SCHEMA __ggupgrade_tmp_generator;"}
 				if !reflect.DeepEqual(actualSql, expected) {
 					t.Errorf("got sql %q, want %q", actualSql, expected)
