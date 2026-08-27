@@ -1,11 +1,13 @@
 -- Copyright (c) 2017-2023 VMware, Inc. or its affiliates
 -- SPDX-License-Identifier: Apache-2.0
 
--- This script assumes that the plpython language is already enabled
--- The generator should enable it if necessary on each database prior to this point
-
--- TODO: This implementation can be greatly simplified using recursive CTEs
--- They will be supported for 6X -> 7X upgrades
+-- Collect the views that have to be dropped before the deprecated data types
+-- can be replaced, together with the order they have to be dropped in.
+--
+-- A view is stamped with the length of the longest chain of views between it
+-- and the table column it ultimately depends on. Dropping in descending and
+-- recreating in ascending order of that number is therefore always safe: a view
+-- is dropped before every view it is built on, and recreated after them.
 
 SET client_min_messages TO WARNING;
 
