@@ -9,32 +9,25 @@
 
 SET client_min_messages TO WARNING;
 
-CREATE OR REPLACE FUNCTION  __ggupgrade_tmp_generator.find_view_dependencies()
-RETURNS VOID AS
-$$
-import plpy
+DROP TABLE IF EXISTS  __ggupgrade_tmp_generator.__temp_views_list;
 
+CREATE TABLE  __ggupgrade_tmp_generator.__temp_views_list (full_view_name TEXT, view_owner TEXT, view_order INTEGER);
 
-# First find views that do not depend on other views (and directly on the table)
-
-leaf_view = plpy.execute("""
-SELECT
-    schema,
-    view,
-    owner
-FROM (
+INSERT INTO __ggupgrade_tmp_generator.__temp_views_list
+WITH RECURSIVE
+-- Views reading a column of one of the deprecated types directly from a table.
+leaf_views AS
+(
     SELECT DISTINCT
-        nv.nspname AS schema,
-        v.relname AS view,
-        pg_catalog.pg_get_userbyid(v.relowner) AS owner
+        v.oid
     FROM
-        pg_depend d
-        JOIN pg_rewrite r ON r.oid = d.objid
-        JOIN pg_class v ON v.oid = r.ev_class
-        JOIN pg_catalog.pg_namespace nv ON v.relnamespace = nv.oid
-        JOIN pg_catalog.pg_attribute a ON (d.refobjid = a.attrelid AND d.refobjsubid = a.attnum)
-        JOIN pg_catalog.pg_class c ON c.oid = a.attrelid
-        JOIN pg_catalog.pg_namespace nc ON c.relnamespace = nc.oid
+        pg_catalog.pg_depend d
+            JOIN pg_catalog.pg_rewrite r ON r.oid = d.objid
+            JOIN pg_catalog.pg_class v ON v.oid = r.ev_class
+            JOIN pg_catalog.pg_namespace nv ON nv.oid = v.relnamespace
+            JOIN pg_catalog.pg_attribute a ON (a.attrelid = d.refobjid AND a.attnum = d.refobjsubid)
+            JOIN pg_catalog.pg_class c ON c.oid = a.attrelid
+            JOIN pg_catalog.pg_namespace nc ON nc.oid = c.relnamespace
     WHERE
         v.relkind = 'v'
         AND d.classid = 'pg_rewrite'::regclass
@@ -49,84 +42,57 @@ FROM (
         AND nc.nspname NOT LIKE 'pg_temp_%'
         AND nc.nspname NOT LIKE 'pg_toast_temp_%'
         AND nc.nspname NOT IN ('pg_catalog', 'information_schema')
-    ) subq;
-""")
-
-checklist = {}
-view_order = 1
-for row in leaf_view:
-    checklist[(row['schema'], row['view'], row['owner'])] = view_order
-
-rows = plpy.execute("""
+),
+-- Views reading from another view.
+view_dependencies AS
+(
+    SELECT DISTINCT
+        v.oid AS depender,
+        dv.oid AS dependee
+    FROM
+        pg_catalog.pg_rewrite r
+            JOIN pg_catalog.pg_depend d ON d.objid = r.oid
+            JOIN pg_catalog.pg_class v ON v.oid = r.ev_class
+            JOIN pg_catalog.pg_namespace nv ON nv.oid = v.relnamespace
+            JOIN pg_catalog.pg_class dv ON dv.oid = d.refobjid
+            JOIN pg_catalog.pg_namespace ndv ON ndv.oid = dv.relnamespace
+    WHERE
+        d.classid = 'pg_rewrite'::regclass
+        AND d.refclassid = 'pg_class'::regclass
+        AND dv.relkind = 'v'
+        -- A view always depends on itself through its own rewrite rule.
+        AND v.oid <> dv.oid
+        AND nv.nspname NOT LIKE 'pg_temp_%'
+        AND nv.nspname NOT LIKE 'pg_toast_temp_%'
+        AND nv.nspname NOT IN ('pg_catalog', 'information_schema', 'gp_toolkit')
+        AND ndv.nspname NOT LIKE 'pg_temp_%'
+        AND ndv.nspname NOT LIKE 'pg_toast_temp_%'
+        AND ndv.nspname NOT IN ('pg_catalog', 'information_schema', 'gp_toolkit')
+),
+-- Walk the dependency graph upwards from the leaf views. The same view can be
+-- reached through several chains, the longest one wins below.
+view_chains (oid, view_order) AS
+(
+    SELECT
+        oid,
+        1
+    FROM
+        leaf_views
+    UNION
+    SELECT
+        dep.depender,
+        chain.view_order + 1
+    FROM
+        view_chains chain
+            JOIN view_dependencies dep ON dep.dependee = chain.oid
+)
 SELECT
-    nsp1.nspname AS depender_schema,
-    depender,
-    depender_owner,
-    nsp2.nspname AS dependee_schema,
-    dependee,
-    dependee_owner
+    nv.nspname || '.' || v.relname,
+    pg_catalog.pg_get_userbyid(v.relowner),
+    max(chain.view_order)
 FROM
-    pg_namespace AS nsp1,
-    pg_namespace AS nsp2,
-    (
-        SELECT
-            c.relname depender,
-            c.relnamespace AS depender_nsp,
-            pg_catalog.pg_get_userbyid(c.relowner) as depender_owner,
-            c1.relname AS dependee,
-            c1.relnamespace AS dependee_nsp,
-            pg_catalog.pg_get_userbyid(c1.relowner) as dependee_owner
-        FROM
-            pg_rewrite AS rw,
-            pg_depend AS d,
-            pg_class AS c,
-            pg_class AS c1
-        WHERE
-            rw.ev_class = c.oid
-            AND rw.oid = d.objid
-            AND d.classid = 'pg_rewrite'::regclass
-            AND d.refclassid = 'pg_class'::regclass
-            AND d.refobjid = c1.oid
-            AND c1.relkind = 'v'
-            AND c.relname <> c1.relname
-        GROUP BY
-            depender, depender_nsp, depender_owner, dependee, dependee_nsp, dependee_owner
-    ) t1
-WHERE
-    t1.depender_nsp = nsp1.oid
-    AND t1.dependee_nsp = nsp2.oid
-    AND nsp1.nspname NOT LIKE 'pg_temp_%'
-    AND nsp1.nspname NOT LIKE 'pg_toast_temp_%'
-    AND nsp1.nspname NOT IN ('pg_catalog', 'information_schema', 'gp_toolkit')
-    AND nsp2.nspname NOT LIKE 'pg_temp_%'
-    AND nsp2.nspname NOT LIKE 'pg_toast_temp_%'
-    AND nsp2.nspname NOT IN ('pg_catalog', 'information_schema', 'gp_toolkit')
-""")
-
-view2view = {}
-for row in rows:
-    key = (row['depender_schema'], row['depender'], row['depender_owner'])
-    val = (row['dependee_schema'], row['dependee'], row['dependee_owner'])
-    view2view[key]=val
-
-while True:
-    view_order += 1
-    new_checklist = {}
-    for depender, dependee in view2view.items():
-        if dependee in checklist and depender not in checklist:
-            new_checklist[depender] = view_order
-    if len(new_checklist) == 0:
-        break
-    else:
-        checklist.update(new_checklist)
-
-plpy.execute("DROP TABLE IF EXISTS  __ggupgrade_tmp_generator.__temp_views_list")
-plpy.execute("CREATE TABLE  __ggupgrade_tmp_generator.__temp_views_list (full_view_name TEXT, view_owner TEXT, view_order INTEGER)")
-for v, view_order in checklist.items():
-    sql = "INSERT INTO  __ggupgrade_tmp_generator.__temp_views_list VALUES('{0}.{1}', '{2}', {3})".format(v[0],v[1],v[2],view_order)
-    plpy.execute(sql)
-$$ LANGUAGE plpython3u;
-
-SELECT __ggupgrade_tmp_generator.find_view_dependencies();
-
-DROP FUNCTION __ggupgrade_tmp_generator.find_view_dependencies();
+    view_chains chain
+        JOIN pg_catalog.pg_class v ON v.oid = chain.oid
+        JOIN pg_catalog.pg_namespace nv ON nv.oid = v.relnamespace
+GROUP BY
+    1, 2;
