@@ -1,1 +1,1 @@
-test: sample heterogeneous_partition_tables
+test: sample heterogeneous_partition_tables partition_indexes
