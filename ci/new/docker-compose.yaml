@@ -17,6 +17,7 @@ services:
     volumes:
       - ${PWD}/ssh_keys:/home/gpadmin/.ssh
       - ${PWD}/logs_coordinator:/logs
+      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
     networks:
       backend:
         aliases:
