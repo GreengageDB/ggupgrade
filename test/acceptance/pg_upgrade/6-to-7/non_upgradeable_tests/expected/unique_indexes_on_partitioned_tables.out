@@ -1,0 +1,100 @@
+-- Copyright (c) 2017-2024 VMware, Inc. or its affiliates
+-- SPDX-License-Identifier: Apache-2.0
+
+--------------------------------------------------------------------------------
+-- Create and setup non-upgradeable objects
+--------------------------------------------------------------------------------
+
+-- Greengage 7 requires a unique index on a partitioned table to contain every
+-- partitioning column. Greengage 6 allows such an index, the initialize data
+-- migration scripts drop it and the finalize ones replay its definition, which
+-- the target cluster rejects. Nothing can recreate it there, so the upgrade has
+-- to stop before anything is dropped.
+CREATE SCHEMA unsupported_unique_index;
+CREATE SCHEMA
+SET search_path TO unsupported_unique_index;
+SET
+
+CREATE TABLE sales (trans_id int, office_id int, region text) DISTRIBUTED BY (trans_id) PARTITION BY RANGE (office_id) (START (1) END (4) EVERY (1));
+CREATE TABLE
+CREATE UNIQUE INDEX sales_unique_idx ON sales(trans_id);
+CREATE INDEX
+
+-- a multi level partitioned table is missing the partitioning columns of every level
+CREATE TABLE ml_sales (trans_id int, office_id int, region int, dummy int) DISTRIBUTED BY (trans_id) PARTITION BY RANGE (office_id) SUBPARTITION BY RANGE (dummy) SUBPARTITION TEMPLATE (START (1) END (16) EVERY (4)) (START (1) END (3) EVERY (1));
+CREATE TABLE
+CREATE UNIQUE INDEX ml_sales_unique_idx ON ml_sales(trans_id);
+CREATE INDEX
+
+RESET search_path;
+RESET
+
+--------------------------------------------------------------------------------
+-- Assert that ggupgrade correctly detects the non-upgradeable objects
+--------------------------------------------------------------------------------
+!\retcode ggupgrade initialize --source-gphome="${GPHOME_SOURCE}" --target-gphome=${GPHOME_TARGET} --source-master-port=${PGPORT} --disk-free-ratio 0 --non-interactive;
+-- start_ignore
+
+Initialize in progress.
+
+Verifying source and target cluster versions...                    [IN PROGRESS]
+Verifying source and target cluster versions...                    [COMPLETE]   
+Saving source cluster configuration...                             [IN PROGRESS]
+Saving source cluster configuration...                             [COMPLETE]   
+Starting ggupgrade hub process...                                  [IN PROGRESS]
+Starting ggupgrade hub process...                                  [COMPLETE]   
+Checking for plpython2u...                                         [IN PROGRESS]
+Checking for plpython2u...                                         [COMPLETE]   
+Checking for unique indexes on partitioned tables...               [IN PROGRESS]
+Checking for unique indexes on partitioned tables...               [FAILED]     
+
+Error: substep "check_for_unsupported_unique_indexes": Can not start migration because the cluster has unique indexes on partitioned tables that do not contain all of the partitioning columns.
+
+Greengage 7 requires a unique index on a partitioned table to contain every partitioning column:
+
+'''
+ERROR:  unique constraint on partitioned table must include all partitioning columns
+DETAIL:  UNIQUE constraint on table "sales" lacks column "office_id" which is part of the partition key.
+'''
+
+Such an index has to be dropped before the upgrade and cannot be recreated afterwards. Were the
+migration to start, the index would be lost and the finalize phase would fail on a cluster that has
+already been upgraded.
+
+Affected databases, tables and indexes are listed in this file:
+'/home/gpadmin/gpAdminLogs/ggupgrade/partitioned_tables_with_unsupported_unique_indexes.txt'
+
+For each of them either drop the index:
+
+'''
+DROP INDEX <schema>.<index>;
+'''
+
+or recreate it with the partitioning columns included:
+
+'''
+DROP INDEX <schema>.<index>;
+CREATE UNIQUE INDEX <index> ON <schema>.<table> (<original columns>, <missing columns>);
+'''
+
+
+NEXT ACTIONS
+------------
+Please address the above issue and run "ggupgrade initialize" again.
+If you would like to return the cluster to its original state, please run "ggupgrade revert".
+
+-- end_ignore
+(exited with code 1)
+! cat ~/gpAdminLogs/ggupgrade/partitioned_tables_with_unsupported_unique_indexes.txt;
+-----------------------------------------------------------------------------
+Database: isolation2test
+-----------------------------------------------------------------------------
+unsupported_unique_index.ml_sales_unique_idx does not contain the partitioning columns office_id, dummy of table unsupported_unique_index.ml_sales
+unsupported_unique_index.sales_unique_idx does not contain the partitioning columns office_id of table unsupported_unique_index.sales
+
+
+--------------------------------------------------------------------------------
+-- Workaround to unblock upgrade
+--------------------------------------------------------------------------------
+DROP SCHEMA unsupported_unique_index CASCADE;
+DROP SCHEMA
