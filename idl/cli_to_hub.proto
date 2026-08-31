@@ -111,6 +111,7 @@ enum Substep {
   initialize_wait_for_cluster_to_be_ready = 48;
   wait_for_cluster_to_be_ready_before_upgrade_master = 49;
   check_for_obsolete_plpython = 50;
+  check_for_unsupported_unique_indexes = 51;
 }
 
 enum Status {

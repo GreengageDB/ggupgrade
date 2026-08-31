@@ -236,3 +236,177 @@ SELECT quote_ident(c.proname) proname, pg_catalog.pg_get_function_arguments(c.oi
 
 	return xerrors.Errorf(ErrorMessagePlpython, foundLanguages, filePath, dropCommand)
 }
+
+const OutputFileUnsupportedUniqueIndexes = "partitioned_tables_with_unsupported_unique_indexes.txt"
+
+const ErrorMessageUnsupportedUniqueIndexes = `Can not start migration because the cluster has unique indexes on partitioned tables that do not contain all of the partitioning columns.
+
+Greengage 7 requires a unique index on a partitioned table to contain every partitioning column:
+
+'''
+ERROR:  unique constraint on partitioned table must include all partitioning columns
+DETAIL:  UNIQUE constraint on table "sales" lacks column "office_id" which is part of the partition key.
+'''
+
+Such an index has to be dropped before the upgrade and cannot be recreated afterwards. Were the
+migration to start, the index would be lost and the finalize phase would fail on a cluster that has
+already been upgraded.
+
+Affected databases, tables and indexes are listed in this file:
+'%v'
+
+For each of them either drop the index:
+
+'''
+DROP INDEX <schema>.<index>;
+'''
+
+or recreate it with the partitioning columns included:
+
+'''
+DROP INDEX <schema>.<index>;
+CREATE UNIQUE INDEX <index> ON <schema>.<table> (<original columns>, <missing columns>);
+'''
+`
+
+// unsupportedUniqueIndexesQuery lists the unique indexes on partitioned tables that Greengage 7
+// does not allow, together with the partitioning columns they are missing. Indexes on the child
+// partitions are not reported separately as pg_partition only holds the root of a hierarchy, and
+// unique constraints need no reporting at all since Greengage 6 already refuses to create one that
+// does not contain the partitioning columns.
+const unsupportedUniqueIndexesQuery = `
+WITH partition_keys AS
+(
+   SELECT DISTINCT
+      p.parrelid AS relid,
+      key.attnum
+   FROM
+      pg_catalog.pg_partition p,
+      unnest(p.paratts) AS key(attnum)
+)
+SELECT
+   pg_catalog.quote_ident(n.nspname) AS schemaname,
+   pg_catalog.quote_ident(c.relname) AS tablename,
+   pg_catalog.quote_ident(i.relname) AS indexname,
+   pg_catalog.string_agg(pg_catalog.quote_ident(a.attname), ', ' ORDER BY a.attnum) AS missing_columns
+FROM
+   pg_catalog.pg_index x
+   JOIN pg_catalog.pg_class i ON i.oid = x.indexrelid
+   JOIN pg_catalog.pg_class c ON c.oid = x.indrelid
+   JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+   JOIN partition_keys k ON k.relid = x.indrelid
+   JOIN pg_catalog.pg_attribute a ON a.attrelid = x.indrelid AND a.attnum = k.attnum
+WHERE
+   x.indisunique
+   AND k.attnum <> ALL (x.indkey::pg_catalog.int2[])
+GROUP BY 1, 2, 3
+ORDER BY 1, 2, 3;
+`
+
+// CheckForUnsupportedUniqueIndexes stops the upgrade of a 6.x cluster that has a unique index on a
+// partitioned table which does not contain all of the partitioning columns. The initialize data
+// migration scripts drop such an index and the finalize ones replay its definition, which Greengage
+// 7 rejects. Nothing can recreate it there, so the operator has to decide what happens to it before
+// anything is dropped.
+func CheckForUnsupportedUniqueIndexes(streams step.OutStreams, gphome string, port int) (err error) {
+	version, err := greengage.Version(gphome)
+	if err != nil {
+		return err
+	}
+
+	if version.Major != 6 {
+		// This check is relevant only for 6.x.
+		return nil
+	}
+
+	db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port, "template1")
+	if err != nil {
+		return err
+	}
+
+	databases, err := GetDatabases(db)
+
+	// Whether the above call succeeds or not, close the database first
+	dbErr := db.Close()
+	if dbErr != nil {
+		return dbErr
+	}
+	if err != nil {
+		return err
+	}
+
+	var contents bytes.Buffer
+	indexesArePresent := false
+	for _, dbInfo := range databases {
+		db, err := bootstrapConnectionFunc(idl.ClusterDestination_source, gphome, port, dbInfo.Datname)
+		if err != nil {
+			return err
+		}
+
+		defer func() {
+			if cErr := db.Close(); cErr != nil {
+				err = errorlist.Append(err, cErr)
+			}
+		}()
+
+		rows, err := db.Query(unsupportedUniqueIndexesQuery)
+		if err != nil {
+			return xerrors.Errorf("database %v: %w", dbInfo.QuotedDatname, err)
+		}
+		defer func() {
+			if cErr := rows.Close(); cErr != nil {
+				err = errorlist.Append(err, cErr)
+			}
+		}()
+
+		var databaseContents bytes.Buffer
+		for rows.Next() {
+			var nspname string
+			var relname string
+			var indexname string
+			var missingColumns string
+			err = rows.Scan(&nspname, &relname, &indexname, &missingColumns)
+			if err != nil {
+				return xerrors.Errorf("database %v: %w", dbInfo.QuotedDatname, err)
+			}
+
+			databaseContents.WriteString(fmt.Sprintf("%s.%s does not contain the partitioning columns %s of table %s.%s\n",
+				nspname, indexname, missingColumns, nspname, relname))
+		}
+
+		if err = rows.Err(); err != nil {
+			return xerrors.Errorf("database %v: %w", dbInfo.QuotedDatname, err)
+		}
+
+		if databaseContents.Len() == 0 {
+			continue
+		}
+
+		indexesArePresent = true
+
+		contents.WriteString(substeps.Divider)
+		contents.WriteString("\n")
+		contents.WriteString(fmt.Sprintf("Database: %s\n", dbInfo.QuotedDatname))
+		contents.WriteString(substeps.Divider)
+		contents.WriteString("\n")
+		contents.Write(databaseContents.Bytes())
+	}
+
+	if !indexesArePresent {
+		// no such index in the cluster, can safely continue
+		return nil
+	}
+
+	outputDir, err := utils.GetLogDir()
+	if err != nil {
+		return xerrors.Errorf("Internal error: unexpected condition")
+	}
+
+	filePath := filepath.Join(outputDir, OutputFileUnsupportedUniqueIndexes)
+	err = utils.System.WriteFile(filePath, contents.Bytes(), 0644)
+	if err != nil {
+		return err
+	}
+
+	return xerrors.Errorf(ErrorMessageUnsupportedUniqueIndexes, filePath)
+}
