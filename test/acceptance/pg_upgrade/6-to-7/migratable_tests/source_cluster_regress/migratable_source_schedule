@@ -1,1 +1,1 @@
-test: sample
+test: sample heterogeneous_partition_tables tables_using_tsquery_type
