@@ -58,6 +58,15 @@ CREATE VIEW view_on_view_on_tsquery AS SELECT * FROM view_on_tsquery;
 CREATE VIEW view_on_view_and_table AS
     SELECT v.name, t.altitude FROM view_on_view_on_tsquery v, table_with_tsquery t;
 
+-- redundant check to make sure the we handle
+-- columns inside distribution policy correctly.
+-- q has attnum 3, which equals to the segment count.
+CREATE TABLE table_with_tsquery_column_attnum_equal_to_segment_count (a tsquery, b int, q tsquery) DISTRIBUTED BY (b);
+CREATE INDEX table_with_tsquery_column_attnum_equal_to_segment_count_idx ON
+    table_with_tsquery_column_attnum_equal_to_segment_count (q);
+CREATE VIEW table_with_tsquery_column_attnum_equal_to_segment_count_view AS
+    SELECT * FROM table_with_tsquery_column_attnum_equal_to_segment_count;
+
 -- NOTE: a table partitioned by a tsquery column cannot be migrated at all, the
 -- type of a partitioning column cannot be changed. Such a table has to be
 -- dropped by hand before the upgrade, see test/drop_unfixable_objects.sql in

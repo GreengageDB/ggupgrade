@@ -25,44 +25,47 @@ SELECT * FROM table_with_tsquery ORDER BY name;
 
 -- check that every column is a tsquery again
 SELECT c.relname AS table_name, a.attname AS column_name, pg_catalog.format_type(a.atttypid, a.atttypmod) AS column_type FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace JOIN pg_catalog.pg_attribute a ON a.attrelid = c.oid WHERE n.nspname = 'migratable_tsquery' AND c.relkind IN ('r', 'p') AND a.attnum > 0 AND NOT a.attisdropped AND a.atttypid = 'pg_catalog.tsquery'::pg_catalog.regtype ORDER BY 1, 2;
- table_name                                  | column_name | column_type 
----------------------------------------------+-------------+-------------
- table_with_tsquery                          | altitude    | tsquery     
- table_with_tsquery_datatype_columns         | a           | tsquery     
- table_with_tsquery_datatype_columns         | b           | tsquery     
- table_with_tsquery_datatype_columns         | c           | tsquery     
- table_with_tsquery_datatype_columns_1_prt_1 | a           | tsquery     
- table_with_tsquery_datatype_columns_1_prt_1 | b           | tsquery     
- table_with_tsquery_datatype_columns_1_prt_1 | c           | tsquery     
- table_with_tsquery_datatype_columns_1_prt_2 | a           | tsquery     
- table_with_tsquery_datatype_columns_1_prt_2 | b           | tsquery     
- table_with_tsquery_datatype_columns_1_prt_2 | c           | tsquery     
- table_with_tsquery_datatype_columns_1_prt_3 | a           | tsquery     
- table_with_tsquery_datatype_columns_1_prt_3 | b           | tsquery     
- table_with_tsquery_datatype_columns_1_prt_3 | c           | tsquery     
- tsquery_cluster_comment                     | j           | tsquery     
- tsquery_composite                           | j           | tsquery     
- tsquery_composite                           | k           | tsquery     
- tsquery_gist                                | j           | tsquery     
- tsquery_gist                                | k           | tsquery     
- tsquery_inherits                            | a           | tsquery     
- tsquery_inherits                            | b           | tsquery     
- tsquery_inherits                            | c           | tsquery     
- tsquery_inherits                            | e           | tsquery     
- tsquery_inherits_parent                     | a           | tsquery     
- tsquery_inherits_parent                     | b           | tsquery     
- tsquery_inherits_parent                     | c           | tsquery     
-(25 rows)
+ table_name                                              | column_name | column_type 
+---------------------------------------------------------+-------------+-------------
+ table_with_tsquery                                      | altitude    | tsquery     
+ table_with_tsquery_column_attnum_equal_to_segment_count | a           | tsquery     
+ table_with_tsquery_column_attnum_equal_to_segment_count | q           | tsquery     
+ table_with_tsquery_datatype_columns                     | a           | tsquery     
+ table_with_tsquery_datatype_columns                     | b           | tsquery     
+ table_with_tsquery_datatype_columns                     | c           | tsquery     
+ table_with_tsquery_datatype_columns_1_prt_1             | a           | tsquery     
+ table_with_tsquery_datatype_columns_1_prt_1             | b           | tsquery     
+ table_with_tsquery_datatype_columns_1_prt_1             | c           | tsquery     
+ table_with_tsquery_datatype_columns_1_prt_2             | a           | tsquery     
+ table_with_tsquery_datatype_columns_1_prt_2             | b           | tsquery     
+ table_with_tsquery_datatype_columns_1_prt_2             | c           | tsquery     
+ table_with_tsquery_datatype_columns_1_prt_3             | a           | tsquery     
+ table_with_tsquery_datatype_columns_1_prt_3             | b           | tsquery     
+ table_with_tsquery_datatype_columns_1_prt_3             | c           | tsquery     
+ tsquery_cluster_comment                                 | j           | tsquery     
+ tsquery_composite                                       | j           | tsquery     
+ tsquery_composite                                       | k           | tsquery     
+ tsquery_gist                                            | j           | tsquery     
+ tsquery_gist                                            | k           | tsquery     
+ tsquery_inherits                                        | a           | tsquery     
+ tsquery_inherits                                        | b           | tsquery     
+ tsquery_inherits                                        | c           | tsquery     
+ tsquery_inherits                                        | e           | tsquery     
+ tsquery_inherits_parent                                 | a           | tsquery     
+ tsquery_inherits_parent                                 | b           | tsquery     
+ tsquery_inherits_parent                                 | c           | tsquery     
+(27 rows)
 
 -- check indexes on the tsquery columns
 SELECT c.relname AS table_name, i.relname AS index_name FROM pg_catalog.pg_index x JOIN pg_catalog.pg_class c ON c.oid = x.indrelid JOIN pg_catalog.pg_class i ON i.oid = x.indexrelid JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'migratable_tsquery' ORDER BY 1, 2;
- table_name              | index_name                     
--------------------------+--------------------------------
- table_with_tsquery      | table_with_tsquery_tsquery_idx 
- tsquery_cluster_comment | tsquery_cluster_comment_idx    
- tsquery_composite       | tsquery_composite_idx          
- tsquery_gist            | tsquery_gist_idx               
-(4 rows)
+ table_name                                              | index_name                                                  
+---------------------------------------------------------+-------------------------------------------------------------
+ table_with_tsquery                                      | table_with_tsquery_tsquery_idx                              
+ table_with_tsquery_column_attnum_equal_to_segment_count | table_with_tsquery_column_attnum_equal_to_segment_count_idx 
+ tsquery_cluster_comment                                 | tsquery_cluster_comment_idx                                 
+ tsquery_composite                                       | tsquery_composite_idx                                       
+ tsquery_gist                                            | tsquery_gist_idx                                            
+(5 rows)
 
 -- check the comment on the clustered index survived
 SELECT pg_catalog.obj_description('migratable_tsquery.tsquery_cluster_comment_idx'::regclass, 'pg_class');
@@ -73,13 +76,14 @@ SELECT pg_catalog.obj_description('migratable_tsquery.tsquery_cluster_comment_id
 
 -- check views
 SELECT viewname FROM pg_catalog.pg_views WHERE schemaname = 'migratable_tsquery' ORDER BY 1;
- viewname                    
------------------------------
- view_on_tsquery             
- view_on_tsquery_mult_tables 
- view_on_view_and_table      
- view_on_view_on_tsquery     
-(4 rows)
+ viewname                                                     
+--------------------------------------------------------------
+ table_with_tsquery_column_attnum_equal_to_segment_count_view 
+ view_on_tsquery                                              
+ view_on_tsquery_mult_tables                                  
+ view_on_view_and_table                                       
+ view_on_view_on_tsquery                                      
+(5 rows)
 
 -- check the objects are usable, including the views stacked on other views
 INSERT INTO table_with_tsquery VALUES ('kazbek', 'e & f'::tsquery);
