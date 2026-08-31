@@ -253,8 +253,7 @@ func GenerateScriptsPerDatabase(streams step.OutStreams, database DatabaseInfo, 
 	case 5:
 		output, err = executeSQLCommand(gphome, port, database.Datname, `CREATE LANGUAGE plpythonu;`)
 	case 6:
-		// The 6 to 7 seed scripts are plain SQL, so the source cluster does not
-		// need a procedural language created in it.
+		// The 6 to 7 seed scripts use SQL or PL/pgSQL only, so they don't need plpython language
 	default:
 		return fmt.Errorf("Internal error: unsupported source cluster version %v", version)
 	}
