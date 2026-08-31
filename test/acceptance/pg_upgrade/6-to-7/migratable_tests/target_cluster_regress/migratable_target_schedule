@@ -1,1 +1,1 @@
-test: sample heterogeneous_partition_tables partition_indexes
+test: sample heterogeneous_partition_tables tables_using_tsquery_type  partition_indexes
