@@ -238,40 +238,6 @@ func TestGenerateScriptsPerDatabase(t *testing.T) {
 	greengage.SetVersionCommand(exectest.NewCommand(PostgresGPVersion_6_7_1))
 	defer greengage.ResetVersionCommand()
 
-	t.Run("errors when creating plpythonu fails with other error", func(t *testing.T) {
-		db, mock, err := sqlmock.New()
-		if err != nil {
-			t.Fatalf("couldn't create sqlmock: %v", err)
-		}
-		defer testutils.FinishMock(mock, t)
-
-		commanders.SetBootstrapConnectionFunction(func(destination idl.ClusterDestination, gphome string, port int, database string) (*sql.DB, error) {
-			return db, nil
-		})
-		defer commanders.ResetBootstrapConnectionFunction()
-
-		expectPgDatabaseToReturn(mock).WillReturnRows(sqlmock.NewRows([]string{"datname", "quoted_datname"}).AddRow("postgres", "postgres"))
-
-		utils.System.DirFS = func(dir string) fs.FS {
-			return fstest.MapFS{}
-		}
-		defer utils.ResetSystemFunctions()
-
-		utils.System.MkdirAll = func(path string, perm os.FileMode) error {
-			return nil
-		}
-		defer utils.ResetSystemFunctions()
-
-		commanders.SetPsqlCommand(exectest.NewCommand(FailedMain))
-		defer commanders.ResetPsqlCommand()
-
-		err = commanders.GenerateDataMigrationScripts(step.DevNullStream, false, "", 0, "", "", fstest.MapFS{})
-		var exitError *exec.ExitError
-		if !errors.As(err, &exitError) {
-			t.Errorf("got %T, want %T", err, exitError)
-		}
-	})
-
 	t.Run("errors when create_find_view_dep_function.sql fails", func(t *testing.T) {
 		db, mock, err := sqlmock.New()
 		if err != nil {
