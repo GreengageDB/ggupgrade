@@ -8,7 +8,13 @@
 -- foreign key constraints such that they can be properly referenced referenced.
 -- Thus, we place them in the same subdirectory.
 SELECT
-   'ALTER TABLE ' || pg_catalog.quote_ident(nspname) || '.' || pg_catalog.quote_ident(relname) || ' DROP CONSTRAINT ' || pg_catalog.quote_ident(conname) || ';'
+   -- IF EXISTS because "initialize" applies the scripts on every run and an
+   -- earlier run may have dropped the constraint already.
+   'ALTER TABLE ' || pg_catalog.quote_ident(nspname) || '.' || pg_catalog.quote_ident(relname) || ' DROP CONSTRAINT IF EXISTS ' || pg_catalog.quote_ident(conname) || ';'
+-- Every unique and primary key constraint is dropped with CASCADE, which takes
+-- the foreign keys referencing them along. So this has to cover every table,
+-- not just the root partitions, otherwise a foreign key on an ordinary table is
+-- dropped here without ever being recreated.
 FROM
    pg_constraint cc
    JOIN
@@ -18,13 +24,23 @@ FROM
             n.nspname,
             c.relname
          FROM
-            pg_catalog.pg_partition p
-            JOIN
-               pg_catalog.pg_class c
-               ON (p.parrelid = c.oid)
+            pg_catalog.pg_class c
             JOIN
                pg_catalog.pg_namespace n
                ON (n.oid = c.relnamespace)
+         WHERE
+            c.relkind = 'r'
+            AND n.nspname NOT LIKE 'pg_%'
+            AND n.nspname <> 'information_schema'
+            -- dropping a constraint directly from a child partition is
+            -- rejected, the root takes care of them
+            AND c.oid NOT IN
+            (
+               SELECT
+                  parchildrelid
+               FROM
+                  pg_catalog.pg_partition_rule
+            )
       )
       as sub
       ON sub.oid = cc.conrelid
