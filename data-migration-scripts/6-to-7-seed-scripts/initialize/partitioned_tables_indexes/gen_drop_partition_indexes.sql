@@ -5,17 +5,21 @@
 -- constraints
 
 -- cte to hold the oid from all the root and child partition table
-WITH partitions (relid) AS
+WITH partitions (relid, partlevel) AS
 (
    SELECT DISTINCT
-      parrelid
+      parrelid,
+      -1
    FROM
       pg_partition
    UNION ALL
    SELECT DISTINCT
-      parchildrelid
+      rule.parchildrelid,
+      part.parlevel
    FROM
-      pg_partition_rule
+      pg_partition_rule rule
+      JOIN pg_partition part
+      ON part.oid = rule.paroid
 )
 ,
 -- cte to hold the unique and primary key constraint on all the root and child partition table
@@ -94,4 +98,4 @@ WHERE
       FROM
          part_constraint
    )
-;
+ORDER BY (c.partlevel, i.oid);
