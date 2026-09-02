@@ -26,12 +26,13 @@ FROM
             c.relkind = 'r'
             AND n.nspname NOT LIKE 'pg_%'
             AND n.nspname <> 'information_schema'
-            AND c.oid NOT IN
+            AND NOT EXISTS
             (
-                SELECT
-                    parchildrelid
-                FROM
-                    pg_catalog.pg_partition_rule
+               SELECT 1
+               FROM
+                  pg_catalog.pg_partition_rule p
+               WHERE
+                  p.parchildrelid = c.oid
             )
     )
         as sub

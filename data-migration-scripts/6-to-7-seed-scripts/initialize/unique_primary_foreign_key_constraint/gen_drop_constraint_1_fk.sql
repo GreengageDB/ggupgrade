@@ -34,12 +34,13 @@ FROM
             AND n.nspname <> 'information_schema'
             -- dropping a constraint directly from a child partition is
             -- rejected, the root takes care of them
-            AND c.oid NOT IN
+            AND NOT EXISTS
             (
-               SELECT
-                  parchildrelid
+               SELECT 1
                FROM
-                  pg_catalog.pg_partition_rule
+                  pg_catalog.pg_partition_rule p
+               WHERE
+                  p.parchildrelid = c.oid
             )
       )
       as sub
