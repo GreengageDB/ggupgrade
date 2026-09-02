@@ -17,11 +17,12 @@ SELECT * FROM table_with_tsquery_datatype_columns ORDER BY d;
  'x' & 'y' | 'x' & 'y' | 'x' & 'y' | 3 
 (3 rows)
 SELECT * FROM table_with_tsquery ORDER BY name;
- name    | altitude  
----------+-----------
- elbrus  | 'c' & 'd' 
- everest | 'a' & 'b' 
-(2 rows)
+ name         | altitude                                                                                                                                
+--------------+-----------------------------------------------------------------------------------------------------------------------------------------
+ elbrus       | 'c' & 'd'                                                                                                                               
+ everest      | 'a' & 'b'                                                                                                                               
+ long_tsquery | 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' 
+(3 rows)
 
 -- check that every column is a tsquery again
 SELECT c.relname AS table_name, a.attname AS column_name, pg_catalog.format_type(a.atttypid, a.atttypmod) AS column_type FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace JOIN pg_catalog.pg_attribute a ON a.attrelid = c.oid WHERE n.nspname = 'migratable_tsquery' AND c.relkind IN ('r', 'p') AND a.attnum > 0 AND NOT a.attisdropped AND a.atttypid = 'pg_catalog.tsquery'::pg_catalog.regtype ORDER BY 1, 2;
@@ -89,27 +90,35 @@ SELECT viewname FROM pg_catalog.pg_views WHERE schemaname = 'migratable_tsquery'
 INSERT INTO table_with_tsquery VALUES ('kazbek', 'e & f'::tsquery);
 INSERT 0 1
 SELECT * FROM view_on_tsquery ORDER BY name;
- name    | altitude  
----------+-----------
- elbrus  | 'c' & 'd' 
- everest | 'a' & 'b' 
- kazbek  | 'e' & 'f' 
-(3 rows)
+ name         | altitude                                                                                                                                
+--------------+-----------------------------------------------------------------------------------------------------------------------------------------
+ elbrus       | 'c' & 'd'                                                                                                                               
+ everest      | 'a' & 'b'                                                                                                                               
+ kazbek       | 'e' & 'f'                                                                                                                               
+ long_tsquery | 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' 
+(4 rows)
 -- sort on the text of the tsquery, the sort order of the type itself follows
 -- its internal representation.
 SELECT * FROM view_on_view_and_table ORDER BY name, altitude::text;
- name    | altitude  
----------+-----------
- elbrus  | 'a' & 'b' 
- elbrus  | 'c' & 'd' 
- elbrus  | 'e' & 'f' 
- everest | 'a' & 'b' 
- everest | 'c' & 'd' 
- everest | 'e' & 'f' 
- kazbek  | 'a' & 'b' 
- kazbek  | 'c' & 'd' 
- kazbek  | 'e' & 'f' 
-(9 rows)
+ name         | altitude                                                                                                                                
+--------------+-----------------------------------------------------------------------------------------------------------------------------------------
+ elbrus       | 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' 
+ elbrus       | 'a' & 'b'                                                                                                                               
+ elbrus       | 'c' & 'd'                                                                                                                               
+ elbrus       | 'e' & 'f'                                                                                                                               
+ everest      | 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' 
+ everest      | 'a' & 'b'                                                                                                                               
+ everest      | 'c' & 'd'                                                                                                                               
+ everest      | 'e' & 'f'                                                                                                                               
+ kazbek       | 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' 
+ kazbek       | 'a' & 'b'                                                                                                                               
+ kazbek       | 'c' & 'd'                                                                                                                               
+ kazbek       | 'e' & 'f'                                                                                                                               
+ long_tsquery | 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' & 'a' 
+ long_tsquery | 'a' & 'b'                                                                                                                               
+ long_tsquery | 'c' & 'd'                                                                                                                               
+ long_tsquery | 'e' & 'f'                                                                                                                               
+(16 rows)
 
 RESET search_path;
 RESET

@@ -46,6 +46,7 @@ CREATE TABLE table_with_tsquery (
 );
 CREATE INDEX table_with_tsquery_tsquery_idx ON table_with_tsquery(altitude);
 INSERT INTO table_with_tsquery VALUES ('everest', 'a & b'::tsquery), ('elbrus', 'c & d'::tsquery);
+INSERT INTO table_with_tsquery VALUES ('long_tsquery', 'a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a'::tsquery);
 
 CREATE VIEW view_on_tsquery AS SELECT * FROM table_with_tsquery;
 CREATE VIEW view_on_tsquery_mult_tables AS SELECT t1.name, t2.altitude FROM table_with_tsquery t1, table_with_tsquery t2;

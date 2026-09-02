@@ -59,11 +59,8 @@ WITH distcols AS
              SELECT DISTINCT parrelid, unnest(paratts) att_num
              FROM pg_catalog.pg_partition p
          )
-SELECT 'DO $$ BEGIN ALTER TABLE ' ||
-       pg_catalog.quote_ident(n.nspname) || '.' || pg_catalog.quote_ident(c.relname) ||
-       ' ALTER COLUMN ' || pg_catalog.quote_ident(a.attname) ||
-       ' TYPE VARCHAR(63); EXCEPTION WHEN feature_not_supported THEN PERFORM pg_temp.notsupported(''' ||
-       c.oid::pg_catalog.regclass || '''); END $$;'
+SELECT 'ALTER TABLE ' || pg_catalog.quote_ident(n.nspname) || '.' || pg_catalog.quote_ident(c.relname) ||
+       ' ALTER COLUMN ' || pg_catalog.quote_ident(a.attname) || ' TYPE TEXT;'
 FROM pg_catalog.pg_class c,
      pg_catalog.pg_namespace n,
      pg_catalog.pg_attribute a
