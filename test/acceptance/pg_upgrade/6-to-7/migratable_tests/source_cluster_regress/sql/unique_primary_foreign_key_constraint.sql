@@ -61,11 +61,6 @@ SELECT * FROM fk_pt_with_index ORDER BY 1, 2, 3, 4;
 
 
 -- unique constraints
--- create tables where the index relation name is not equal primary/unique key
--- constraint name. we create a TYPE with the default name of the constraint
--- that would have been created to force skipping the default name
-CREATE TYPE table_with_unique_constraint_author_key AS (dummy int);
-CREATE TYPE table_with_unique_constraint_author_key1 AS (dummy int);
 CREATE TABLE table_with_unique_constraint (
     author int,
     title int,
@@ -76,16 +71,6 @@ ALTER TABLE table_with_unique_constraint ADD PRIMARY KEY (author, title);
 INSERT INTO table_with_unique_constraint VALUES (1, 1);
 INSERT INTO table_with_unique_constraint VALUES (2, 2);
 
--- create partitioned tables where the index relation name is not equal
--- primary/unique key constraint name for the root 
--- Note that the naming of the constraint is key, not the type of constraint.
--- If the constraint is named, every partition will have the same named
--- constraint and they all can be dropped with the same command. If the
--- constraint is not named, greengage generates a unique name for each
--- partition as well as the coordinator table. We can only drop the coordinator
--- tables constraint and the partition constraints remain in effect
-CREATE TYPE unique_constraint_p_author_key AS (dummy int);
-CREATE TYPE unique_constraint_p_author_key1 AS (dummy int);
 CREATE TABLE table_with_unique_constraint_p (
     author int,
     title int,
@@ -111,7 +96,7 @@ JOIN pg_depend dep
     ON (refclassid, classid, objsubid) = ('pg_constraint'::regclass, 'pg_class'::regclass, 0)
     AND refobjid = con.oid
     AND deptype = 'i'
-    AND contype IN ('u', 'p', 'x') -- 'x' is an option for GPDB6, not GPDB5
+    AND contype IN ('u', 'p', 'x')
 JOIN non_child_partitions c ON objid = c.oid
     AND relkind = 'i'
 JOIN non_child_partitions cc ON cc.oid = con.conrelid
@@ -126,9 +111,6 @@ SELECT * FROM table_with_unique_constraint_p ORDER BY 1, 2;
 
 
 -- primary constraints
--- Create type and table with primary constraint
-CREATE TYPE table_with_primary_constraint_pkey AS (dummy int);
-CREATE TYPE table_with_primary_constraint_pkey1 AS (dummy int);
 CREATE TABLE table_with_primary_constraint (
     author int,
     title int,
@@ -139,9 +121,6 @@ ALTER TABLE table_with_primary_constraint ADD UNIQUE (author, title);
 INSERT INTO table_with_primary_constraint VALUES (1, 1);
 INSERT INTO table_with_primary_constraint VALUES (2, 2);
 
--- Create type and table with primary constraint
-CREATE TYPE primary_constraint_p_pkey AS (dummy int);
-CREATE TYPE primary_constraint_p_pkey1 AS (dummy int);
 CREATE TABLE table_with_primary_constraint_p (
     author int,
     title int,
@@ -167,7 +146,7 @@ JOIN pg_depend dep
     ON (refclassid, classid, objsubid) = ('pg_constraint'::regclass, 'pg_class'::regclass, 0)
     AND refobjid = con.oid
     AND deptype = 'i'
-    AND contype IN ('u', 'p', 'x') -- 'x' is an option for GPDB6, not GPDB5
+    AND contype IN ('u', 'p', 'x')
 JOIN non_child_partitions c ON objid = c.oid
     AND relkind = 'i'
 JOIN non_child_partitions cc ON cc.oid = con.conrelid
