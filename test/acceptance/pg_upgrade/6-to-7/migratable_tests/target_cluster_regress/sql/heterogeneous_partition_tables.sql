@@ -5,7 +5,6 @@
 SELECT * FROM dropped_column ORDER BY 1, 2, 3;
 SELECT * FROM child_has_dropped_column ORDER BY 1, 2, 3, 4;
 
--- In the target cluster, this table has missing values. Investigate why.
 SELECT * FROM heterogeneous_ml_partition_table ORDER BY 1, 2, 3;
 
 -- check owners
