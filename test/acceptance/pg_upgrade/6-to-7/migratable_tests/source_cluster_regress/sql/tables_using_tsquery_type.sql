@@ -46,6 +46,7 @@ CREATE TABLE table_with_tsquery (
 );
 CREATE INDEX table_with_tsquery_tsquery_idx ON table_with_tsquery(altitude);
 INSERT INTO table_with_tsquery VALUES ('everest', 'a & b'::tsquery), ('elbrus', 'c & d'::tsquery);
+INSERT INTO table_with_tsquery VALUES ('long_tsquery', 'a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a & a'::tsquery);
 
 CREATE VIEW view_on_tsquery AS SELECT * FROM table_with_tsquery;
 CREATE VIEW view_on_tsquery_mult_tables AS SELECT t1.name, t2.altitude FROM table_with_tsquery t1, table_with_tsquery t2;
@@ -57,6 +58,15 @@ CREATE VIEW view_on_tsquery_mult_tables AS SELECT t1.name, t2.altitude FROM tabl
 CREATE VIEW view_on_view_on_tsquery AS SELECT * FROM view_on_tsquery;
 CREATE VIEW view_on_view_and_table AS
     SELECT v.name, t.altitude FROM view_on_view_on_tsquery v, table_with_tsquery t;
+
+-- redundant check to make sure the we handle
+-- columns inside distribution policy correctly.
+-- q has attnum 3, which equals to the segment count.
+CREATE TABLE table_with_tsquery_column_attnum_equal_to_segment_count (a tsquery, b int, q tsquery) DISTRIBUTED BY (b);
+CREATE INDEX table_with_tsquery_column_attnum_equal_to_segment_count_idx ON
+    table_with_tsquery_column_attnum_equal_to_segment_count (q);
+CREATE VIEW table_with_tsquery_column_attnum_equal_to_segment_count_view AS
+    SELECT * FROM table_with_tsquery_column_attnum_equal_to_segment_count;
 
 -- NOTE: a table partitioned by a tsquery column cannot be migrated at all, the
 -- type of a partitioning column cannot be changed. Such a table has to be
