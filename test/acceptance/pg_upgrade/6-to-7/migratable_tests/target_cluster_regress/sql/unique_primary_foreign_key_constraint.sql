@@ -8,6 +8,9 @@ CREATE TABLE interesting_relations AS (
     WHERE relname IN (
         'fk_base_table',
         'fk_pt_with_index',
+        'fk_plain_child',
+        'fk_part_child',
+        'fk_subpart_child',
         'table_with_unique_constraint',
         'table_with_unique_constraint_p',
         'table_with_primary_constraint',
