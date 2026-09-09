@@ -1,0 +1,172 @@
+-- check partition indices
+--
+-- note, that not having
+-- sales_1_prt_outlying_dates(trans_id) and
+-- sales_1_prt_2(office_id, region)
+-- indices is expected, because recreate_partition_indexes
+-- scipts concern themselves only with root and child
+-- partitions, not the ones in the middle of the
+-- hierarchy.
+
+SELECT indrelid::regclass AS table_name, indkey, indisunique FROM pg_index pi JOIN pg_class pc ON pc.oid = pi.indrelid WHERE pc.relname LIKE 'test_scores%' OR pc.relname LIKE 'sales%' ORDER BY 1, 2;
+ table_name                                     | indkey | indisunique 
+------------------------------------------------+--------+-------------
+ test_scores                                    | 2      | f           
+ test_scores_1_prt_1                            | 2      | f           
+ test_scores_1_prt_2                            | 2      | f           
+ test_scores_1_prt_3                            | 2      | f           
+ test_scores_1_prt_4                            | 2      | f           
+ test_scores_1_prt_5                            | 2      | f           
+ sales                                          | 1 2 3  | t           
+ sales                                          | 2      | f           
+ sales                                          | 2      | f           
+ sales_1_prt_outlying_dates                     | 1      | f           
+ sales_1_prt_outlying_dates                     | 1 2 3  | t           
+ sales_1_prt_outlying_dates                     | 2      | f           
+ sales_1_prt_outlying_dates                     | 2      | f           
+ sales_1_prt_outlying_dates_2_prt_usa           | 1      | f           
+ sales_1_prt_outlying_dates_2_prt_usa           | 1 2 3  | t           
+ sales_1_prt_outlying_dates_2_prt_usa           | 2      | f           
+ sales_1_prt_outlying_dates_2_prt_usa           | 2      | f           
+ sales_1_prt_outlying_dates_2_prt_asia          | 1      | f           
+ sales_1_prt_outlying_dates_2_prt_asia          | 1 2 3  | t           
+ sales_1_prt_outlying_dates_2_prt_asia          | 2      | f           
+ sales_1_prt_outlying_dates_2_prt_asia          | 2      | f           
+ sales_1_prt_outlying_dates_2_prt_europe        | 1      | f           
+ sales_1_prt_outlying_dates_2_prt_europe        | 1 2 3  | t           
+ sales_1_prt_outlying_dates_2_prt_europe        | 2      | f           
+ sales_1_prt_outlying_dates_2_prt_europe        | 2      | f           
+ sales_1_prt_outlying_dates_2_prt_other_regions | 1      | f           
+ sales_1_prt_outlying_dates_2_prt_other_regions | 1 2 3  | t           
+ sales_1_prt_outlying_dates_2_prt_other_regions | 2      | f           
+ sales_1_prt_outlying_dates_2_prt_other_regions | 2      | f           
+ sales_1_prt_2                                  | 1 2 3  | t           
+ sales_1_prt_2                                  | 2      | f           
+ sales_1_prt_2                                  | 2      | f           
+ sales_1_prt_2                                  | 2 3    | f           
+ sales_1_prt_2_2_prt_usa                        | 1 2 3  | t           
+ sales_1_prt_2_2_prt_usa                        | 2      | f           
+ sales_1_prt_2_2_prt_usa                        | 2      | f           
+ sales_1_prt_2_2_prt_usa                        | 2 3    | f           
+ sales_1_prt_2_2_prt_asia                       | 1 2 3  | t           
+ sales_1_prt_2_2_prt_asia                       | 2      | f           
+ sales_1_prt_2_2_prt_asia                       | 2      | f           
+ sales_1_prt_2_2_prt_asia                       | 2 3    | f           
+ sales_1_prt_2_2_prt_europe                     | 1 2 3  | t           
+ sales_1_prt_2_2_prt_europe                     | 2      | f           
+ sales_1_prt_2_2_prt_europe                     | 2      | f           
+ sales_1_prt_2_2_prt_europe                     | 2 3    | f           
+ sales_1_prt_2_2_prt_other_regions              | 1 2 3  | t           
+ sales_1_prt_2_2_prt_other_regions              | 2      | f           
+ sales_1_prt_2_2_prt_other_regions              | 2      | f           
+ sales_1_prt_2_2_prt_other_regions              | 2 3    | f           
+ sales_1_prt_3                                  | 1 2 3  | t           
+ sales_1_prt_3                                  | 2      | f           
+ sales_1_prt_3                                  | 2      | f           
+ sales_1_prt_3_2_prt_usa                        | 1 2 3  | t           
+ sales_1_prt_3_2_prt_usa                        | 2      | f           
+ sales_1_prt_3_2_prt_usa                        | 2      | f           
+ sales_1_prt_3_2_prt_asia                       | 1 2 3  | t           
+ sales_1_prt_3_2_prt_asia                       | 2      | f           
+ sales_1_prt_3_2_prt_asia                       | 2      | f           
+ sales_1_prt_3_2_prt_asia                       | 3      | f           
+ sales_1_prt_3_2_prt_europe                     | 1 2 3  | t           
+ sales_1_prt_3_2_prt_europe                     | 2      | f           
+ sales_1_prt_3_2_prt_europe                     | 2      | f           
+ sales_1_prt_3_2_prt_other_regions              | 1 2 3  | t           
+ sales_1_prt_3_2_prt_other_regions              | 2      | f           
+ sales_1_prt_3_2_prt_other_regions              | 2      | f           
+ sales_1_prt_4                                  | 1 2 3  | t           
+ sales_1_prt_4                                  | 2      | f           
+ sales_1_prt_4                                  | 2      | f           
+ sales_1_prt_4_2_prt_usa                        | 1 2 3  | t           
+ sales_1_prt_4_2_prt_usa                        | 2      | f           
+ sales_1_prt_4_2_prt_usa                        | 2      | f           
+ sales_1_prt_4_2_prt_asia                       | 1 2 3  | t           
+ sales_1_prt_4_2_prt_asia                       | 2      | f           
+ sales_1_prt_4_2_prt_asia                       | 2      | f           
+ sales_1_prt_4_2_prt_europe                     | 1 2 3  | t           
+ sales_1_prt_4_2_prt_europe                     | 2      | f           
+ sales_1_prt_4_2_prt_europe                     | 2      | f           
+ sales_1_prt_4_2_prt_other_regions              | 1 2 3  | t           
+ sales_1_prt_4_2_prt_other_regions              | 2      | f           
+ sales_1_prt_4_2_prt_other_regions              | 2      | f           
+(80 rows)
+
+-- check data
+SELECT * FROM test_scores ORDER BY 1, 2;
+ student_id | score 
+------------+-------
+ 1          | 50    
+ 2          | 60    
+ 3          | 70    
+ 4          | 80    
+ 5          | 90    
+(5 rows)
+SELECT * FROM sales ORDER BY 1, 2, 3;
+ trans_id | office_id | region 
+----------+-----------+--------
+ 1        | 1         | asia   
+ 1        | 2         | asia   
+ 1        | 3         | asia   
+ 2        | 1         | europe 
+ 2        | 2         | europe 
+ 2        | 3         | europe 
+(6 rows)
+
+-- insert data
+INSERT INTO test_scores VALUES (6, 51);
+INSERT 0 1
+INSERT INTO test_scores VALUES (7, 61);
+INSERT 0 1
+INSERT INTO test_scores VALUES (8, 71);
+INSERT 0 1
+INSERT INTO test_scores VALUES (9, 81);
+INSERT 0 1
+INSERT INTO test_scores VALUES (10, 91);
+INSERT 0 1
+
+INSERT INTO sales VALUES (3, 1, 'usa');
+INSERT 0 1
+INSERT INTO sales VALUES (3, 2, 'usa');
+INSERT 0 1
+INSERT INTO sales VALUES (3, 3, 'usa');
+INSERT 0 1
+INSERT INTO sales VALUES (4, 1, 'zzz');
+INSERT 0 1
+INSERT INTO sales VALUES (4, 2, 'zzz');
+INSERT 0 1
+INSERT INTO sales VALUES (4, 3, 'zzz');
+INSERT 0 1
+
+-- check data
+SELECT * FROM test_scores ORDER BY 1, 2;
+ student_id | score 
+------------+-------
+ 1          | 50    
+ 2          | 60    
+ 3          | 70    
+ 4          | 80    
+ 5          | 90    
+ 6          | 51    
+ 7          | 61    
+ 8          | 71    
+ 9          | 81    
+ 10         | 91    
+(10 rows)
+SELECT * FROM sales ORDER BY 1, 2, 3;
+ trans_id | office_id | region 
+----------+-----------+--------
+ 1        | 1         | asia   
+ 1        | 2         | asia   
+ 1        | 3         | asia   
+ 2        | 1         | europe 
+ 2        | 2         | europe 
+ 2        | 3         | europe 
+ 3        | 1         | usa    
+ 3        | 2         | usa    
+ 3        | 3         | usa    
+ 4        | 1         | zzz    
+ 4        | 2         | zzz    
+ 4        | 3         | zzz    
+(12 rows)
