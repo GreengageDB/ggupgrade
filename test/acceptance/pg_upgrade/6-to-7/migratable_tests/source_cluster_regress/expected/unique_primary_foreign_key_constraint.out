@@ -14,10 +14,10 @@ CREATE TABLE
 
 CREATE TABLE fk_plain_child (a int REFERENCES fk_base_table(a));
 CREATE TABLE
-CREATE TABLE fk_part_child ( a int REFERENCES fk_base_table(a), int b ) PARTITION BY RANGE(b) ( START(1) END(3) EVERY(1) );
+CREATE TABLE fk_part_child ( a int REFERENCES fk_base_table(a), b int ) PARTITION BY RANGE(b) ( START(1) END(3) EVERY(1) );
 CREATE TABLE
 
-CREATE TABLE fk_subpart_child ( a int REFERENCES fk_base_table(a), b int, c int REFERENCES fk_base_table_2(c) ) PARTITION BY RANGE(b) SUBPARTITION BY RANGE(c) SUBPARTITION TEMPLATE ( START(1) END(3) EVERY(1) ) ( START(1) END(3) EVERY(1) );
+CREATE TABLE fk_subpart_child ( a int REFERENCES fk_base_table(a), b int, c int ) PARTITION BY RANGE(b) SUBPARTITION BY RANGE(c) SUBPARTITION TEMPLATE ( START(1) END(3) EVERY(1) ) ( START(1) END(3) EVERY(1) );
 CREATE TABLE
 
 CREATE INDEX fk_pt_idx_c on fk_pt_with_index(c);
@@ -44,8 +44,10 @@ INSERT 0 1
 WITH Partitions AS ( SELECT DISTINCT p.parrelid AS oid, n.nspname, c.relname FROM pg_catalog.pg_partition p JOIN pg_catalog.pg_class c ON p.parrelid = c.oid JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace ) SELECT nspname, relname, conname FROM pg_constraint cc JOIN Partitions sub ON sub.oid = cc.conrelid WHERE cc.contype = 'f';
  nspname     | relname          | conname                 
 -------------+------------------+-------------------------
+ constraints | fk_part_child    | fk_part_child_a_fkey    
+ constraints | fk_subpart_child | fk_subpart_child_a_fkey 
  constraints | fk_pt_with_index | fk_pt_with_index_a_fkey 
-(1 row)
+(3 rows)
 
 -- check indexes
 SELECT c.relname AS index_name FROM pg_index i JOIN pg_class c ON i.indexrelid = c.oid JOIN pg_class t ON i.indrelid = t.oid AND t.relname LIKE 'fk_pt_%';
