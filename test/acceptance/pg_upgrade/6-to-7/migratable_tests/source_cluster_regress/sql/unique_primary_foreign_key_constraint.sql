@@ -21,7 +21,7 @@ CREATE TABLE fk_pt_with_index (
 CREATE TABLE fk_plain_child (a int REFERENCES fk_base_table(a));
 CREATE TABLE fk_part_child (
     a int REFERENCES fk_base_table(a),
-    int b
+    b int
 ) PARTITION BY RANGE(b) 
 (
     START(1) END(3) EVERY(1)
@@ -30,7 +30,7 @@ CREATE TABLE fk_part_child (
 CREATE TABLE fk_subpart_child (
     a int REFERENCES fk_base_table(a),
     b int,
-    c int REFERENCES fk_base_table_2(c)
+    c int
 ) PARTITION BY RANGE(b)
 	SUBPARTITION BY RANGE(c)
 	SUBPARTITION TEMPLATE (
