@@ -206,7 +206,7 @@ pkg-deb : debian/changelog debian/install
 											-o -name "*.changes" \) \
 											-exec mv -f {} $(DEB_TOPDIR)/ \;
 
-.PHONY: debian/changelog debian/install pkg pkg-info pkg-deb
+.PHONY: VERSION debian/changelog debian/install pkg pkg-info pkg-deb
 
 install:
 	@test $${GOPATH?Error GOPATH not set}
