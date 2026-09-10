@@ -6,11 +6,10 @@ SET search_path TO constraints;
 CREATE TABLE interesting_relations AS (
     SELECT oid FROM pg_class
     WHERE relname IN (
-        'fk_base_table',
-        'fk_pt_with_index',
-        'fk_plain_child',
-        'fk_ao_child',
-        'fk_subpart_child',
+        'table_with_fk_base_table',
+        'table_with_fk_pt_with_index',
+        'table_with_fk_plain_child',
+        'table_with_fk_ao_child',
         'table_with_unique_constraint',
         'table_with_unique_constraint_p',
         'table_with_primary_constraint',
@@ -33,17 +32,17 @@ SELECT c.relname AS index_name
 FROM pg_index i
 JOIN pg_class c ON i.indexrelid = c.oid
 JOIN pg_class t ON i.indrelid = t.oid
-AND t.relname LIKE 'fk_pt_%';
+AND t.relname LIKE 'table_with_fk_pt_%';
 
 -- check data
-SELECT * FROM fk_pt_with_index ORDER BY 1, 2, 3, 4;
+SELECT * FROM table_with_fk_pt_with_index ORDER BY 1, 2, 3, 4;
 
 -- insert data and exercise constraint
-INSERT INTO fk_pt_with_index VALUES (3, 3, 3, 3);
-INSERT INTO fk_pt_with_index VALUES (3, 3, 3, 3);
+INSERT INTO table_with_fk_pt_with_index VALUES (3, 3, 3, 3);
+INSERT INTO table_with_fk_pt_with_index VALUES (3, 3, 3, 3);
 
 -- check data
-SELECT * FROM fk_pt_with_index ORDER BY 1, 2, 3, 4;
+SELECT * FROM table_with_fk_pt_with_index ORDER BY 1, 2, 3, 4;
 
 
 -- check unique constraints

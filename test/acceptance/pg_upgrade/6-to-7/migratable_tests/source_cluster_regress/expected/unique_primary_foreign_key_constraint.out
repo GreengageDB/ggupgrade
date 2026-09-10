@@ -7,70 +7,69 @@ SET search_path TO constraints;
 SET
 
 -- foreign key constraints
-CREATE TABLE fk_base_table (a int unique);
+CREATE TABLE table_with_fk_base_table (a int unique);
 CREATE TABLE
-CREATE TABLE fk_pt_with_index ( a int REFERENCES fk_base_table(a), b int, c int, d int ) PARTITION BY RANGE(b) ( PARTITION pt1 START(1), PARTITION pt2 START(2) END(3), PARTITION pt3 START(3) END(4) );
+CREATE TABLE table_with_fk_pt_with_index ( a int REFERENCES table_with_fk_base_table(a), b int, c int, d int ) PARTITION BY RANGE(b) ( PARTITION pt1 START(1), PARTITION pt2 START(2) END(3), PARTITION pt3 START(3) END(4) );
 CREATE TABLE
 
-CREATE INDEX fk_pt_idx_c on fk_pt_with_index(c);
+CREATE INDEX table_with_fk_pt_idx_c on table_with_fk_pt_with_index(c);
 CREATE INDEX
-CREATE INDEX fk_pt_idx_c_bitmap on fk_pt_with_index using bitmap(c);
-CREATE INDEX
-
-CREATE INDEX fk_pt_idx_b_prt_2 on fk_pt_with_index_1_prt_pt2(b);
-CREATE INDEX
-CREATE INDEX fk_pt_idx_b_prt_2_bitmap on fk_pt_with_index_1_prt_pt2 using bitmap(b);
+CREATE INDEX table_with_fk_pt_idx_c_bitmap on table_with_fk_pt_with_index using bitmap(c);
 CREATE INDEX
 
-CREATE INDEX fk_pt_idx_c_prt_2 on fk_pt_with_index_1_prt_pt2(c);
+CREATE INDEX table_with_fk_pt_idx_b_prt_2 on table_with_fk_pt_with_index_1_prt_pt2(b);
 CREATE INDEX
-CREATE INDEX fk_pt_idx_c_prt_2_bitmap on fk_pt_with_index_1_prt_pt2 using bitmap(c);
+CREATE INDEX table_with_fk_pt_idx_b_prt_2_bitmap on table_with_fk_pt_with_index_1_prt_pt2 using bitmap(b);
 CREATE INDEX
 
-INSERT INTO fk_pt_with_index VALUES (1, 1, 1, 1);
+CREATE INDEX table_with_fk_pt_idx_c_prt_2 on table_with_fk_pt_with_index_1_prt_pt2(c);
+CREATE INDEX
+CREATE INDEX table_with_fk_pt_idx_c_prt_2_bitmap on table_with_fk_pt_with_index_1_prt_pt2 using bitmap(c);
+CREATE INDEX
+
+INSERT INTO table_with_fk_pt_with_index VALUES (1, 1, 1, 1);
 INSERT 0 1
-INSERT INTO fk_pt_with_index VALUES (2, 2, 2, 2);
+INSERT INTO table_with_fk_pt_with_index VALUES (2, 2, 2, 2);
 INSERT 0 1
 
-CREATE TABLE fk_plain_child (a int REFERENCES fk_base_table(a));
+CREATE TABLE table_with_fk_plain_child (a int REFERENCES table_with_fk_base_table(a));
 CREATE TABLE
 
-CREATE TABLE fk_subpart_child ( a int REFERENCES fk_base_table(a), b int, c int ) PARTITION BY RANGE(b) SUBPARTITION BY RANGE(c) SUBPARTITION TEMPLATE ( START(1) END(3) EVERY(1) ) ( START(1) END(3) EVERY(1) );
+CREATE TABLE table_with_fk_subpart_child ( a int REFERENCES table_with_fk_base_table(a), b int, c int ) PARTITION BY RANGE(b) SUBPARTITION BY RANGE(c) SUBPARTITION TEMPLATE ( START(1) END(3) EVERY(1) ) ( START(1) END(3) EVERY(1) );
 CREATE TABLE
 
-CREATE TABLE fk_ao_child (a int REFERENCES fk_base_table(a), b int) WITH(appendonly=true);
+CREATE TABLE table_with_fk_ao_child (a int REFERENCES table_with_fk_base_table(a), b int) WITH(appendonly=true);
 CREATE TABLE
 
 -- check foreign key constraints
-SELECT nspname, relname, conname FROM pg_constraint cc JOIN pg_class c ON c.oid = cc.conrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE cc.contype = 'f' AND EXISTS (SELECT 1 FROM interesting_relations rels WHERE c.oid = rels.oid);
- nspname     | relname          | conname                 
--------------+------------------+-------------------------
- constraints | fk_plain_child   | fk_plain_child_a_fkey   
- constraints | fk_subpart_child | fk_subpart_child_a_fkey 
- constraints | fk_pt_with_index | fk_pt_with_index_a_fkey 
- constraints | fk_ao_child      | fk_ao_child_a_fkey      
-(4 rows)
+SELECT nspname, relname, conname FROM pg_constraint cc JOIN pg_class c ON c.oid = cc.conrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE cc.contype = 'f' AND c.relname LIKE 'table_with_fk_%';
+ nspname     | relname                     | conname                                       
+-------------+-----------------------------+-----------------------------------------------
+ constraints | table_with_fk_plain_child   | table_with_fk_plain_child_a_table_with_fkey   
+ constraints | table_with_fk_pt_with_index | table_with_fk_pt_with_index_a_table_with_fkey 
+ constraints | table_with_fk_ao_child      | table_with_fk_ao_child_a_table_with_fkey      
+(3 rows)
 
 -- check indexes
-SELECT c.relname AS index_name FROM pg_index i JOIN pg_class c ON i.indexrelid = c.oid JOIN pg_class t ON i.indrelid = t.oid AND t.relname LIKE 'fk_pt_%';
- index_name                        
------------------------------------
- fk_pt_with_index_1_prt_pt1_c_idx1 
- fk_pt_idx_c_bitmap                
- fk_pt_with_index_1_prt_pt1_c_idx  
- fk_pt_idx_c                       
- fk_pt_with_index_1_prt_pt2_c_idx  
- fk_pt_with_index_1_prt_pt3_c_idx  
- fk_pt_with_index_1_prt_pt2_c_idx1 
- fk_pt_with_index_1_prt_pt3_c_idx1 
- fk_pt_idx_b_prt_2                 
- fk_pt_idx_b_prt_2_bitmap          
- fk_pt_idx_c_prt_2                 
- fk_pt_idx_c_prt_2_bitmap          
+SELECT c.relname AS index_name FROM pg_index i JOIN pg_class c ON i.indexrelid = c.oid JOIN pg_class t ON i.indrelid = t.oid AND t.relname LIKE 'table_with_fk_pt_%';
+ index_name                                   
+----------------------------------------------
+ table_with_fk_pt_with_index_1_prt_pt1_c_idx1 
+ table_with_fk_pt_idx_c_bitmap                
+ table_with_fk_pt_with_index_1_prt_pt1_c_idx  
+ table_with_fk_pt_idx_c                       
+ table_with_fk_pt_with_index_1_prt_pt2_c_idx  
+ table_with_fk_pt_with_index_1_prt_pt3_c_idx  
+ table_with_fk_pt_with_index_1_prt_pt2_c_idx1 
+ table_with_fk_pt_with_index_1_prt_pt3_c_idx1 
+ table_with_fk_pt_idx_b_prt_2                 
+ table_with_fk_pt_idx_b_prt_2_bitmap          
+ table_with_fk_pt_idx_c_prt_2                 
+ table_with_fk_pt_idx_c_prt_2_bitmap          
 (12 rows)
 
 -- check data
-SELECT * FROM fk_pt_with_index ORDER BY 1, 2, 3, 4;
+SELECT * FROM table_with_fk_pt_with_index ORDER BY 1, 2, 3, 4;
  a | b | c | d 
 ---+---+---+---
  1 | 1 | 1 | 1 
