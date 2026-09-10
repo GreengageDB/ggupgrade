@@ -241,12 +241,7 @@ const OutputFileUnsupportedUniqueIndexes = "partitioned_tables_with_unsupported_
 
 const ErrorMessageUnsupportedUniqueIndexes = `Can not start migration because the cluster has unique indexes on partitioned tables that do not contain all of the partitioning columns.
 
-Greengage 7 requires a unique index on a partitioned table to contain every partitioning column:
-
-'''
-ERROR:  unique constraint on partitioned table must include all partitioning columns
-DETAIL:  UNIQUE constraint on table "sales" lacks column "office_id" which is part of the partition key.
-'''
+Greengage 7 requires a unique index on a partitioned table to contain every partitioning column.
 
 Such an index has to be dropped before the upgrade and cannot be recreated afterwards. Were the
 migration to start, the index would be lost and the finalize phase would fail on a cluster that has
