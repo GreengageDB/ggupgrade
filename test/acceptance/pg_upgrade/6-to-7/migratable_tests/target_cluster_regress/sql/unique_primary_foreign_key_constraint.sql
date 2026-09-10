@@ -9,7 +9,7 @@ CREATE TABLE interesting_relations AS (
         'fk_base_table',
         'fk_pt_with_index',
         'fk_plain_child',
-        'fk_part_child',
+        'fk_ao_child',
         'fk_subpart_child',
         'table_with_unique_constraint',
         'table_with_unique_constraint_p',

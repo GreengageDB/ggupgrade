@@ -18,28 +18,6 @@ CREATE TABLE fk_pt_with_index (
     PARTITION pt3 START(3) END(4)
 );
 
-CREATE TABLE fk_plain_child (a int REFERENCES fk_base_table(a));
-CREATE TABLE fk_part_child (
-    a int REFERENCES fk_base_table(a),
-    b int
-) PARTITION BY RANGE(b) 
-(
-    START(1) END(3) EVERY(1)
-);
-
-CREATE TABLE fk_subpart_child (
-    a int REFERENCES fk_base_table(a),
-    b int,
-    c int
-) PARTITION BY RANGE(b)
-	SUBPARTITION BY RANGE(c)
-	SUBPARTITION TEMPLATE (
-        START(1) END(3) EVERY(1)
-    )
-	(
-        START(1) END(3) EVERY(1)
-    );
-
 CREATE INDEX fk_pt_idx_c on fk_pt_with_index(c);
 CREATE INDEX fk_pt_idx_c_bitmap on fk_pt_with_index using bitmap(c);
 
@@ -51,6 +29,10 @@ CREATE INDEX fk_pt_idx_c_prt_2_bitmap on fk_pt_with_index_1_prt_pt2 using bitmap
 
 INSERT INTO fk_pt_with_index VALUES (1, 1, 1, 1);
 INSERT INTO fk_pt_with_index VALUES (2, 2, 2, 2);
+
+CREATE TABLE fk_plain_child (a int REFERENCES fk_base_table(a));
+
+CREATE TABLE fk_ao_child (a int REFERENCES fk_base_table(a), b int) WITH(appendonly=true);
 
 -- check foreign key constraints
 WITH Partitions AS (

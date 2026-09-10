@@ -4,17 +4,17 @@ SET
 -- A table to hold interesting relations, to make sure that
 -- we don't duplicate code, as we can't detect partitions
 -- in a cross-version way
-CREATE TABLE interesting_relations AS ( SELECT oid FROM pg_class WHERE relname IN ( 'fk_base_table', 'fk_pt_with_index', 'fk_plain_child', 'fk_part_child', 'fk_subpart_child', 'table_with_unique_constraint', 'table_with_unique_constraint_p', 'table_with_primary_constraint', 'table_with_primary_constraint_p' ) );
+CREATE TABLE interesting_relations AS ( SELECT oid FROM pg_class WHERE relname IN ( 'fk_base_table', 'fk_pt_with_index', 'fk_plain_child', 'fk_ao_child', 'fk_subpart_child', 'table_with_unique_constraint', 'table_with_unique_constraint_p', 'table_with_primary_constraint', 'table_with_primary_constraint_p' ) );
 SELECT 9
 
 
 SELECT nspname, relname, conname FROM pg_constraint cc JOIN pg_class c ON c.oid = cc.conrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE cc.contype = 'f' AND EXISTS ( SELECT 1 FROM interesting_relations rels WHERE c.oid = rels.oid );
  nspname     | relname          | conname                 
 -------------+------------------+-------------------------
- constraints | fk_part_child    | fk_part_child_a_fkey    
- constraints | fk_pt_with_index | fk_pt_with_index_a_fkey 
  constraints | fk_plain_child   | fk_plain_child_a_fkey   
  constraints | fk_subpart_child | fk_subpart_child_a_fkey 
+ constraints | fk_pt_with_index | fk_pt_with_index_a_fkey 
+ constraints | fk_ao_child      | fk_ao_child_a_fkey      
 (4 rows)
 
 -- check indexes
