@@ -9,11 +9,11 @@ SELECT 8
 
 
 SELECT nspname, relname, conname FROM pg_constraint cc JOIN pg_class c ON c.oid = cc.conrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE cc.contype = 'f' AND EXISTS ( SELECT 1 FROM interesting_relations rels WHERE c.oid = rels.oid );
- nspname     | relname                     | conname                                       
--------------+-----------------------------+-----------------------------------------------
- constraints | table_with_fk_plain_child   | table_with_fk_plain_child_a_table_with_fkey   
- constraints | table_with_fk_pt_with_index | table_with_fk_pt_with_index_a_table_with_fkey 
- constraints | table_with_fk_ao_child      | table_with_fk_ao_child_a_table_with_fkey      
+ nspname     | relname                     | conname                            
+-------------+-----------------------------+------------------------------------
+ constraints | table_with_fk_plain_child   | table_with_fk_plain_child_a_fkey   
+ constraints | table_with_fk_pt_with_index | table_with_fk_pt_with_index_a_fkey 
+ constraints | table_with_fk_ao_child      | table_with_fk_ao_child_a_fkey      
 (3 rows)
 
 -- check indexes
