@@ -35,22 +35,14 @@ CREATE TABLE fk_plain_child (a int REFERENCES fk_base_table(a));
 CREATE TABLE fk_ao_child (a int REFERENCES fk_base_table(a), b int) WITH(appendonly=true);
 
 -- check foreign key constraints
-WITH Partitions AS (
-    SELECT DISTINCT
-        p.parrelid AS oid,
-        n.nspname,
-        c.relname
-    FROM
-        pg_catalog.pg_partition p
-    JOIN
-        pg_catalog.pg_class c ON p.parrelid = c.oid
-    JOIN
-        pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-)
 SELECT nspname, relname, conname
 FROM pg_constraint cc
-JOIN Partitions sub ON sub.oid = cc.conrelid
-WHERE cc.contype = 'f';
+JOIN pg_class c ON c.oid = cc.conrelid
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE cc.contype = 'f' AND EXISTS (
+    SELECT 1 FROM interesting_relations rels
+    WHERE c.oid = rels.oid
+);
 
 -- check indexes
 SELECT c.relname AS index_name
