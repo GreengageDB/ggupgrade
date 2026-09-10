@@ -25,7 +25,8 @@ JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE cc.contype = 'f' AND EXISTS (
     SELECT 1 FROM interesting_relations rels
     WHERE c.oid = rels.oid
-);
+)
+ORDER BY 1, 2, 3;
 
 -- check indexes
 SELECT c.relname AS index_name
