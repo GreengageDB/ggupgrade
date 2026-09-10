@@ -4,7 +4,7 @@
 -- Generate a script to drop unique/primary key constraints.
 
 SELECT
-   'ALTER TABLE ' || pg_catalog.quote_ident(n.nspname) || '.' || pg_catalog.quote_ident(cc.relname) || ' DROP CONSTRAINT ' || pg_catalog.quote_ident(conname) || ' CASCADE;'
+   'ALTER TABLE ' || pg_catalog.quote_ident(n.nspname) || '.' || pg_catalog.quote_ident(cc.relname) || ' DROP CONSTRAINT IF EXISTS ' || pg_catalog.quote_ident(conname) || ' CASCADE;'
 FROM
    pg_constraint con
    JOIN
@@ -31,4 +31,8 @@ FROM
       ON cc.oid = con.conrelid
    JOIN
       pg_namespace n
-      ON (n.oid = cc.relnamespace);
+      ON (n.oid = cc.relnamespace)
+    WHERE NOT EXISTS (
+        SELECT 1 FROM pg_partition_rule r
+        WHERE r.parchildrelid = cc.oid
+    );

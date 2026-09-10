@@ -1,0 +1,160 @@
+SET search_path TO constraints;
+SET
+
+-- A table to hold interesting relations, to make sure that
+-- we don't duplicate code, as we can't detect partitions
+-- in a cross-version way
+CREATE TABLE interesting_relations AS ( SELECT oid FROM pg_class WHERE relname IN ( 'fk_base_table', 'fk_pt_with_index', 'table_with_unique_constraint', 'table_with_unique_constraint_p', 'table_with_primary_constraint', 'table_with_primary_constraint_p' ) );
+SELECT 6
+
+
+SELECT nspname, relname, conname FROM pg_constraint cc JOIN pg_class c ON c.oid = cc.conrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE cc.contype = 'f' AND EXISTS ( SELECT 1 FROM interesting_relations rels WHERE c.oid = rels.oid );
+ nspname     | relname          | conname                 
+-------------+------------------+-------------------------
+ constraints | fk_pt_with_index | fk_pt_with_index_a_fkey 
+(1 row)
+
+-- check indexes
+SELECT c.relname AS index_name FROM pg_index i JOIN pg_class c ON i.indexrelid = c.oid JOIN pg_class t ON i.indrelid = t.oid AND t.relname LIKE 'fk_pt_%';
+ index_name                        
+-----------------------------------
+ fk_pt_idx_b_prt_2                 
+ fk_pt_idx_b_prt_2_bitmap          
+ fk_pt_with_index_1_prt_pt1_c_idx  
+ fk_pt_with_index_1_prt_pt2_c_idx  
+ fk_pt_with_index_1_prt_pt3_c_idx  
+ fk_pt_idx_c_prt_2                 
+ fk_pt_idx_c_prt_2_bitmap          
+ fk_pt_idx_c_bitmap                
+ fk_pt_with_index_1_prt_pt1_c_idx1 
+ fk_pt_with_index_1_prt_pt2_c_idx1 
+ fk_pt_with_index_1_prt_pt3_c_idx1 
+ fk_pt_idx_c                       
+(12 rows)
+
+-- check data
+SELECT * FROM fk_pt_with_index ORDER BY 1, 2, 3, 4;
+ a | b | c | d 
+---+---+---+---
+ 1 | 1 | 1 | 1 
+ 2 | 2 | 2 | 2 
+(2 rows)
+
+-- insert data and exercise constraint
+INSERT INTO fk_pt_with_index VALUES (3, 3, 3, 3);
+INSERT 0 1
+INSERT INTO fk_pt_with_index VALUES (3, 3, 3, 3);
+INSERT 0 1
+
+-- check data
+SELECT * FROM fk_pt_with_index ORDER BY 1, 2, 3, 4;
+ a | b | c | d 
+---+---+---+---
+ 1 | 1 | 1 | 1 
+ 2 | 2 | 2 | 2 
+ 3 | 3 | 3 | 3 
+ 3 | 3 | 3 | 3 
+(4 rows)
+
+
+-- check unique constraints
+SELECT n.nspname, cc.relname, conname FROM pg_constraint con JOIN pg_depend dep ON (refclassid, classid, objsubid) = ('pg_constraint'::regclass, 'pg_class'::regclass, 0) AND refobjid = con.oid AND deptype = 'i' AND contype IN ('u', 'p', 'x') JOIN pg_class c ON objid = c.oid AND c.relkind = 'i' JOIN pg_class cc ON cc.oid = con.conrelid JOIN pg_namespace n ON (n.oid = cc.relnamespace) WHERE cc.relname LIKE 'table_with_unique_constraint%' AND EXISTS ( SELECT 1 FROM interesting_relations rels WHERE cc.oid = rels.oid ) ORDER BY 1, 2, 3;
+ nspname     | relname                      | conname                                 
+-------------+------------------------------+-----------------------------------------
+ constraints | table_with_unique_constraint | table_with_unique_constraint_pkey       
+ constraints | table_with_unique_constraint | table_with_unique_constraint_uniq_au_ti 
+(2 rows)
+
+-- check data
+SELECT * FROM table_with_unique_constraint ORDER BY 1, 2;
+ author | title 
+--------+-------
+ 1      | 1     
+ 2      | 2     
+(2 rows)
+SELECT * FROM table_with_unique_constraint_p ORDER BY 1, 2;
+ author | title 
+--------+-------
+ 1      | 1     
+ 2      | 2     
+(2 rows)
+
+-- insert data and exercise constraint
+INSERT INTO table_with_unique_constraint VALUES (3, 3);
+INSERT 0 1
+INSERT INTO table_with_unique_constraint VALUES (3, 3);
+ERROR:  duplicate key value violates unique constraint "table_with_unique_constraint_uniq_au_ti"  (seg0 172.17.0.2:6002 pid=22834)
+DETAIL:  Key (author, title)=(3, 3) already exists.
+INSERT INTO table_with_unique_constraint_p VALUES (3, 3);
+INSERT 0 1
+INSERT INTO table_with_unique_constraint_p VALUES (3, 3);
+ERROR:  duplicate key value violates unique constraint "table_with_unique_constraint_p_1_prt_3_author_title_key"  (seg0 172.17.0.2:6002 pid=22834)
+DETAIL:  Key (author, title)=(3, 3) already exists.
+
+-- check data
+SELECT * FROM table_with_unique_constraint ORDER BY 1, 2;
+ author | title 
+--------+-------
+ 1      | 1     
+ 2      | 2     
+ 3      | 3     
+(3 rows)
+SELECT * FROM table_with_unique_constraint_p ORDER BY 1, 2;
+ author | title 
+--------+-------
+ 1      | 1     
+ 2      | 2     
+ 3      | 3     
+(3 rows)
+
+
+
+-- check primary unique constraints
+SELECT n.nspname, cc.relname, conname FROM pg_constraint con JOIN pg_depend dep ON (refclassid, classid, objsubid) = ('pg_constraint'::regclass, 'pg_class'::regclass, 0) AND refobjid = con.oid AND deptype = 'i' AND contype IN ('u', 'p', 'x') JOIN pg_class c ON objid = c.oid AND c.relkind = 'i' JOIN pg_class cc ON cc.oid = con.conrelid JOIN pg_namespace n ON (n.oid = cc.relnamespace) WHERE cc.relname LIKE 'table_with_primary_constraint%' AND EXISTS ( SELECT 1 FROM interesting_relations rels WHERE cc.oid = rels.oid ) ORDER BY 1, 2, 3;
+ nspname     | relname                       | conname                                        
+-------------+-------------------------------+------------------------------------------------
+ constraints | table_with_primary_constraint | table_with_primary_constraint_au_ti            
+ constraints | table_with_primary_constraint | table_with_primary_constraint_author_title_key 
+(2 rows)
+
+-- check data
+SELECT * FROM table_with_primary_constraint ORDER BY 1, 2;
+ author | title 
+--------+-------
+ 1      | 1     
+ 2      | 2     
+(2 rows)
+SELECT * FROM table_with_primary_constraint_p ORDER BY 1, 2;
+ author | title 
+--------+-------
+ 1      | 1     
+ 2      | 2     
+(2 rows)
+
+-- insert data and exercise constraint
+INSERT INTO table_with_primary_constraint VALUES (3, 3);
+INSERT 0 1
+INSERT INTO table_with_primary_constraint VALUES (3, 3);
+ERROR:  duplicate key value violates unique constraint "table_with_primary_constraint_au_ti"  (seg0 172.17.0.2:6002 pid=22834)
+DETAIL:  Key (author, title)=(3, 3) already exists.
+INSERT INTO table_with_primary_constraint_p VALUES (3, 3);
+INSERT 0 1
+INSERT INTO table_with_primary_constraint_p VALUES (3, 3);
+ERROR:  duplicate key value violates unique constraint "table_with_primary_constraint_p_1_prt_3_pkey"  (seg0 172.17.0.2:6002 pid=22834)
+DETAIL:  Key (author, title)=(3, 3) already exists.
+
+-- check data
+SELECT * FROM table_with_primary_constraint ORDER BY 1, 2;
+ author | title 
+--------+-------
+ 1      | 1     
+ 2      | 2     
+ 3      | 3     
+(3 rows)
+SELECT * FROM table_with_primary_constraint_p ORDER BY 1, 2;
+ author | title 
+--------+-------
+ 1      | 1     
+ 2      | 2     
+ 3      | 3     
+(3 rows)
