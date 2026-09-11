@@ -111,12 +111,11 @@ SELECT * FROM child_has_dropped_column ORDER BY 1, 2, 3, 4;
  1 | 1 | a | aaa 
 (1 row)
 
--- In the target cluster, this table has missing values. Investigate why.
 SELECT * FROM heterogeneous_ml_partition_table ORDER BY 1, 2, 3;
  trans_id | office_id | dummy 
 ----------+-----------+-------
- 1        | 1         |       
- 2        | 2         |       
+ 1        | 1         | 1     
+ 2        | 2         | 2     
 (2 rows)
 
 -- check owners
@@ -280,7 +279,7 @@ SELECT * FROM child_has_dropped_column ORDER BY 1, 2, 3, 4;
 SELECT * FROM heterogeneous_ml_partition_table ORDER BY 1, 2, 3;
  trans_id | office_id | dummy 
 ----------+-----------+-------
- 1        | 1         |       
- 2        | 2         |       
+ 1        | 1         | 1     
+ 2        | 2         | 2     
  3        | 3         | 3     
 (3 rows)
