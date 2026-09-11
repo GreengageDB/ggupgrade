@@ -4,36 +4,38 @@ SET
 -- A table to hold interesting relations, to make sure that
 -- we don't duplicate code, as we can't detect partitions
 -- in a cross-version way
-CREATE TABLE interesting_relations AS ( SELECT oid FROM pg_class WHERE relname IN ( 'fk_base_table', 'fk_pt_with_index', 'table_with_unique_constraint', 'table_with_unique_constraint_p', 'table_with_primary_constraint', 'table_with_primary_constraint_p' ) );
-SELECT 6
+CREATE TABLE interesting_relations AS ( SELECT oid FROM pg_class WHERE relname IN ( 'table_with_fk_base_table', 'table_with_fk_pt_with_index', 'table_with_fk_plain_child', 'table_with_fk_ao_child', 'table_with_unique_constraint', 'table_with_unique_constraint_p', 'table_with_primary_constraint', 'table_with_primary_constraint_p' ) );
+SELECT 8
 
 
-SELECT nspname, relname, conname FROM pg_constraint cc JOIN pg_class c ON c.oid = cc.conrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE cc.contype = 'f' AND EXISTS ( SELECT 1 FROM interesting_relations rels WHERE c.oid = rels.oid );
- nspname     | relname          | conname                 
--------------+------------------+-------------------------
- constraints | fk_pt_with_index | fk_pt_with_index_a_fkey 
-(1 row)
+SELECT nspname, relname, conname FROM pg_constraint cc JOIN pg_class c ON c.oid = cc.conrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE cc.contype = 'f' AND EXISTS ( SELECT 1 FROM interesting_relations rels WHERE c.oid = rels.oid ) ORDER BY 1, 2, 3;
+ nspname     | relname                     | conname                            
+-------------+-----------------------------+------------------------------------
+ constraints | table_with_fk_ao_child      | table_with_fk_ao_child_a_fkey      
+ constraints | table_with_fk_plain_child   | table_with_fk_plain_child_a_fkey   
+ constraints | table_with_fk_pt_with_index | table_with_fk_pt_with_index_a_fkey 
+(3 rows)
 
 -- check indexes
-SELECT c.relname AS index_name FROM pg_index i JOIN pg_class c ON i.indexrelid = c.oid JOIN pg_class t ON i.indrelid = t.oid AND t.relname LIKE 'fk_pt_%';
- index_name                        
------------------------------------
- fk_pt_idx_b_prt_2                 
- fk_pt_idx_b_prt_2_bitmap          
- fk_pt_with_index_1_prt_pt1_c_idx  
- fk_pt_with_index_1_prt_pt2_c_idx  
- fk_pt_with_index_1_prt_pt3_c_idx  
- fk_pt_idx_c_prt_2                 
- fk_pt_idx_c_prt_2_bitmap          
- fk_pt_idx_c_bitmap                
- fk_pt_with_index_1_prt_pt1_c_idx1 
- fk_pt_with_index_1_prt_pt2_c_idx1 
- fk_pt_with_index_1_prt_pt3_c_idx1 
- fk_pt_idx_c                       
+SELECT c.relname AS index_name FROM pg_index i JOIN pg_class c ON i.indexrelid = c.oid JOIN pg_class t ON i.indrelid = t.oid AND t.relname LIKE 'table_with_fk_pt_%';
+ index_name                                   
+----------------------------------------------
+ table_with_fk_pt_idx_c_bitmap                
+ table_with_fk_pt_with_index_1_prt_pt2_c_idx  
+ table_with_fk_pt_with_index_1_prt_pt3_c_idx  
+ table_with_fk_pt_with_index_1_prt_pt1_c_idx  
+ table_with_fk_pt_with_index_1_prt_pt1_c_idx1 
+ table_with_fk_pt_idx_c                       
+ table_with_fk_pt_with_index_1_prt_pt2_c_idx1 
+ table_with_fk_pt_with_index_1_prt_pt3_c_idx1 
+ table_with_fk_pt_idx_c_prt_2_bitmap          
+ table_with_fk_pt_idx_c_prt_2                 
+ table_with_fk_pt_idx_b_prt_2_bitmap          
+ table_with_fk_pt_idx_b_prt_2                 
 (12 rows)
 
 -- check data
-SELECT * FROM fk_pt_with_index ORDER BY 1, 2, 3, 4;
+SELECT * FROM table_with_fk_pt_with_index ORDER BY 1, 2, 3, 4;
  a | b | c | d 
 ---+---+---+---
  1 | 1 | 1 | 1 
@@ -41,13 +43,13 @@ SELECT * FROM fk_pt_with_index ORDER BY 1, 2, 3, 4;
 (2 rows)
 
 -- insert data and exercise constraint
-INSERT INTO fk_pt_with_index VALUES (3, 3, 3, 3);
+INSERT INTO table_with_fk_pt_with_index VALUES (3, 3, 3, 3);
 INSERT 0 1
-INSERT INTO fk_pt_with_index VALUES (3, 3, 3, 3);
+INSERT INTO table_with_fk_pt_with_index VALUES (3, 3, 3, 3);
 INSERT 0 1
 
 -- check data
-SELECT * FROM fk_pt_with_index ORDER BY 1, 2, 3, 4;
+SELECT * FROM table_with_fk_pt_with_index ORDER BY 1, 2, 3, 4;
  a | b | c | d 
 ---+---+---+---
  1 | 1 | 1 | 1 
