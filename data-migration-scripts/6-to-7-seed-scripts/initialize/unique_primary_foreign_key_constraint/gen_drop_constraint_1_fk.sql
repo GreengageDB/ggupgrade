@@ -30,8 +30,9 @@ FROM
                ON (n.oid = c.relnamespace)
          WHERE
             c.relkind = 'r'
-            AND n.nspname NOT LIKE 'pg_%'
-            AND n.nspname <> 'information_schema'
+            AND n.nspname NOT LIKE 'pg_temp_%'
+            AND n.nspname NOT LIKE 'pg_toast_temp_%'
+            AND n.nspname NOT IN ('pg_catalog', 'information_schema')
             -- dropping a constraint directly from a child partition is
             -- rejected, the root takes care of them
             AND NOT EXISTS
