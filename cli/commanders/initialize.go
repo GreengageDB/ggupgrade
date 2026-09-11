@@ -294,8 +294,7 @@ FROM
 WHERE
    x.indisunique
    AND k.attnum <> ALL (x.indkey::pg_catalog.int2[])
-GROUP BY 1, 2, 3
-ORDER BY 1, 2, 3;
+GROUP BY 1, 2, 3;
 `
 
 // CheckForUnsupportedUniqueIndexes stops the upgrade of a 6.x cluster that has a unique index on a
