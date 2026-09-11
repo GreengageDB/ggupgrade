@@ -129,10 +129,26 @@ ggupgrade inits a fresh target cluster "next to" the source cluster, and upgrade
 
 ### Prerequisites
 
+#### Build ggupgrade binary
 - Golang. See the top of [go.mod](go.mod) for the current version used.
 - protoc. This is the compiler for the [grpc protobuf](https://grpc.io/)
   system which can be installed from the github repository.
   `https://github.com/protocolbuffers/protobuf/releases`.
+
+#### Build ggupgrade deb package
+- debhelper
+- devscripts
+- fakeroot
+- lsb-release
+- perl
+
+On Debian/Ubuntu these can be installed with:
+```
+sudo apt-get install -y debhelper devscripts fakeroot lsb-release perl
+```
+
+Alternatively, build the package inside Docker without installing anything locally —
+see [ci/Dockerfile.ubuntu](ci/Dockerfile.ubuntu).
 
 ### Setting up your IDE
 
@@ -174,6 +190,7 @@ make                        # build ggupgrade binary (same as make build)
 make install-dependencies   # installs necessary developer dependencies and tools
 make generate               # recompiles proto files to generate gRPC client and server code
 make build                  # build ggupgrade binary
+make pkg-deb                # build ggupgrade deb package
 make install                # installs ggupgrade into $GOBIN
 make lint                   # runs linter
 make unit                   # runs unit test
