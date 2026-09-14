@@ -1,0 +1,63 @@
+# .github/workflows/build_and_package.yml
+name: Build and package DEB
+
+on:
+  push:
+    branches: ['main']
+    tags: ['**']
+  pull_request:
+    branches: ['**']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target_os: ubuntu
+            target_os_version: '22.04'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ci/Dockerfile.ubuntu
+          push: false
+          tags: ggupgrade:${{ matrix.target_os_version }}
+          build-args: OS_VERSION=${{ matrix.target_os_version }}
+
+      - name: Extract artifacts
+        run: |
+          mkdir artifacts
+          docker create --name temp-container ggupgrade:${{ matrix.target_os_version }}
+          docker cp temp-container:/home/gpadmin/deb-packages artifacts/
+          docker cp temp-container:/home/gpadmin/bin artifacts/
+          docker rm temp-container
+
+      - name: Upload deb packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: deb-packages-ggupgrade-${{ matrix.target_os }}${{ matrix.target_os_version }}
+          path: artifacts/deb-packages/
+
+      - name: Test deb package installation
+        uses: greengagedb/greengage-ci/.github/actions/tests/install/deb@v45
+        with:
+          test_docker: '${{ matrix.target_os }}:${{ matrix.target_os_version }}'
+          artifact_name: 'deb-packages-ggupgrade-${{ matrix.target_os }}${{ matrix.target_os_version }}'
+          add_greengage_repo: true
+          greengage_repo_url: "https://storage.yandexcloud.net/greengage-repo"
+          verify_commands: |
+            dpkg -l ggupgrade* &&
+            /opt/greengagedb/ggupgrade/ggupgrade --version
