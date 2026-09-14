@@ -5,9 +5,9 @@ CREATE SCHEMA constraints;
 SET search_path TO constraints;
 
 -- foreign key constraints
-CREATE TABLE fk_base_table (a int unique);
-CREATE TABLE fk_pt_with_index (
-    a int REFERENCES fk_base_table(a),
+CREATE TABLE table_with_fk_base_table (a int unique);
+CREATE TABLE table_with_fk_pt_with_index (
+    a int REFERENCES table_with_fk_base_table(a),
     b int,
     c int,
     d int
@@ -18,45 +18,39 @@ CREATE TABLE fk_pt_with_index (
     PARTITION pt3 START(3) END(4)
 );
 
-CREATE INDEX fk_pt_idx_c on fk_pt_with_index(c);
-CREATE INDEX fk_pt_idx_c_bitmap on fk_pt_with_index using bitmap(c);
+CREATE INDEX table_with_fk_pt_idx_c on table_with_fk_pt_with_index(c);
+CREATE INDEX table_with_fk_pt_idx_c_bitmap on table_with_fk_pt_with_index using bitmap(c);
 
-CREATE INDEX fk_pt_idx_b_prt_2 on fk_pt_with_index_1_prt_pt2(b);
-CREATE INDEX fk_pt_idx_b_prt_2_bitmap on fk_pt_with_index_1_prt_pt2 using bitmap(b);
+CREATE INDEX table_with_fk_pt_idx_b_prt_2 on table_with_fk_pt_with_index_1_prt_pt2(b);
+CREATE INDEX table_with_fk_pt_idx_b_prt_2_bitmap on table_with_fk_pt_with_index_1_prt_pt2 using bitmap(b);
 
-CREATE INDEX fk_pt_idx_c_prt_2 on fk_pt_with_index_1_prt_pt2(c);
-CREATE INDEX fk_pt_idx_c_prt_2_bitmap on fk_pt_with_index_1_prt_pt2 using bitmap(c);
+CREATE INDEX table_with_fk_pt_idx_c_prt_2 on table_with_fk_pt_with_index_1_prt_pt2(c);
+CREATE INDEX table_with_fk_pt_idx_c_prt_2_bitmap on table_with_fk_pt_with_index_1_prt_pt2 using bitmap(c);
 
-INSERT INTO fk_pt_with_index VALUES (1, 1, 1, 1);
-INSERT INTO fk_pt_with_index VALUES (2, 2, 2, 2);
+INSERT INTO table_with_fk_pt_with_index VALUES (1, 1, 1, 1);
+INSERT INTO table_with_fk_pt_with_index VALUES (2, 2, 2, 2);
+
+CREATE TABLE table_with_fk_plain_child (a int REFERENCES table_with_fk_base_table(a));
+
+CREATE TABLE table_with_fk_ao_child (a int REFERENCES table_with_fk_base_table(a), b int) WITH(appendonly=true);
 
 -- check foreign key constraints
-WITH Partitions AS (
-    SELECT DISTINCT
-        p.parrelid AS oid,
-        n.nspname,
-        c.relname
-    FROM
-        pg_catalog.pg_partition p
-    JOIN
-        pg_catalog.pg_class c ON p.parrelid = c.oid
-    JOIN
-        pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-)
 SELECT nspname, relname, conname
 FROM pg_constraint cc
-JOIN Partitions sub ON sub.oid = cc.conrelid
-WHERE cc.contype = 'f';
+JOIN pg_class c ON c.oid = cc.conrelid
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE cc.contype = 'f'
+AND c.relname LIKE 'table_with_fk_%';
 
 -- check indexes
 SELECT c.relname AS index_name
 FROM pg_index i
 JOIN pg_class c ON i.indexrelid = c.oid
 JOIN pg_class t ON i.indrelid = t.oid
-AND t.relname LIKE 'fk_pt_%';
+AND t.relname LIKE 'table_with_fk_pt_%';
 
 -- check data
-SELECT * FROM fk_pt_with_index ORDER BY 1, 2, 3, 4;
+SELECT * FROM table_with_fk_pt_with_index ORDER BY 1, 2, 3, 4;
 
 
 
