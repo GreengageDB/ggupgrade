@@ -9,3 +9,7 @@ CHECKSUM
 /ci/functional/generated/
 /cli/bash/ggupgrade.bash
 *.pb.go
+
+# Packages
+/Package/
+/.debuilder.lock

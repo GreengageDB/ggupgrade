@@ -21,6 +21,11 @@ jobs:
           - target_os: ubuntu
             target_os_version: '22.04'
     runs-on: ubuntu-24.04
+    env:
+      # The developer image is used only as a build toolchain (debhelper, protoc).
+      GGDB_IMAGE:   ghcr.io/greengagedb/greengage/ggdb6_${{ matrix.target_os}}${{ matrix.target_os_version != '22.04' && matrix.target_os_version || '' }}:latest
+      DEB_PACKAGES: deb-packages-ggupgrade-${{ matrix.target_os }}${{ matrix.target_os_version }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -28,36 +33,29 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Build Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ci/Dockerfile.ubuntu
-          push: false
-          tags: ggupgrade:${{ matrix.target_os_version }}
-          build-args: OS_VERSION=${{ matrix.target_os_version }}
-
-      - name: Extract artifacts
+      - name: Build in Docker using docker run
         run: |
-          mkdir artifacts
-          docker create --name temp-container ggupgrade:${{ matrix.target_os_version }}
-          docker cp temp-container:/home/gpadmin/deb-packages artifacts/
-          docker cp temp-container:/home/gpadmin/bin artifacts/
-          docker rm temp-container
+          set -eux
+          docker run \
+            --rm \
+            -e DEB_PACKAGES \
+            -v ${{ github.workspace }}:/ggupgrade/src -w /ggupgrade/src \
+            $GGDB_IMAGE \
+            ci/build_in_docker.sh
 
       - name: Upload deb packages
         uses: actions/upload-artifact@v7
         with:
-          name: deb-packages-ggupgrade-${{ matrix.target_os }}${{ matrix.target_os_version }}
-          path: artifacts/deb-packages/
+          name: ${{ env.DEB_PACKAGES }}
+          path: ${{ env.DEB_PACKAGES }}
 
-      - name: Test deb package installation
+      - name: Test install deb-packages in Docker
         uses: greengagedb/greengage-ci/.github/actions/tests/install/deb@v45
         with:
-          test_docker: '${{ matrix.target_os }}:${{ matrix.target_os_version }}'
-          artifact_name: 'deb-packages-ggupgrade-${{ matrix.target_os }}${{ matrix.target_os_version }}'
+          test_docker: ${{ matrix.target_os}}:${{ matrix.target_os_version }}
+          artifact_name: ${{ env.DEB_PACKAGES }}
           add_greengage_repo: true
           greengage_repo_url: "https://storage.yandexcloud.net/greengage-repo"
           verify_commands: |
-            dpkg -l ggupgrade* &&
+            dpkg -l ggupgrade &&
             /opt/greengagedb/ggupgrade/ggupgrade --version

@@ -147,8 +147,24 @@ On Debian/Ubuntu these can be installed with:
 sudo apt-get install -y debhelper devscripts fakeroot lsb-release perl
 ```
 
-Alternatively, build the package inside Docker without installing anything locally —
-see [ci/Dockerfile.ubuntu](ci/Dockerfile.ubuntu).
+Then build the package (Go and protoc from the section above are also required):
+```
+make -f package.mk pkg
+```
+
+Alternatively, build the package inside a Greengage developer image without
+installing anything locally (Go is installed inside the container):
+```
+ci/build_in_docker_local.sh          # Ubuntu 22.04 (default)
+ci/build_in_docker_local.sh 24.04
+```
+
+The resulting `.deb`, `.build`, `.buildinfo` and `.changes` land in
+`./Package/ggupgrade_<version>/`; the directory can be overridden with
+`DEB_PACKAGES`. The version is taken from `GGUPGRADE_PACKAGE_VERSION`, then
+`git describe --tags`, then `.version`; `git describe` output
+`<version>-<commits>-g<hash>` becomes `<version>+dev.<commits>.g<hash>`.
+`make -f package.mk version-info` prints the resolved version.
 
 ### Setting up your IDE
 
@@ -190,7 +206,7 @@ make                        # build ggupgrade binary (same as make build)
 make install-dependencies   # installs necessary developer dependencies and tools
 make generate               # recompiles proto files to generate gRPC client and server code
 make build                  # build ggupgrade binary
-make pkg-deb                # build ggupgrade deb package
+make -f package.mk pkg      # build ggupgrade deb package
 make install                # installs ggupgrade into $GOBIN
 make lint                   # runs linter
 make unit                   # runs unit test

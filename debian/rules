@@ -1,4 +1,5 @@
 #!/usr/bin/make -f
+# debian/rules
 
 DH_VERBOSE = 1
 
@@ -9,8 +10,8 @@ export GOPATH ?= $(HOME)/go
 export GOFLAGS = -buildvcs=false
 export PATH := /usr/local/go/bin:$(PATH)
 
-BIN ?= ggupgrade
-INSTALL_ROOT = $(CURDIR)/debian/tmp/$(PACKAGE_NAME)$(GPROOT)/$(PACKAGE_NAME)
+BIN          := ggupgrade
+INSTALL_ROOT := $(CURDIR)/debian/ggupgrade/opt/greengagedb/ggupgrade
 
 %:
 	dh $@
@@ -18,8 +19,13 @@ INSTALL_ROOT = $(CURDIR)/debian/tmp/$(PACKAGE_NAME)$(GPROOT)/$(PACKAGE_NAME)
 override_dh_auto_clean:
 	@echo "Skipping 'make clean': it removes idl/*.pb.go and cli/bash/ggupgrade.bash generated for this build"
 
+override_dh_auto_build:
+	@command -v go >/dev/null || { echo "go not found in PATH"; exit 1; }
+	$(MAKE) install-dependencies generate build \
+		$(if $(GGUPGRADE_PACKAGE_VERSION),VERSION="$(GGUPGRADE_PACKAGE_VERSION)")
+
 override_dh_auto_install:
-	@echo "=== Installing $(PACKAGE_NAME) to $(PACKAGE_NAME)$(GPROOT)/$(PACKAGE_NAME) ==="
+	@echo "=== Installing $(BIN) to $(INSTALL_ROOT) ==="
 	@install -D -m 755 $(CURDIR)/$(BIN) $(INSTALL_ROOT)/$(BIN)
 	@install -D -m 644 $(CURDIR)/cli/bash/ggupgrade.bash $(INSTALL_ROOT)/ggupgrade.bash
 	@install -D -m 644 $(CURDIR)/ggupgrade_config $(INSTALL_ROOT)/ggupgrade_config
@@ -31,3 +37,7 @@ override_dh_auto_install:
 
 override_dh_dwz:
 	@echo "Skipping debug symbols compression (not working properly with Golang)"
+
+# Go binaries carry no GNU build-id, so dh_strip cannot produce a -dbgsym package.
+override_dh_strip:
+	dh_strip --no-automatic-dbgsym

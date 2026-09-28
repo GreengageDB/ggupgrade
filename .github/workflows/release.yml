@@ -13,7 +13,7 @@ jobs:
         include:
         - target_os: ubuntu
           target_os_version: '22.04'
-          extensions: 'deb ddeb'
+          extensions: deb
     runs-on: ubuntu-24.04
     permissions:
       contents: write
