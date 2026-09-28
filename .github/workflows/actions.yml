@@ -97,16 +97,20 @@ jobs:
             command: "go test --cover -count=1 -timeout 30m -v -run '^TestRevert$' ./test/acceptance/ggupgrade"
           - test: e2e_copy
             command: ci/new/e2e.bash copy
+            needs_sqldump: true
           - test: e2e_link
             command: ci/new/e2e.bash link
+            needs_sqldump: true
           - test: e2e_link_primaries_only
             command: ci/new/e2e.bash link
             with_mirrors: 'false'
             with_standby: 'false'
+            needs_sqldump: true
           - test: e2e_link_no_standby
             command: ci/new/e2e.bash link
             with_mirrors: 'true'
             with_standby: 'false'
+            needs_sqldump: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -118,6 +122,37 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           version: latest
+
+      - name: Fetch SQL Dump
+        if: ${{ matrix.needs_sqldump }}
+        id: sql-dump
+        # TODO: Replace with reusing sql-dump/fetch action from greengage repo
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          artifact_name="sqldump_ggdb6_ubuntu24.04"
+          archive_name="ubuntu24.04_postgres_sqldump.tar"
+          run_ids=$(gh run list -R greengagedb/greengage --workflow "Greengage SQL Dump" \
+            --limit 100 \
+            --json conclusion,status,databaseId \
+            --jq 'map(select(.status=="completed" and .conclusion=="success")) | .[].databaseId')
+
+          for run_id in $run_ids; do
+            if gh run download "$run_id" -R greengagedb/greengage --name "$artifact_name" 2>/dev/null; then
+              echo "::notice::SQL Dump $artifact_name found at $run_id finished workflow"
+              break
+            fi
+          done
+
+          if sql_dump=$(tar -xvf "$archive_name" 2>/dev/null); then
+            rm -f "$archive_name"
+            echo "sql_dump=$sql_dump" >> "$GITHUB_OUTPUT"
+            echo "::notice::SQL Dump '$sql_dump' successfully unpacked. Archive $archive_name removed"
+          else
+            echo "::error::Artifact '$artifact_name' not found in any completed workflow run"
+            exit 1
+          fi
 
       - name: Build
         uses: docker/build-push-action@v6
@@ -142,6 +177,8 @@ jobs:
                  -u gpadmin -T coordinator env \
                  WITH_MIRRORS=${{ matrix.with_mirrors || 'true'}} \
                  WITH_STANDBY=${{ matrix.with_standby || 'true'}} \
+                 SQLDUMP_PATH=${{ matrix.needs_sqldump && '/home/gpadmin/sqldump/dump.sql' || '' }} \
+                 CLEANUP_SCRIPT=/home/gpadmin/gpdb_src/src/bin/pg_upgrade/cleanup_regression_dump_from_6X.sql \
                  ggupgrade/ci/new/run_test_in_dist_cluster.bash ${{ matrix.command }}
 
       - name: Upload artifacts
