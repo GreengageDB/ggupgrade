@@ -8,11 +8,14 @@ WITH_STANDBY="${WITH_STANDBY:-true}"
 
 function load_dump() {
     echo "Loading SQL Dump"
-    psql -d postgres -f ci/new/basic_sql_dump.sql &> sql_load.log
+    psql -d postgres -f "${SQLDUMP_PATH}" &> sql_load.log
     echo "SQL Dump load complete"
+    psql -d postgres -f "${CLEANUP_SCRIPT}"
 }
 
-load_dump
+if [ -n "${SQLDUMP_PATH}" ]; then
+    load_dump
+fi
 
 gpcheckcat -A
 
