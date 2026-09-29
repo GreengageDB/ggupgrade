@@ -218,6 +218,13 @@ func initialize() *cobra.Command {
 				return commanders.CheckForObsoletePlpython(streams, sourceGPHome, sourcePort, filepath.Clean(dataMigrationSeedDir))
 			})
 
+			// Check for unique indexes on partitioned tables that Greengage 7 does not allow. It has
+			// to run before the initialize data migration scripts as they drop such an index, and
+			// nothing can recreate it in the target cluster.
+			st.AlwaysRun(idl.Substep_check_for_unsupported_unique_indexes, func(streams step.OutStreams) error {
+				return commanders.CheckForUnsupportedUniqueIndexes(streams, sourceGPHome, sourcePort)
+			})
+
 			generatedScriptsOutputDir, err := utils.GetDefaultGeneratedDataMigrationScriptsDir()
 			if err != nil {
 				return nil

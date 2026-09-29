@@ -66,6 +66,7 @@ var SubstepDescriptions = map[idl.Substep]substepText{
 	idl.Substep_check_active_connections_on_source_cluster:                    substepText{"Checking active connections on source cluster...", "Check active connections on source cluster"},
 	idl.Substep_check_active_connections_on_target_cluster:                    substepText{"Checking active connections on target cluster...", "Check active connections on target cluster"},
 	idl.Substep_check_for_obsolete_plpython:                                   substepText{"Checking for plpython2u...", "Check for plpython2u"},
+	idl.Substep_check_for_unsupported_unique_indexes:                          substepText{"Checking for unique indexes on partitioned tables...", "Check for unique indexes on partitioned tables"},
 	idl.Substep_generate_data_migration_scripts:                               substepText{"Generating data migration SQL scripts...", "Generated data migration SQL scripts"},
 	idl.Substep_execute_stats_data_migration_scripts:                          substepText{"Executing stats data migration SQL scripts...", "Executed stats data migration SQL scripts"},
 	idl.Substep_execute_initialize_data_migration_scripts:                     substepText{"Executing initialize data migration SQL scripts...", "Executed initialize data migration SQL scripts"},

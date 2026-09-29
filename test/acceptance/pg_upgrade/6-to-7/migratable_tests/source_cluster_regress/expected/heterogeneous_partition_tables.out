@@ -1,0 +1,204 @@
+--------------------------------------------------------------------------------
+-- Create and setup migratable objects
+--------------------------------------------------------------------------------
+
+-- Heterogeneous partition table with dropped column, constraint, and default
+-- The root and only a subset of children have the dropped column reference.
+CREATE TABLE dropped_column ( a int CONSTRAINT positive_int CHECK (b > 0), b int DEFAULT 1, c char, d varchar(50) ) DISTRIBUTED BY (c) PARTITION BY RANGE (a) ( PARTITION part_1 START(1) END(5), PARTITION part_2 START(5) );
+CREATE TABLE
+
+ALTER TABLE dropped_column DROP COLUMN d;
+ALTER TABLE
+ALTER TABLE dropped_column OWNER TO migratable_objects_role;
+ALTER TABLE
+
+-- Splitting the subpartition leads to its rewrite, eliminating its dropped column
+-- reference. So, after this, only part_2 and the root partition will have a
+-- dropped column reference.
+ALTER TABLE dropped_column SPLIT PARTITION FOR (1) AT (2) INTO ( PARTITION split_part_1, PARTITION split_part_2 );
+ALTER TABLE
+
+INSERT INTO dropped_column SELECT i, i, 'a' FROM generate_series(1,99) i;
+INSERT 0 99
+
+-- Root partitions do not have dropped column references, but some child partitions do
+CREATE TABLE child_has_dropped_column ( a int, b int, c char, d varchar(50) ) PARTITION BY RANGE (a) ( PARTITION part_1 START(1) END(5), PARTITION part_2 START(5) );
+CREATE TABLE
+
+CREATE TABLE intermediate_table ( a int, b int, c char, d varchar(50), to_drop int );
+CREATE TABLE
+ALTER TABLE intermediate_table DROP COLUMN to_drop;
+ALTER TABLE
+
+ALTER TABLE child_has_dropped_column EXCHANGE PARTITION part_1 WITH TABLE intermediate_table;
+ALTER TABLE
+
+DROP TABLE intermediate_table;
+DROP TABLE
+
+INSERT INTO child_has_dropped_column VALUES (1, 1, 'a', 'aaa');
+INSERT 0 1
+
+-- heterogeneous multilevel partitioned table
+CREATE TABLE heterogeneous_ml_partition_table ( trans_id int, office_id int, region int, dummy int ) DISTRIBUTED BY (trans_id) PARTITION BY RANGE (office_id) SUBPARTITION BY RANGE (dummy) SUBPARTITION TEMPLATE ( START (1) END (16) EVERY (4), DEFAULT SUBPARTITION other_dummy ) ( START (1) END (4) EVERY (1), DEFAULT PARTITION outlying_dates );
+CREATE TABLE
+
+ALTER TABLE heterogeneous_ml_partition_table DROP COLUMN region;
+ALTER TABLE
+ALTER TABLE heterogeneous_ml_partition_table ALTER PARTITION FOR (1) SPLIT PARTITION FOR (1) AT (3) INTO ( PARTITION p1, PARTITION p2 );
+ALTER TABLE
+
+INSERT INTO heterogeneous_ml_partition_table VALUES (1, 1, 1);
+INSERT 0 1
+INSERT INTO heterogeneous_ml_partition_table VALUES (2, 2, 2);
+INSERT 0 1
+
+-- check data
+SELECT * FROM dropped_column ORDER BY 1, 2, 3;
+ a  | b  | c 
+----+----+---
+ 1  | 1  | a 
+ 2  | 2  | a 
+ 3  | 3  | a 
+ 4  | 4  | a 
+ 5  | 5  | a 
+ 6  | 6  | a 
+ 7  | 7  | a 
+ 8  | 8  | a 
+ 9  | 9  | a 
+ 10 | 10 | a 
+ 11 | 11 | a 
+ 12 | 12 | a 
+ 13 | 13 | a 
+ 14 | 14 | a 
+ 15 | 15 | a 
+ 16 | 16 | a 
+ 17 | 17 | a 
+ 18 | 18 | a 
+ 19 | 19 | a 
+ 20 | 20 | a 
+ 21 | 21 | a 
+ 22 | 22 | a 
+ 23 | 23 | a 
+ 24 | 24 | a 
+ 25 | 25 | a 
+ 26 | 26 | a 
+ 27 | 27 | a 
+ 28 | 28 | a 
+ 29 | 29 | a 
+ 30 | 30 | a 
+ 31 | 31 | a 
+ 32 | 32 | a 
+ 33 | 33 | a 
+ 34 | 34 | a 
+ 35 | 35 | a 
+ 36 | 36 | a 
+ 37 | 37 | a 
+ 38 | 38 | a 
+ 39 | 39 | a 
+ 40 | 40 | a 
+ 41 | 41 | a 
+ 42 | 42 | a 
+ 43 | 43 | a 
+ 44 | 44 | a 
+ 45 | 45 | a 
+ 46 | 46 | a 
+ 47 | 47 | a 
+ 48 | 48 | a 
+ 49 | 49 | a 
+ 50 | 50 | a 
+ 51 | 51 | a 
+ 52 | 52 | a 
+ 53 | 53 | a 
+ 54 | 54 | a 
+ 55 | 55 | a 
+ 56 | 56 | a 
+ 57 | 57 | a 
+ 58 | 58 | a 
+ 59 | 59 | a 
+ 60 | 60 | a 
+ 61 | 61 | a 
+ 62 | 62 | a 
+ 63 | 63 | a 
+ 64 | 64 | a 
+ 65 | 65 | a 
+ 66 | 66 | a 
+ 67 | 67 | a 
+ 68 | 68 | a 
+ 69 | 69 | a 
+ 70 | 70 | a 
+ 71 | 71 | a 
+ 72 | 72 | a 
+ 73 | 73 | a 
+ 74 | 74 | a 
+ 75 | 75 | a 
+ 76 | 76 | a 
+ 77 | 77 | a 
+ 78 | 78 | a 
+ 79 | 79 | a 
+ 80 | 80 | a 
+ 81 | 81 | a 
+ 82 | 82 | a 
+ 83 | 83 | a 
+ 84 | 84 | a 
+ 85 | 85 | a 
+ 86 | 86 | a 
+ 87 | 87 | a 
+ 88 | 88 | a 
+ 89 | 89 | a 
+ 90 | 90 | a 
+ 91 | 91 | a 
+ 92 | 92 | a 
+ 93 | 93 | a 
+ 94 | 94 | a 
+ 95 | 95 | a 
+ 96 | 96 | a 
+ 97 | 97 | a 
+ 98 | 98 | a 
+ 99 | 99 | a 
+(99 rows)
+SELECT * FROM child_has_dropped_column ORDER BY 1, 2, 3, 4;
+ a | b | c | d   
+---+---+---+-----
+ 1 | 1 | a | aaa 
+(1 row)
+SELECT * FROM heterogeneous_ml_partition_table ORDER BY 1, 2, 3;
+ trans_id | office_id | dummy 
+----------+-----------+-------
+ 1        | 1         | 1     
+ 2        | 2         | 2     
+(2 rows)
+
+-- check owners
+SELECT c.relname, pg_catalog.pg_get_userbyid(c.relowner) FROM pg_partition_rule pr JOIN pg_class c ON c.oid = pr.parchildrelid WHERE c.relname LIKE 'dropped_column%' UNION SELECT c.relname, pg_catalog.pg_get_userbyid(c.relowner) FROM pg_partition p JOIN pg_class c ON c.oid = p.parrelid WHERE c.relname LIKE 'dropped_column%' ORDER BY 1,2;
+ relname                           | pg_get_userbyid         
+-----------------------------------+-------------------------
+ dropped_column                    | migratable_objects_role 
+ dropped_column_1_prt_part_2       | migratable_objects_role 
+ dropped_column_1_prt_split_part_1 | migratable_objects_role 
+ dropped_column_1_prt_split_part_2 | migratable_objects_role 
+(4 rows)
+
+-- check constraints
+SELECT c.relname, con.conname FROM pg_partition_rule pr JOIN pg_class c ON c.oid = pr.parchildrelid JOIN pg_constraint con ON con.conrelid = c.oid WHERE c.relname LIKE 'dropped_column%' UNION SELECT c.relname, con.conname FROM pg_partition p JOIN pg_class c ON c.oid = p.parrelid JOIN pg_constraint con ON con.conrelid = c.oid WHERE c.relname LIKE 'dropped_column%' ORDER BY 1,2;
+ relname                           | conname                                 
+-----------------------------------+-----------------------------------------
+ dropped_column                    | positive_int                            
+ dropped_column_1_prt_part_2       | dropped_column_1_prt_part_2_check       
+ dropped_column_1_prt_part_2       | positive_int                            
+ dropped_column_1_prt_split_part_1 | dropped_column_1_prt_split_part_1_check 
+ dropped_column_1_prt_split_part_1 | positive_int                            
+ dropped_column_1_prt_split_part_2 | dropped_column_1_prt_split_part_2_check 
+ dropped_column_1_prt_split_part_2 | positive_int                            
+(7 rows)
+
+-- check defaults
+SELECT c.relname, att.attname, ad.adnum, ad.adsrc FROM pg_partition_rule pr JOIN pg_class c ON c.oid = pr.parchildrelid JOIN pg_attrdef ad ON ad.adrelid = pr.parchildrelid JOIN pg_attribute att ON att.attrelid = c.oid AND att.attnum = ad.adnum UNION SELECT c.relname, att.attname, ad.adnum, ad.adsrc FROM pg_partition p JOIN pg_class c ON c.oid = p.parrelid JOIN pg_attrdef ad ON ad.adrelid = p.parrelid JOIN pg_attribute att ON att.attrelid = c.oid AND att.attnum = ad.adnum ORDER BY 1, 2, 3, 4;
+ relname                           | attname | adnum | adsrc 
+-----------------------------------+---------+-------+-------
+ dropped_column                    | b       | 2     | 1     
+ dropped_column_1_prt_part_2       | b       | 2     | 1     
+ dropped_column_1_prt_split_part_1 | b       | 2     | 1     
+ dropped_column_1_prt_split_part_2 | b       | 2     | 1     
+(4 rows)
+

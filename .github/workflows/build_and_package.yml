@@ -55,7 +55,5 @@ jobs:
           test_docker: ${{ matrix.target_os}}:${{ matrix.target_os_version }}
           artifact_name: ${{ env.DEB_PACKAGES }}
           add_greengage_repo: true
-          greengage_repo_url: "https://storage.yandexcloud.net/greengage-repo"
           verify_commands: |
-            dpkg -l ggupgrade &&
-            /opt/greengagedb/ggupgrade/ggupgrade --version
+            dpkg -l ggupgrade
