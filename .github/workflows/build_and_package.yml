@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       # The developer image is used only as a build toolchain (debhelper, protoc).
-      GGDB_IMAGE:   ghcr.io/greengagedb/greengage/ggdb6_${{ matrix.target_os}}${{ matrix.target_os_version != '22.04' && matrix.target_os_version || '' }}:latest
+      GGDB_IMAGE:   ghcr.io/greengagedb/greengage/ggdb6_${{ matrix.target_os }}${{ matrix.target_os_version != '22.04' && matrix.target_os_version || '' }}:latest
       DEB_PACKAGES: deb-packages-ggupgrade-${{ matrix.target_os }}${{ matrix.target_os_version }}
 
     steps:
