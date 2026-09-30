@@ -52,7 +52,7 @@ jobs:
       - name: Test install deb-packages in Docker
         uses: greengagedb/greengage-ci/.github/actions/tests/install/deb@v45
         with:
-          test_docker: ${{ matrix.target_os}}:${{ matrix.target_os_version }}
+          test_docker: ${{ matrix.target_os }}:${{ matrix.target_os_version }}
           artifact_name: ${{ env.DEB_PACKAGES }}
           add_greengage_repo: true
           verify_commands: |
