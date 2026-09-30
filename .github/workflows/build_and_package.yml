@@ -56,4 +56,5 @@ jobs:
           artifact_name: ${{ env.DEB_PACKAGES }}
           add_greengage_repo: true
           verify_commands: |
-            dpkg -l ggupgrade
+            dpkg -l ggupgrade &&
+            ggupgrade --version
