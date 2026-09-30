@@ -87,7 +87,7 @@ build:
 	$(eval BUILD_FLAGS = -gcflags="all=-N -l")
 	$(eval override BUILD_FLAGS += -ldflags "$(VERSION_LD_STR)")
 
-	$(BUILD_ENV) go build -buildmode=pie -o ggupgrade $(BUILD_FLAGS) github.com/GreengageDB/ggupgrade/cmd/ggupgrade
+	$(BUILD_ENV) go build -o ggupgrade $(BUILD_FLAGS) github.com/GreengageDB/ggupgrade/cmd/ggupgrade
 
 build_linux: OS := LINUX
 build_mac: OS := MAC
