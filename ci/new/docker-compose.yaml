@@ -15,6 +15,7 @@ services:
     working_dir: /home/gpadmin
     hostname: coordinator
     volumes:
+      - ${PWD}/sqldump:/home/gpadmin/sqldump
       - ${PWD}/ssh_keys:/home/gpadmin/.ssh
       - ${PWD}/logs_coordinator:/logs
     networks:
