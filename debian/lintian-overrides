@@ -1,0 +1,7 @@
+# 3rd-party package installed outside vendor-managed directories
+# (Greengage install layout under /opt is expected here).
+dir-or-file-in-opt
+
+# ggupgrade_config lives next to the binary under /opt and must survive
+# upgrades as a user-editable config file.
+non-etc-file-marked-as-conffile opt/greengagedb/ggupgrade/ggupgrade_config

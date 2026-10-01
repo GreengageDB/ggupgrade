@@ -1,0 +1,2 @@
+opt/greengagedb/ggupgrade/ggupgrade usr/bin/ggupgrade
+opt/greengagedb/ggupgrade/ggupgrade.bash usr/share/bash-completion/completions/ggupgrade
