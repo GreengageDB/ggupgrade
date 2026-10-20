@@ -120,10 +120,10 @@ func TestQueryPgStatActivity(t *testing.T) {
 }
 
 func expectPgStatActivityToNotReturn(mock sqlmock.Sqlmock) {
-	mock.ExpectQuery(`SELECT application_name, usename, datname, query FROM pg_stat_activity WHERE pid <> pg_backend_pid\(\) ORDER BY application_name, usename, datname;`).
+	mock.ExpectQuery(`SELECT application_name, usename, datname, query FROM pg_stat_activity WHERE pid <> pg_backend_pid\(\) AND client_port IS NOT NULL ORDER BY application_name, usename, datname;`).
 		WillReturnRows(sqlmock.NewRows([]string{"application_name", "usename", "datname", "query"}))
 }
 
 func expectPgStatActivityToReturn(mock sqlmock.Sqlmock) *sqlmock.ExpectedQuery {
-	return mock.ExpectQuery(`SELECT application_name, usename, datname, query FROM pg_stat_activity WHERE pid <> pg_backend_pid\(\) ORDER BY application_name, usename, datname;`)
+	return mock.ExpectQuery(`SELECT application_name, usename, datname, query FROM pg_stat_activity WHERE pid <> pg_backend_pid\(\) AND client_port IS NOT NULL ORDER BY application_name, usename, datname;`)
 }
