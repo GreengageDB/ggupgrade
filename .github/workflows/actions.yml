@@ -125,7 +125,7 @@ jobs:
 
       - name: Fetch SQL Dump
         if: ${{ matrix.needs_sqldump }}
-        uses: greengagedb/greengage-ci/.github/actions/sql-dump/fetch@CI-6389
+        uses: greengagedb/greengage-ci/.github/actions/sql-dump/fetch@v62
         with:
           version: 6
 
