@@ -44,10 +44,8 @@ func (s StatActivities) Error() string {
 func QueryPgStatActivity(db *sql.DB, cluster *Cluster) error {
 	var query string
 	switch cluster.Version.Major {
-	case 7:
-		query = `SELECT application_name, usename, datname, query FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND client_addr IS NOT NULL ORDER BY application_name, usename, datname;`
-	case 6:
-		query = `SELECT application_name, usename, datname, query FROM pg_stat_activity WHERE pid <> pg_backend_pid() ORDER BY application_name, usename, datname;`
+	case 6, 7:
+		query = `SELECT application_name, usename, datname, query FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND client_port IS NOT NULL ORDER BY application_name, usename, datname;`
 	case 5:
 		query = `SELECT application_name, usename, datname, current_query FROM pg_stat_activity WHERE procpid <> pg_backend_pid() ORDER BY application_name, usename, datname;`
 	default:
