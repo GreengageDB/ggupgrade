@@ -184,3 +184,82 @@ func TestRemoveDuplicates(t *testing.T) {
 		}
 	})
 }
+
+func TestHandleDataMigrationSeedDir(t *testing.T) {
+	t.Run("Gives an error when default seed directory doesn't exist", func(t *testing.T) {
+		utils.System.Stat = func(name string) (os.FileInfo, error) {
+			return nil, &os.PathError{}
+		}
+
+		_, err := utils.HandleDataMigrationSeedDir("", false)
+		if err == nil {
+			t.Errorf("Expected to get an error for nonexistent default directory")
+		}
+	})
+
+	t.Run("Gives an error when specified --seed-dir doesn't exist", func(t *testing.T) {
+		utils.System.Stat = func(name string) (os.FileInfo, error) {
+			return nil, &os.PathError{}
+		}
+
+		_, err := utils.HandleDataMigrationSeedDir("", true)
+		if err == nil {
+			t.Errorf("Expected to get an error for nonexistent '--seed-dir'")
+		}
+	})
+
+	t.Run("Fails together with System.Executable()", func(t *testing.T) {
+		utils.System.Stat = func(name string) (os.FileInfo, error) {
+			return nil, nil
+		}
+
+		utils.System.Executable = func() (string, error) {
+			return "", errors.New("Some error")
+		}
+
+		_, err := utils.HandleDataMigrationSeedDir("", false)
+		if err == nil {
+			t.Errorf("Expected to fail together with System.Executable()")
+		}
+	})
+
+	t.Run("Returns path to the executable by default", func(t *testing.T) {
+		utils.System.Stat = func(name string) (os.FileInfo, error) {
+			return nil, nil
+		}
+
+		utils.System.Executable = func() (string, error) {
+			return "/dir/script", nil
+		}
+
+		dir, err := utils.HandleDataMigrationSeedDir("", false)
+		if err != nil {
+			t.Errorf("Unxpected error")
+		}
+
+		expectedDir := "/dir/data-migration-scripts"
+		if dir != expectedDir {
+			t.Errorf("Unexpected directory: expected %v, got %v", expectedDir, dir)
+		}
+	})
+
+	t.Run("Doesn't override '--seed-dir'", func(t *testing.T) {
+		utils.System.Stat = func(name string) (os.FileInfo, error) {
+			return nil, nil
+		}
+
+		utils.System.Executable = func() (string, error) {
+			return "/dir/script", nil
+		}
+
+		userDir := "/my_directory/seed_scripts"
+		dir, err := utils.HandleDataMigrationSeedDir(userDir, true)
+		if err != nil {
+			t.Errorf("Unxpected error")
+		}
+
+		if dir != userDir {
+			t.Errorf("Directory specified by the user via '--seed-scripts' gets overwritten")
+		}
+	})
+}
