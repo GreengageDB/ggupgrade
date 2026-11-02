@@ -124,7 +124,7 @@ func GetLogDir() (string, error) {
 
 // There are several commands that have 'seed-dir' flag, so handle it in one place.
 func HandleDataMigrationSeedDir(dir string, dirIsSetByUser bool) (string, error) {
-	// Try to find data migration scripts if their directory set by the user;
+	// Try to find data migration scripts if their directory is not set by the user;
 	// our best guess it that they are located near the executable.
 	if !dirIsSetByUser {
 		executablePath, err := System.Executable()
