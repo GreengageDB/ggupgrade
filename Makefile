@@ -140,9 +140,9 @@ rpm:
 
 # Install migration scripts and the executable.
 #
-# We need migration scripts in the same directory
-# with these executable, otherwise any 'initialize'
-# or 'generate' command would require to us set
+# We need migration scripts to be in the same directory
+# with the executable, otherwise any 'initialize'
+# or 'generate' command would require to set
 # '--seed-dir' explicitly, which is cumbersome.
 install:
 	@test $${GOPATH?Error GOPATH not set}

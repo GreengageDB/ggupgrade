@@ -234,7 +234,7 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 
 		dir, err := utils.HandleDataMigrationSeedDir("", false)
 		if err != nil {
-			t.Errorf("Unxpected error")
+			t.Errorf("Unexpected error")
 		}
 
 		expectedDir := "/dir/data-migration-scripts"
@@ -255,11 +255,11 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 		userDir := "/my_directory/seed_scripts"
 		dir, err := utils.HandleDataMigrationSeedDir(userDir, true)
 		if err != nil {
-			t.Errorf("Unxpected error")
+			t.Errorf("Unexpected error")
 		}
 
 		if dir != userDir {
-			t.Errorf("Directory specified by the user via '--seed-scripts' gets overwritten")
+			t.Errorf("Directory specified by the user via '--seed-dir' gets overwritten")
 		}
 	})
 }

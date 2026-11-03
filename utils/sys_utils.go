@@ -138,7 +138,7 @@ func HandleDataMigrationSeedDir(dir string, dirIsSetByUser bool) (string, error)
 
 	if _, err := System.Stat(dir); err != nil {
 		if dirIsSetByUser {
-			return "", xerrors.Errorf("Specified migration script directory doesn't exist")
+			return "", xerrors.Errorf("Specified migration script directory doesn't exist.")
 		} else {
 			return "", xerrors.Errorf("Unable to automatically detect migration scripts. Set '--seed-dir' flag to '<path to your ggupgrade installation>/data-migration-scripts' directory manually.")
 		}
