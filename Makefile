@@ -138,9 +138,16 @@ rpm:
 	cp rpm/rpmbuild/RPMS/x86_64/ggupgrade-$(VERSION)*.rpm .
 	rm -r rpm
 
+# Install migration scripts and the executable.
+#
+# We need migration scripts in the same directory
+# with these executable, otherwise any 'initialize'
+# or 'generate' command would require to us set
+# '--seed-dir' explicitly, which is cumbersome.
 install:
 	@test $${GOPATH?Error GOPATH not set}
 	cp -f ggupgrade $(GOPATH)/bin/
+	cp -r data-migration-scripts $(GOPATH)/bin/data-migration-scripts
 
 # To lint, you must install golangci-lint via one of the supported methods
 # listed at
