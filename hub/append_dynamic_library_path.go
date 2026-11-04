@@ -60,7 +60,7 @@ func AppendDynamicLibraryPath(intermediate *greengage.Cluster, toAppend string) 
 	}
 
 	if currentValue == "" {
-		fmt.Errorf(`Target cluster is missing value for dynamic_library_path. Expected "$libdir", but found %q: %w`, stream.StdoutBuf.String(), err)
+		return fmt.Errorf(`Target cluster is missing value for dynamic_library_path. Expected "$libdir", but found %q: %w`, stream.StdoutBuf.String(), err)
 	}
 
 	// append the user specified dynamic_library_path to the current value and remove any duplicates

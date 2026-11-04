@@ -48,7 +48,7 @@ Master  value: $libdir
 Segment value: $libdir
 `
 
-	os.Stdout.WriteString(output)
+	_, _ = os.Stdout.WriteString(output)
 }
 
 func SharedPreloadLibrariesGreengage7() {
@@ -59,7 +59,7 @@ Coordinator value: $libdir
 Segment     value: $libdir
 `
 
-	os.Stdout.WriteString(output)
+	_, _ = os.Stdout.WriteString(output)
 }
 
 func PathMain() {
