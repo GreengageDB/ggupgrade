@@ -24,6 +24,8 @@ func init() {
 	exectest.RegisterMains(
 		Success,
 		Failure,
+		SharedPreloadLibrariesGreengage6,
+		SharedPreloadLibrariesGreengage7,
 		PathMain,
 		LdLibraryPathMain,
 		StreamingMain,
@@ -36,6 +38,28 @@ func Success() {}
 func Failure() {
 	_, _ = os.Stderr.WriteString(os.ErrPermission.Error())
 	os.Exit(1)
+}
+
+func SharedPreloadLibrariesGreengage6() {
+	output := `
+Values on all segments are consistent
+GUC          : dynamic_library_path
+Master  value: $libdir
+Segment value: $libdir
+`
+
+	os.Stdout.WriteString(output)
+}
+
+func SharedPreloadLibrariesGreengage7() {
+	output := `
+Values on all segments are consistent
+GUC              : dynamic_library_path
+Coordinator value: $libdir
+Segment     value: $libdir
+`
+
+	os.Stdout.WriteString(output)
 }
 
 func PathMain() {
