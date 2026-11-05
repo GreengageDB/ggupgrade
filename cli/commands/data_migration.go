@@ -34,6 +34,15 @@ func dataMigrationGenerate() *cobra.Command {
 		Use:   "generate",
 		Short: "generate data migration SQL scripts",
 		Long:  "generate data migration SQL scripts",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			var err error
+			seedDirIsSetByUser := cmd.Flag("seed-dir").Changed
+			seedDir, err = utils.HandleDataMigrationSeedDir(seedDir, seedDirIsSetByUser)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			outputDir = filepath.Clean(outputDir)
 			seedDir = filepath.Clean(seedDir)
@@ -46,9 +55,7 @@ func dataMigrationGenerate() *cobra.Command {
 	dataMigrationGenerator.Flags().StringVar(&gphome, "gphome", "", "path to the Greengage installation")
 	dataMigrationGenerator.Flags().IntVar(&port, "port", 0, "master port for Greengage cluster")
 	dataMigrationGenerator.Flags().StringVar(&outputDir, "output-dir", outputDir, "output path to the current generated data migration SQL files. Defaults to $HOME/gpAdminLogs/ggupgrade/data-migration-scripts")
-	// seed-dir is a hidden flag used for internal testing.
-	dataMigrationGenerator.Flags().StringVar(&seedDir, "seed-dir", utils.GetDataMigrationSeedDir(), "path to the seed scripts")
-	dataMigrationGenerator.Flags().MarkHidden("seed-dir") //nolint
+	dataMigrationGenerator.Flags().StringVar(&seedDir, "seed-dir", "" /* Default value is set in PreRunE */, "path to the seed scripts")
 
 	return addHelpToCommand(dataMigrationGenerator, generateHelp)
 }
