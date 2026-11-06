@@ -96,6 +96,13 @@ func initialize() *cobra.Command {
 				}
 			}
 
+			var err error
+			dataMigrationSeedDirIsSetByUser := cmd.Flag("seed-dir").Changed
+			dataMigrationSeedDir, err = utils.HandleDataMigrationSeedDir(dataMigrationSeedDir, dataMigrationSeedDirIsSetByUser)
+			if err != nil {
+				return err
+			}
+
 			return nil
 		},
 
@@ -336,9 +343,7 @@ func initialize() *cobra.Command {
 	subInit.Flags().MarkHidden("stop-before-cluster-creation") //nolint
 	subInit.Flags().BoolVar(&skipVersionCheck, "skip-version-check", false, "disable source and target version check")
 	subInit.Flags().MarkHidden("skip-version-check") //nolint
-	// seed-dir is a hidden flag used for internal testing.
-	subInit.Flags().StringVar(&dataMigrationSeedDir, "seed-dir", utils.GetDataMigrationSeedDir(), "path to the seed scripts")
-	subInit.Flags().MarkHidden("seed-dir") //nolint
+	subInit.Flags().StringVar(&dataMigrationSeedDir, "seed-dir", "" /* Default value is set in PreRunE */, "path to the seed scripts")
 
 	return addHelpToCommand(subInit, InitializeHelp)
 }

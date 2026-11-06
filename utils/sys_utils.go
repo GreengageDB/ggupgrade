@@ -19,6 +19,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/google/renameio"
+	"golang.org/x/xerrors"
 
 	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
@@ -64,6 +65,7 @@ type SystemFunctions struct {
 	ReadDirFS    func(fsys fs.FS, name string) ([]fs.DirEntry, error)
 	StatFS       func(fsys fs.FS, name string) (fs.FileInfo, error)
 	DirFS        func(dir string) fs.FS
+	Executable   func() (string, error)
 }
 
 func InitializeSystemFunctions() *SystemFunctions {
@@ -93,6 +95,7 @@ func InitializeSystemFunctions() *SystemFunctions {
 		ReadDirFS:    fs.ReadDir,
 		StatFS:       fs.Stat,
 		DirFS:        os.DirFS,
+		Executable:   os.Executable,
 	}
 }
 
@@ -119,8 +122,29 @@ func GetLogDir() (string, error) {
 	return logDir, nil
 }
 
-func GetDataMigrationSeedDir() string {
-	return filepath.Join("/", "usr", "local", "bin", "greengage", "ggupgrade", "data-migration-scripts")
+// There are several commands that have 'seed-dir' flag, so handle it in one place.
+func HandleDataMigrationSeedDir(dir string, dirIsSetByUser bool) (string, error) {
+	// Try to find data migration scripts if their directory is not set by the user;
+	// our best guess it that they are located near the executable.
+	if !dirIsSetByUser {
+		executablePath, err := System.Executable()
+		if err != nil {
+			return "", xerrors.Errorf("Enexpected error when trying to detect migration scripts: %w", err)
+		}
+
+		executableDir, _ := filepath.Split(executablePath)
+		dir = filepath.Join(executableDir, "data-migration-scripts")
+	}
+
+	if _, err := System.Stat(dir); err != nil {
+		if dirIsSetByUser {
+			return "", xerrors.Errorf("Specified migration script directory doesn't exist.")
+		} else {
+			return "", xerrors.Errorf("Unable to automatically detect migration scripts. Set '--seed-dir' flag to '<path to your ggupgrade installation>/data-migration-scripts' directory manually.")
+		}
+	}
+
+	return dir, nil
 }
 
 func GetDefaultGeneratedDataMigrationScriptsDir() (string, error) {
