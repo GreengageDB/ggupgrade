@@ -158,7 +158,7 @@ Optional Flags:
   -h, --help                 displays help output for execute
   -v, --verbose              outputs detailed logs for execute
       --pg-upgrade-verbose   execute pg_upgrade with verbose internal logging. Requires the verbose flag.
-      --parent-backup-dir    The parent directory location used internally to store the backup of the 
+      --parent-backup-dirs   The parent directory location used internally to store the backup of the
                              master data directory and user defined master tablespaces. Defaults to the 
                              parent directory of the master data directory such as /data given 
                              /data/master/gpseg-1.
@@ -240,8 +240,8 @@ Required Flags:
 
   --gphome       path to the Greengage installation
   --port         master port for Greengage cluster
-  --phase        the data migration phase. Either "pre-initialize", 
-                 "post-finalize", "post-revert", or "stats".
+  --phase        the data migration phase. Either "initialize",
+                 "finalize", "revert", or "stats".
 
 Optional Flags:
 
