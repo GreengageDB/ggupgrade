@@ -290,13 +290,15 @@ func TestInitialize(t *testing.T) {
 		intermediate := acceptance.GetIntermediateCluster(t)
 		stream := &step.BufferedStreams{}
 
-		// HACK: seems that we lose gp_toolkit during upgrade, and gpconfig fails without gp_toolkit
-		err := intermediate.RunGreengageCmd(stream, "psql", "template1", "-c", "CREATE EXTENSION gp_toolkit")
-		if err != nil {
-			t.Fatalf("Unexpected error: %v", err)
+		// HACK: seems that we lose gp_toolkit during 6.x -> 7.x upgrade, and gpconfig fails without gp_toolkit
+		if intermediate.Version.Major == 7 {
+			err := intermediate.RunGreengageCmd(stream, "psql", "template1", "-c", "CREATE EXTENSION gp_toolkit")
+			if err != nil {
+				t.Fatalf("Unexpected error: %v", err)
+			}
 		}
 
-		err = intermediate.RunGreengageCmdWithEnvironment(stream,
+		err := intermediate.RunGreengageCmdWithEnvironment(stream,
 			"gpconfig", []string{"-s", "dynamic_library_path"},
 			utils.FilterEnv([]string{"USER"}))
 		if err != nil {
