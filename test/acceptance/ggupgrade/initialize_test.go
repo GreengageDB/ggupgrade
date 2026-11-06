@@ -25,6 +25,7 @@ import (
 	"github.com/GreengageDB/ggupgrade/testutils/acceptance"
 	"github.com/GreengageDB/ggupgrade/upgrade"
 	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/hub"
 )
 
 func TestInitialize(t *testing.T) {
@@ -275,5 +276,42 @@ func TestInitialize(t *testing.T) {
 		testutils.MustWriteToFile(t, filepath.Join(utils.GetStateDir(), step.SubstepsFileName), replaced)
 
 		acceptance.Initialize(t, idl.Mode_copy)
+	})
+
+	t.Run("changes dynamic_library_path when --dynamic-library-path is specified", func (t *testing.T) {
+		additionalDynamicLibraryPath := "/mypath"
+		expectedDynamicLibraryPath := fmt.Sprintf("%s:%s", "$libdir", additionalDynamicLibraryPath)
+
+		acceptance.Initialize_withDynamicLibraryPath(t, idl.Mode_copy, additionalDynamicLibraryPath)
+		defer acceptance.Revert(t)
+
+		acceptance.Execute(t)
+
+		intermediate := acceptance.GetIntermediateCluster(t)
+		stream := &step.BufferedStreams{}
+
+		// HACK: seems that we lose gp_toolkit during 6.x -> 7.x upgrade, and gpconfig fails without gp_toolkit
+		if intermediate.Version.Major == 7 {
+			err := intermediate.RunGreengageCmd(stream, "psql", "template1", "-c", "CREATE EXTENSION gp_toolkit")
+			if err != nil {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+		}
+
+		err := intermediate.RunGreengageCmdWithEnvironment(stream,
+			"gpconfig", []string{"-s", "dynamic_library_path"},
+			utils.FilterEnv([]string{"USER"}))
+		if err != nil {
+			t.Fatalf("Unexpected error: %v", err)
+		}
+
+		actualDynamicLibraryPath, err := hub.GetCoordinatorDynamicLibraryPath(stream.StdoutBuf.String(), intermediate.Version)
+		if err != nil {
+			t.Fatalf("Unexpected error: %v", err)
+		}
+
+		if expectedDynamicLibraryPath != actualDynamicLibraryPath {
+			t.Errorf("Mismatching 'dynamic_library_path': expected %v, found: %v", expectedDynamicLibraryPath, actualDynamicLibraryPath)
+		}
 	})
 }

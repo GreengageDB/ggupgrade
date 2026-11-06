@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/blang/semver/v4"
+
 	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/hub"
 	"github.com/GreengageDB/ggupgrade/testutils/exectest"
@@ -50,6 +52,36 @@ func TestAppendDynamicLibraryPath(t *testing.T) {
 		expected := "issing value for dynamic_library_path"
 		if !strings.Contains(err.Error(), expected) {
 			t.Errorf("got %+v, want %+v", err, expected)
+		}
+	})
+
+	t.Run("works with Greengage 6 gpconfig output", func(t *testing.T) {
+		greengage.SetGreengageCommand(exectest.NewCommand(hub.SharedPreloadLibrariesGreengage6))
+		oldVersion := intermediate.Version
+		intermediate.Version = semver.MustParse("6.0.0")
+		defer func() {
+			greengage.ResetGreengageCommand()
+			intermediate.Version = oldVersion
+		}()
+
+		err := hub.AppendDynamicLibraryPath(intermediate, "")
+		if err != nil {
+			t.Errorf("Enexpected error: %v", err)
+		}
+	})
+
+	t.Run("works with Greengage 7 gpconfig output", func(t *testing.T) {
+		greengage.SetGreengageCommand(exectest.NewCommand(hub.SharedPreloadLibrariesGreengage7))
+		oldVersion := intermediate.Version
+		intermediate.Version = semver.MustParse("7.0.0")
+		defer func() {
+			greengage.ResetGreengageCommand()
+			intermediate.Version = oldVersion
+		}()
+
+		err := hub.AppendDynamicLibraryPath(intermediate, "")
+		if err != nil {
+			t.Errorf("Enexpected error: %v", err)
 		}
 	})
 }

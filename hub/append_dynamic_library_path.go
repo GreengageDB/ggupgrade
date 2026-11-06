@@ -8,12 +8,40 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/blang/semver/v4"
 	"golang.org/x/xerrors"
 
 	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/step"
 	"github.com/GreengageDB/ggupgrade/utils"
 )
+
+func GetCoordinatorDynamicLibraryPath(gpconfigOutput string, version semver.Version) (string, error) {
+	var prefix string
+	switch version.Major {
+	case 5, 6:
+		prefix = "Master  value:"
+	case 7:
+		prefix = "Coordinator value:"
+	}
+
+	value := ""
+	scanner := bufio.NewScanner(strings.NewReader(gpconfigOutput))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, prefix) {
+			line = strings.TrimPrefix(line, prefix)
+			value = strings.TrimSpace(line)
+			break
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return "", xerrors.Errorf("scanning gpconfig dynamic_library_path output: %w", err)
+	}
+
+	return value, nil
+}
 
 func AppendDynamicLibraryPath(intermediate *greengage.Cluster, toAppend string) error {
 	stream := &step.BufferedStreams{}
@@ -26,20 +54,9 @@ func AppendDynamicLibraryPath(intermediate *greengage.Cluster, toAppend string) 
 		return err
 	}
 
-	var currentValue string
-	prefix := "Master  value:"
-	scanner := bufio.NewScanner(strings.NewReader(stream.StdoutBuf.String()))
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasPrefix(line, prefix) {
-			line = strings.TrimPrefix(line, prefix)
-			currentValue = strings.TrimSpace(line)
-			break
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return xerrors.Errorf("scanning gpconfig dynamic_library_path output: %w", err)
+	currentValue, err := GetCoordinatorDynamicLibraryPath(stream.StdoutBuf.String(), intermediate.Version)
+	if err != nil {
+		return err
 	}
 
 	if currentValue == "" {
