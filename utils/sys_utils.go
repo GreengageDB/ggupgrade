@@ -65,6 +65,7 @@ type SystemFunctions struct {
 	ReadDirFS    func(fsys fs.FS, name string) ([]fs.DirEntry, error)
 	StatFS       func(fsys fs.FS, name string) (fs.FileInfo, error)
 	DirFS        func(dir string) fs.FS
+	EvalSymlinks func(path string) (string, error)
 	Executable   func() (string, error)
 }
 
@@ -96,6 +97,7 @@ func InitializeSystemFunctions() *SystemFunctions {
 		StatFS:       fs.Stat,
 		DirFS:        os.DirFS,
 		Executable:   os.Executable,
+		EvalSymlinks: filepath.EvalSymlinks,
 	}
 }
 
@@ -128,6 +130,11 @@ func HandleDataMigrationSeedDir(dir string, dirIsSetByUser bool) (string, error)
 	// our best guess it that they are located near the executable.
 	if !dirIsSetByUser {
 		executablePath, err := System.Executable()
+		if err != nil {
+			return "", xerrors.Errorf("Enexpected error when trying to detect migration scripts: %w", err)
+		}
+
+		executablePath, err = System.EvalSymlinks(executablePath)
 		if err != nil {
 			return "", xerrors.Errorf("Enexpected error when trying to detect migration scripts: %w", err)
 		}

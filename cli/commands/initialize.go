@@ -79,7 +79,9 @@ func initialize() *cobra.Command {
 						err = errors.New("The file flag cannot be used with any other flag except verbose and non-interactive.")
 					}
 				})
-				return err
+				if err != nil {
+					return err
+				}
 			}
 
 			// In dev mode the file flag should not be set and ensure all dev
