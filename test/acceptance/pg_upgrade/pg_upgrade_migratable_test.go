@@ -48,10 +48,15 @@ func Test_PgUpgrade_Migratable_Tests(t *testing.T) {
 		defer acceptance.RestoreDemoCluster(t, backupDir, source, acceptance.GetTempTargetCluster(t))
 		acceptance.Isolation2_regress(t, source.Version, acceptance.GPHOME_SOURCE, acceptance.PGPORT, testDir, sourceTestDir, sourceTestDir, idl.Schedule_migratable_source_schedule)
 
+		acceptance.Generate(t, migrationDir)
+		acceptance.Apply(t, acceptance.GPHOME_SOURCE, acceptance.PGPORT, idl.Step_initialize, migrationDir)
+
 		acceptance.Initialize(t, idl.Mode_link)
 		defer acceptance.RevertIgnoreFailures(t) // cleanup in case we fail part way through
 		acceptance.Execute(t)
 		acceptance.Finalize(t)
+
+		acceptance.Apply(t, acceptance.GPHOME_TARGET, acceptance.PGPORT, idl.Step_finalize, migrationDir)
 
 		outputTestDir := filepath.Join(targetTestDir, "finalize")
 		testutils.MustCreateDir(t, outputTestDir)
@@ -61,9 +66,14 @@ func Test_PgUpgrade_Migratable_Tests(t *testing.T) {
 	t.Run("recreate scripts restore migratable objects when reverting after initialize", func(t *testing.T) {
 		acceptance.Isolation2_regress(t, source.Version, acceptance.GPHOME_SOURCE, acceptance.PGPORT, testDir, sourceTestDir, sourceTestDir, idl.Schedule_migratable_source_schedule)
 
+		acceptance.Generate(t, migrationDir)
+		acceptance.Apply(t, acceptance.GPHOME_SOURCE, acceptance.PGPORT, idl.Step_initialize, migrationDir)
+
 		acceptance.Initialize(t, idl.Mode_link)
 		defer acceptance.RevertIgnoreFailures(t) // cleanup in case we fail part way through
 		acceptance.Revert(t)
+
+		acceptance.Apply(t, acceptance.GPHOME_TARGET, acceptance.PGPORT, idl.Step_revert, migrationDir)
 
 		outputTestDir := filepath.Join(targetTestDir, "revert_initialize")
 		testutils.MustCreateDir(t, outputTestDir)
@@ -73,10 +83,15 @@ func Test_PgUpgrade_Migratable_Tests(t *testing.T) {
 	t.Run("recreate scripts restore migratable objects when reverting after execute", func(t *testing.T) {
 		acceptance.Isolation2_regress(t, source.Version, acceptance.GPHOME_SOURCE, acceptance.PGPORT, testDir, sourceTestDir, sourceTestDir, idl.Schedule_migratable_source_schedule)
 
+		acceptance.Generate(t, migrationDir)
+		acceptance.Apply(t, acceptance.GPHOME_SOURCE, acceptance.PGPORT, idl.Step_initialize, migrationDir)
+
 		acceptance.Initialize(t, idl.Mode_link)
 		defer acceptance.RevertIgnoreFailures(t) // cleanup in case we fail part way through
 		acceptance.Execute(t)
 		acceptance.Revert(t)
+
+		acceptance.Apply(t, acceptance.GPHOME_TARGET, acceptance.PGPORT, idl.Step_revert, migrationDir)
 
 		outputTestDir := filepath.Join(targetTestDir, "revert_execute")
 		testutils.MustCreateDir(t, outputTestDir)
