@@ -276,4 +276,34 @@ func TestInitialize(t *testing.T) {
 
 		acceptance.Initialize(t, idl.Mode_copy)
 	})
+
+	t.Run("migration scripts can be found when ggupgrade is run through a symlink", func (t *testing.T) {
+		tempDir := testutils.GetTempDir(t, "")
+		defer testutils.MustRemoveAll(t, tempDir)
+
+		ggupgradePath, err := exec.LookPath("ggupgrade")
+		if err != nil {
+			t.Fatalf("Failed to find ggupgrade executable in PATH: %v", err)
+		}
+
+		linkPath := filepath.Join(tempDir, "ggupgrade-link")
+		if err := os.Symlink(ggupgradePath, linkPath); err != nil {
+			t.Fatalf("Failed to create symlink: %v", err)
+		}
+
+		cmd := exec.Command(linkPath, "initialize",
+			"--non-interactive", "--verbose",
+			"--mode", idl.Mode_copy.String(),
+			"--source-gphome", acceptance.GPHOME_SOURCE,
+			"--target-gphome", acceptance.GPHOME_TARGET,
+			"--source-master-port", acceptance.PGPORT,
+			"--temp-port-range", acceptance.TARGET_PGPORT+"-6040",
+			"--disk-free-ratio", "0")
+		defer acceptance.Revert(t)
+
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Errorf("Unexpected error: %v\nstderr:%v\n", err, string(output))
+		}
+	})
 }
