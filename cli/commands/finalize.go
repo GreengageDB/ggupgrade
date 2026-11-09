@@ -76,10 +76,6 @@ func finalize() *cobra.Command {
 			})
 
 			st.AlwaysRun(idl.Substep_execute_finalize_data_migration_scripts, func(streams step.OutStreams) error {
-				if nonInteractive {
-					return nil
-				}
-
 				currentDir := filepath.Join(response.GetLogArchiveDirectory(), "data-migration-scripts", "current")
 				return commanders.ApplyDataMigrationScripts(streams, nonInteractive, target.GPHome, target.CoordinatorPort(),
 					response.GetLogArchiveDirectory(), utils.System.DirFS(currentDir), currentDir, idl.Step_finalize)

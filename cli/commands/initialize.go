@@ -240,32 +240,24 @@ func initialize() *cobra.Command {
 			}
 
 			st.AlwaysRun(idl.Substep_generate_data_migration_scripts, func(streams step.OutStreams) error {
-				if nonInteractive {
-					return nil
-				}
-
 				return commanders.GenerateDataMigrationScripts(streams, nonInteractive, sourceGPHome, sourcePort, filepath.Clean(dataMigrationSeedDir), generatedScriptsOutputDir, utils.System.DirFS(generatedScriptsOutputDir))
 			})
 
 			st.AlwaysRun(idl.Substep_execute_stats_data_migration_scripts, func(streams step.OutStreams) error {
-				if nonInteractive {
-					return nil
-				}
-
 				currentDir := filepath.Join(generatedScriptsOutputDir, "current")
 				return commanders.ApplyDataMigrationScripts(streams, nonInteractive, sourceGPHome, sourcePort, logdir, utils.System.DirFS(currentDir), currentDir, idl.Step_stats)
 			})
 
 			st.AlwaysRun(idl.Substep_execute_initialize_data_migration_scripts, func(streams step.OutStreams) error {
-				if nonInteractive {
-					return nil
-				}
-
 				currentDir := filepath.Join(filepath.Clean(generatedScriptsOutputDir), "current")
 				err = commanders.ApplyDataMigrationScripts(streams, nonInteractive, sourceGPHome, sourcePort,
 					logdir, utils.System.DirFS(currentDir), currentDir, idl.Step_initialize)
 				if err != nil {
 					return err
+				}
+
+				if nonInteractive {
+					return nil
 				}
 
 				prompt := fmt.Sprintf("Continue with ggupgrade %s?  Yy|Nn: ", idl.Step_initialize)

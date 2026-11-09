@@ -129,14 +129,12 @@ func TestInitialize(t *testing.T) {
 	})
 
 	t.Run("the check upgrade substep always runs", func(t *testing.T) {
-		// run initialize
+		// run initialize, and create a non-upgradeable object to assert pg_upgrade --check is always run
 		acceptance.Initialize(t, idl.Mode_copy)
-		defer acceptance.Revert(t)
-
-		// create a non-upgradeable object to assert pg_upgrade --check is always run
 		source := acceptance.GetSourceCluster(t)
-		testutils.MustExecuteSQL(t, source.Connection(), `CREATE TABLE public.test_pg_upgrade(a int) DISTRIBUTED BY (a) PARTITION BY RANGE (a)(start (1) end(4) every(1)); CREATE UNIQUE INDEX fomo ON public.test_pg_upgrade (a);`)
-		defer testutils.MustExecuteSQL(t, source.Connection(), `DROP TABLE IF EXISTS public.test_pg_upgrade CASCADE;`)
+		testutils.MustExecuteSQL(t, source.Connection(), `CREATE VIEW public.test_pg_upgrade AS SELECT * FROM gp_toolkit.gp_size_of_partition_and_indexes_disk;`)
+		defer testutils.MustExecuteSQL(t, source.Connection(), `DROP VIEW public.test_pg_upgrade CASCADE;`)
+		defer acceptance.Revert(t)
 
 		// re-run initialize and check that pg_upgrade --check ran
 		cmd := exec.Command("ggupgrade", "initialize",
@@ -275,5 +273,35 @@ func TestInitialize(t *testing.T) {
 		testutils.MustWriteToFile(t, filepath.Join(utils.GetStateDir(), step.SubstepsFileName), replaced)
 
 		acceptance.Initialize(t, idl.Mode_copy)
+	})
+
+	t.Run("migration scripts can be found when ggupgrade is run through a symlink", func (t *testing.T) {
+		tempDir := testutils.GetTempDir(t, "")
+		defer testutils.MustRemoveAll(t, tempDir)
+
+		ggupgradePath, err := exec.LookPath("ggupgrade")
+		if err != nil {
+			t.Fatalf("Failed to find ggupgrade executable in PATH: %v", ggupgradePath)
+		}
+
+		linkPath := filepath.Join(tempDir, "ggupgrade-link")
+		if err := os.Symlink(ggupgradePath, linkPath); err != nil {
+			t.Fatalf("Failed to create symlink: %v", err)
+		}
+
+		cmd := exec.Command(linkPath, "initialize",
+			"--non-interactive", "--verbose",
+			"--mode", idl.Mode_copy.String(),
+			"--source-gphome", acceptance.GPHOME_SOURCE,
+			"--target-gphome", acceptance.GPHOME_TARGET,
+			"--source-master-port", acceptance.PGPORT,
+			"--temp-port-range", acceptance.TARGET_PGPORT+"-6040",
+			"--disk-free-ratio", "0")
+		defer acceptance.Revert(t)
+
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Errorf("Unexpected error: %v\nstderr:%v\n", err, string(output))
+		}
 	})
 }
