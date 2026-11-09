@@ -223,6 +223,25 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 		}
 	})
 
+	t.Run("Fails together with System.EvalSymlinks()", func (t *testing.T) {
+		utils.System.Stat = func(name string) (os.FileInfo, error) {
+			return nil, nil
+		}
+
+		utils.System.Executable = func() (string, error) {
+			return "/dir/script", nil
+		}
+
+		utils.System.EvalSymlinks = func(path string) (string, error) {
+			return "", errors.New("Some error")
+		}
+
+		_, err := utils.HandleDataMigrationSeedDir("", false)
+		if err == nil {
+			t.Errorf("Expected to fail together with System.EvalSymlinks()")
+		}
+	})
+
 	t.Run("Returns path to the executable by default", func(t *testing.T) {
 		utils.System.Stat = func(name string) (os.FileInfo, error) {
 			return nil, nil
@@ -230,6 +249,10 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 
 		utils.System.Executable = func() (string, error) {
 			return "/dir/script", nil
+		}
+
+		utils.System.EvalSymlinks = func(path string) (string, error) {
+			return path, nil
 		}
 
 		dir, err := utils.HandleDataMigrationSeedDir("", false)
@@ -250,6 +273,10 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 
 		utils.System.Executable = func() (string, error) {
 			return "/dir/script", nil
+		}
+
+		utils.System.EvalSymlinks = func(path string) (string, error) {
+			return path, nil
 		}
 
 		userDir := "/my_directory/seed_scripts"
