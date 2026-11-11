@@ -37,7 +37,7 @@ func dataMigrationGenerate() *cobra.Command {
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			var err error
 			seedDirIsSetByUser := cmd.Flag("seed-dir").Changed
-			seedDir, err = utils.HandleDataMigrationSeedDir(seedDir, seedDirIsSetByUser)
+			seedDir, err = utils.HandleDataMigrationSeedDir(seedDir, seedDirIsSetByUser, false)
 			if err != nil {
 				return err
 			}

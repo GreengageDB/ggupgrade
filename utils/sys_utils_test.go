@@ -191,7 +191,7 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 			return nil, &os.PathError{}
 		}
 
-		_, err := utils.HandleDataMigrationSeedDir("", false)
+		_, err := utils.HandleDataMigrationSeedDir("", false, true)
 		if err == nil {
 			t.Errorf("Expected to get an error for nonexistent default directory")
 		}
@@ -202,7 +202,7 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 			return nil, &os.PathError{}
 		}
 
-		_, err := utils.HandleDataMigrationSeedDir("", true)
+		_, err := utils.HandleDataMigrationSeedDir("", true, true)
 		if err == nil {
 			t.Errorf("Expected to get an error for nonexistent '--seed-dir'")
 		}
@@ -217,13 +217,13 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 			return "", errors.New("Some error")
 		}
 
-		_, err := utils.HandleDataMigrationSeedDir("", false)
+		_, err := utils.HandleDataMigrationSeedDir("", false, true)
 		if err == nil {
 			t.Errorf("Expected to fail together with System.Executable()")
 		}
 	})
 
-	t.Run("Fails together with System.EvalSymlinks()", func (t *testing.T) {
+	t.Run("Fails together with System.EvalSymlinks()", func(t *testing.T) {
 		utils.System.Stat = func(name string) (os.FileInfo, error) {
 			return nil, nil
 		}
@@ -236,7 +236,7 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 			return "", errors.New("Some error")
 		}
 
-		_, err := utils.HandleDataMigrationSeedDir("", false)
+		_, err := utils.HandleDataMigrationSeedDir("", false, true)
 		if err == nil {
 			t.Errorf("Expected to fail together with System.EvalSymlinks()")
 		}
@@ -255,15 +255,20 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 			return path, nil
 		}
 
-		dir, err := utils.HandleDataMigrationSeedDir("", false)
-		if err != nil {
-			t.Errorf("Unexpected error")
-		}
+		// For paranoia's sake, simulate both cli flags and config options
+		runHandleDataMigrationSeedDir := func(dirIsSetInConfig bool) {
+			dir, err := utils.HandleDataMigrationSeedDir("", false, dirIsSetInConfig)
+			if err != nil {
+				t.Errorf("Unexpected error")
+			}
 
-		expectedDir := "/dir/data-migration-scripts"
-		if dir != expectedDir {
-			t.Errorf("Unexpected directory: expected %v, got %v", expectedDir, dir)
+			expectedDir := "/dir/data-migration-scripts"
+			if dir != expectedDir {
+				t.Errorf("Unexpected directory: expected %v, got %v", expectedDir, dir)
+			}
 		}
+		runHandleDataMigrationSeedDir(false)
+		runHandleDataMigrationSeedDir(true)
 	})
 
 	t.Run("Doesn't override '--seed-dir'", func(t *testing.T) {
@@ -279,14 +284,19 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 			return path, nil
 		}
 
-		userDir := "/my_directory/seed_scripts"
-		dir, err := utils.HandleDataMigrationSeedDir(userDir, true)
-		if err != nil {
-			t.Errorf("Unexpected error")
-		}
+		// For paranoia's sake, simulate both cli flags and config options
+		runHandleDataMigrationSeedDir := func(dirIsSetInConfig bool) {
+			userDir := "/my_directory/seed_scripts"
+			dir, err := utils.HandleDataMigrationSeedDir(userDir, true, dirIsSetInConfig)
+			if err != nil {
+				t.Errorf("Unexpected error")
+			}
 
-		if dir != userDir {
-			t.Errorf("Directory specified by the user via '--seed-dir' gets overwritten")
+			if dir != userDir {
+				t.Errorf("Directory specified by the user via '--seed-dir' gets overwritten")
+			}
 		}
+		runHandleDataMigrationSeedDir(false)
+		runHandleDataMigrationSeedDir(true)
 	})
 }

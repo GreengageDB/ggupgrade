@@ -79,9 +79,7 @@ func initialize() *cobra.Command {
 						err = errors.New("The file flag cannot be used with any other flag except verbose and non-interactive.")
 					}
 				})
-				if err != nil {
-					return err
-				}
+				return err
 			}
 
 			// In dev mode the file flag should not be set and ensure all dev
@@ -98,18 +96,12 @@ func initialize() *cobra.Command {
 				}
 			}
 
-			var err error
-			dataMigrationSeedDirIsSetByUser := cmd.Flag("seed-dir").Changed
-			dataMigrationSeedDir, err = utils.HandleDataMigrationSeedDir(dataMigrationSeedDir, dataMigrationSeedDirIsSetByUser)
-			if err != nil {
-				return err
-			}
-
 			return nil
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			if cmd.Flag("file").Changed {
+			configUsed := cmd.Flag("file").Changed
+			if configUsed {
 				configFile, err := os.Open(file)
 				if err != nil {
 					return err
@@ -132,6 +124,13 @@ func initialize() *cobra.Command {
 			}
 
 			mode, err := parseMode(mode)
+			if err != nil {
+				return err
+			}
+
+			// if dataMigrationSeedDir is not explicitly set, try to find it near the executable
+			dataMigrationSeedDirIsSetByUser := cmd.Flag("seed-dir").Changed
+			dataMigrationSeedDir, err = utils.HandleDataMigrationSeedDir(dataMigrationSeedDir, dataMigrationSeedDirIsSetByUser, configUsed)
 			if err != nil {
 				return err
 			}
