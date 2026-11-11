@@ -25,7 +25,6 @@ var ExecuteHelp string
 var FinalizeHelp string
 var RevertHelp string
 var GlobalHelp string
-var Help map[idl.Step]string
 
 func init() {
 	logDir, err := utils.GetLogDir()
@@ -109,13 +108,6 @@ func init() {
 	FinalizeHelp = fmt.Sprintf(finalizeHelpText, cases.Title(language.English).String(idl.Step_finalize.String()), finalizeSubsteps, logDir)
 	RevertHelp = fmt.Sprintf(revertHelpText, cases.Title(language.English).String(idl.Step_revert.String()), revertSubsteps, logDir)
 	GlobalHelp = fmt.Sprintf(globalHelpText, logDir)
-
-	Help = map[idl.Step]string{
-		idl.Step_initialize: InitializeHelp,
-		idl.Step_execute:    ExecuteHelp,
-		idl.Step_finalize:   FinalizeHelp,
-		idl.Step_revert:     RevertHelp,
-	}
 }
 
 const initializeHelpText = `

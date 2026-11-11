@@ -54,6 +54,7 @@ func initialize() *cobra.Command {
 		Use:   "initialize",
 		Short: "prepare the system for upgrade",
 		Long:  InitializeHelp,
+		Args:  cobra.NoArgs,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if cmd.Flag("pg-upgrade-verbose").Changed && !cmd.Flag("verbose").Changed {
 				return fmt.Errorf("expected --verbose when using --pg-upgrade-verbose")
@@ -152,10 +153,6 @@ func initialize() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			// If we got here, the args are okay and the user doesn't need a usage
-			// dump on failure.
-			cmd.SilenceUsage = true
 
 			// Create the state directory outside the step framework to ensure
 			// we can write to the status file. The step framework assumes valid

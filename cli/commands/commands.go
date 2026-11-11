@@ -60,6 +60,12 @@ func BuildRootCommand() *cobra.Command {
 
 	root := &cobra.Command{
 		Use: "ggupgrade",
+		Args: cobra.NoArgs,
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			// Silence usage since Cobra prints usage for all errors rather than just
+			// "unknown flag" errors.
+			cmd.SilenceUsage = true
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if shouldPrintVersion {
 				printVersion(format)
@@ -97,6 +103,7 @@ func BuildRootCommand() *cobra.Command {
 
 var configCmd = &cobra.Command{
 	Use:   "config",
+	Args:  cobra.NoArgs,
 	Short: "subcommands to set parameters for subsequent ggupgrade commands",
 	Long:  "subcommands to set parameters for subsequent ggupgrade commands",
 }
@@ -106,6 +113,7 @@ func createConfigShowSubcommand() *cobra.Command {
 		Use:   "show",
 		Short: "show configuration settings",
 		Long:  "show configuration settings",
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := connectToHub()
 			if err != nil {
@@ -164,6 +172,7 @@ func version() *cobra.Command {
 		Use:   "version",
 		Short: "Version of ggupgrade",
 		Long:  `Version of ggupgrade`,
+		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			printVersion(format)
 		},
@@ -178,6 +187,7 @@ var restartServices = &cobra.Command{
 	Use:   "restart-services",
 	Short: "restarts hub/agents that are not currently running",
 	Long:  "restarts hub/agents that are not currently running",
+	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := commanders.StartHub(step.StdStreams)
 		if err != nil && !errors.Is(err, step.Skip) {
@@ -208,6 +218,7 @@ var killServices = &cobra.Command{
 	Short: "Abruptly stops the hub and agents that are currently running.",
 	Long: "Abruptly stops the hub and agents that are currently running.\n" +
 		"Return if no hub is running, which may leave spurious agents running.",
+	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		running, err := commanders.IsHubRunning()
 		if err != nil {

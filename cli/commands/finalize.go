@@ -29,6 +29,7 @@ func finalize() *cobra.Command {
 		Use:   "finalize",
 		Short: "finalizes the cluster after upgrade execution",
 		Long:  FinalizeHelp,
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			var response *idl.FinalizeResponse
 

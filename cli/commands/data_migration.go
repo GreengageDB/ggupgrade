@@ -34,6 +34,7 @@ func dataMigrationGenerate() *cobra.Command {
 		Use:   "generate",
 		Short: "generate data migration SQL scripts",
 		Long:  "generate data migration SQL scripts",
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			outputDir = filepath.Clean(outputDir)
 			seedDir = filepath.Clean(seedDir)
@@ -71,6 +72,7 @@ func dataMigrationApply() *cobra.Command {
 		Use:   "apply",
 		Short: "apply data migration SQL scripts",
 		Long:  "apply data migration SQL scripts",
+		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			parsedPhase, err := parsePhase(phase)
 			if err != nil {
