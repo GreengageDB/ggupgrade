@@ -100,8 +100,8 @@ func initialize() *cobra.Command {
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			configUsed := cmd.Flag("file").Changed
-			if configUsed {
+			useConfig := cmd.Flag("file").Changed
+			if useConfig {
 				configFile, err := os.Open(file)
 				if err != nil {
 					return err
@@ -130,7 +130,7 @@ func initialize() *cobra.Command {
 
 			// if dataMigrationSeedDir is not explicitly set, try to find it near the executable
 			dataMigrationSeedDirIsSetByUser := cmd.Flag("seed-dir").Changed
-			dataMigrationSeedDir, err = utils.HandleDataMigrationSeedDir(dataMigrationSeedDir, dataMigrationSeedDirIsSetByUser, configUsed)
+			dataMigrationSeedDir, err = utils.HandleDataMigrationSeedDir(dataMigrationSeedDir, dataMigrationSeedDirIsSetByUser, useConfig)
 			if err != nil {
 				return err
 			}

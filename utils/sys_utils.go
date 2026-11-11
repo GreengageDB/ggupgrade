@@ -125,7 +125,7 @@ func GetLogDir() (string, error) {
 }
 
 // There are several commands that have 'seed-dir' flag, so handle it in one place.
-func HandleDataMigrationSeedDir(dir string, dirIsSetByUser bool, dirIsSetInConfig bool) (string, error) {
+func HandleDataMigrationSeedDir(dir string, dirIsSetByUser bool, configIsUsed bool) (string, error) {
 	// Try to find data migration scripts if their directory is not set by the user;
 	// our best guess it that they are located near the executable.
 	if !dirIsSetByUser {
@@ -148,7 +148,7 @@ func HandleDataMigrationSeedDir(dir string, dirIsSetByUser bool, dirIsSetInConfi
 			return "", xerrors.Errorf("Specified migration script directory doesn't exist.")
 		} else {
 			var overrideOption string
-			if dirIsSetInConfig {
+			if configIsUsed {
 				overrideOption = "'seed_dir' option"
 			} else {
 				overrideOption = "'--seed-dir' flag"

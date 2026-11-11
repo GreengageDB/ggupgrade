@@ -256,8 +256,8 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 		}
 
 		// For paranoia's sake, simulate both cli flags and config options
-		runHandleDataMigrationSeedDir := func(dirIsSetInConfig bool) {
-			dir, err := utils.HandleDataMigrationSeedDir("", false, dirIsSetInConfig)
+		runHandleDataMigrationSeedDir := func(configIsUsed bool) {
+			dir, err := utils.HandleDataMigrationSeedDir("", false, configIsUsed)
 			if err != nil {
 				t.Errorf("Unexpected error")
 			}
@@ -285,9 +285,9 @@ func TestHandleDataMigrationSeedDir(t *testing.T) {
 		}
 
 		// For paranoia's sake, simulate both cli flags and config options
-		runHandleDataMigrationSeedDir := func(dirIsSetInConfig bool) {
+		runHandleDataMigrationSeedDir := func(configIsUsed bool) {
 			userDir := "/my_directory/seed_scripts"
-			dir, err := utils.HandleDataMigrationSeedDir(userDir, true, dirIsSetInConfig)
+			dir, err := utils.HandleDataMigrationSeedDir(userDir, true, configIsUsed)
 			if err != nil {
 				t.Errorf("Unexpected error")
 			}
