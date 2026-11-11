@@ -130,6 +130,7 @@ Optional Flags:
   -h, --help                 displays help output for initialize
   -v, --verbose              outputs detailed logs for initialize
       --pg-upgrade-verbose   execute pg_upgrade with verbose internal logging. Requires the verbose flag.
+      --seed-dir             specifies the directory containing data migration scripts
 
 ggupgrade log files can be found on all hosts in %s
 `
@@ -217,6 +218,7 @@ Optional Flags:
 
   --output-dir    output path to the current generated data migration SQL files. 
                   Defaults to $HOME/gpAdminLogs/ggupgrade/data-migration-scripts
+  --seed-dir      specifies the directory containing data migration scripts
 `
 const applyHelp = `
 Applies data migration SQL scripts to resolve catalog inconsistencies between 
