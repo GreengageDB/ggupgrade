@@ -64,20 +64,18 @@ func testFinalize(t *testing.T, mode idl.Mode, useHbaHostnames bool) {
 	testutils.MustAddTablespace(t, source, tablespaceDir)
 	defer testutils.MustDeleteTablespaces(t, source, acceptance.GetTempTargetCluster(t))
 
-	hbaHostnames := ""
-	if useHbaHostnames {
-		hbaHostnames = "--use-hba-hostnames"
-	}
-
-	cmd := exec.Command("ggupgrade", "initialize",
+	args := []string{"initialize",
 		"--non-interactive", "--verbose",
 		"--mode", mode.String(),
 		"--source-gphome", acceptance.GPHOME_SOURCE,
 		"--target-gphome", acceptance.GPHOME_TARGET,
 		"--source-master-port", acceptance.PGPORT,
 		"--temp-port-range", acceptance.TARGET_PGPORT+"-6040",
-		"--disk-free-ratio", "0",
-		hbaHostnames)
+		"--disk-free-ratio", "0"}
+	if useHbaHostnames {
+		args = append(args, "--use-hba-hostnames")
+	}
+	cmd := exec.Command("ggupgrade", args...)
 	output, err := cmd.CombinedOutput()
 	defer acceptance.RevertIgnoreFailures(t) // cleanup in case we fail part way through
 	if err != nil {
