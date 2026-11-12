@@ -54,7 +54,7 @@ func initialize() *cobra.Command {
 		Use:   "initialize",
 		Short: "prepare the system for upgrade",
 		Long:  InitializeHelp,
-		Args:  cobra.NoArgs,
+		Args:  NoArgs,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if cmd.Flag("pg-upgrade-verbose").Changed && !cmd.Flag("verbose").Changed {
 				return fmt.Errorf("expected --verbose when using --pg-upgrade-verbose")

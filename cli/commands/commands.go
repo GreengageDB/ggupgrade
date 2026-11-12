@@ -54,13 +54,50 @@ import (
 	"github.com/GreengageDB/ggupgrade/utils"
 )
 
+// This is a calque of Cobra's findSuggestions(), which is
+// not exposed as a part of the API for some reason
+func findSuggestions(c *cobra.Command, arg string) string {
+	if c.DisableSuggestions {
+		return ""
+	}
+	if c.SuggestionsMinimumDistance <= 0 {
+		c.SuggestionsMinimumDistance = 2
+	}
+	var sb strings.Builder
+	if suggestions := c.SuggestionsFor(arg); len(suggestions) > 0 {
+		sb.WriteString("\n\nDid you mean this?\n")
+		for _, s := range suggestions {
+			_, _ = fmt.Fprintf(&sb, "\t%v\n", s)
+		}
+	}
+	return sb.String()
+}
+
+// By default, cobra.NoArgs butchers suggestions,
+// so let's make a version that doesn't
+func NoArgs(c *cobra.Command, args []string) error {
+	if len(args) == 0 {
+		// everything is ok
+		return nil
+	}
+
+	if c.HasSubCommands() {
+		// In Cobra, any misspelled subcommand is treated as an argument,
+		// so look for suggestions in this case
+		return fmt.Errorf("unknown subcommand %q for %q%s", args[0], c.CommandPath(), findSuggestions(c, args[0]))
+	}
+
+	// No subcommands, can safely tell that we don't accept arguments
+	return fmt.Errorf("%q doesn't expect any arguments", c.CommandPath())
+}
+
 func BuildRootCommand() *cobra.Command {
 	var shouldPrintVersion bool
 	var format string
 
 	root := &cobra.Command{
 		Use: "ggupgrade",
-		Args: cobra.NoArgs,
+		Args: NoArgs,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			// Silence usage since Cobra prints usage for all errors rather than just
 			// "unknown flag" errors.
@@ -103,7 +140,7 @@ func BuildRootCommand() *cobra.Command {
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Args:  cobra.NoArgs,
+	Args:  NoArgs,
 	Short: "subcommands to set parameters for subsequent ggupgrade commands",
 	Long:  "subcommands to set parameters for subsequent ggupgrade commands",
 }
@@ -113,7 +150,7 @@ func createConfigShowSubcommand() *cobra.Command {
 		Use:   "show",
 		Short: "show configuration settings",
 		Long:  "show configuration settings",
-		Args:  cobra.NoArgs,
+		Args:  NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := connectToHub()
 			if err != nil {
@@ -172,7 +209,7 @@ func version() *cobra.Command {
 		Use:   "version",
 		Short: "Version of ggupgrade",
 		Long:  `Version of ggupgrade`,
-		Args:  cobra.NoArgs,
+		Args:  NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			printVersion(format)
 		},
@@ -187,7 +224,7 @@ var restartServices = &cobra.Command{
 	Use:   "restart-services",
 	Short: "restarts hub/agents that are not currently running",
 	Long:  "restarts hub/agents that are not currently running",
-	Args:  cobra.NoArgs,
+	Args:  NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := commanders.StartHub(step.StdStreams)
 		if err != nil && !errors.Is(err, step.Skip) {
@@ -218,7 +255,7 @@ var killServices = &cobra.Command{
 	Short: "Abruptly stops the hub and agents that are currently running.",
 	Long: "Abruptly stops the hub and agents that are currently running.\n" +
 		"Return if no hub is running, which may leave spurious agents running.",
-	Args: cobra.NoArgs,
+	Args: NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		running, err := commanders.IsHubRunning()
 		if err != nil {

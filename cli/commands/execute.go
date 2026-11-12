@@ -32,7 +32,7 @@ func execute() *cobra.Command {
 		Use:   "execute",
 		Short: "executes the upgrade",
 		Long:  ExecuteHelp,
-		Args:  cobra.NoArgs,
+		Args:  NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			var response *idl.ExecuteResponse
 

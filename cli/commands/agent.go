@@ -23,7 +23,7 @@ func Agent() *cobra.Command {
 		Short:  "start the agent",
 		Long:   "start the agent",
 		Hidden: true,
-		Args:   cobra.NoArgs, // no positional args allowed
+		Args:   NoArgs, // no positional args allowed
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Initialize("agent")
 			defer logger.WritePanics()
