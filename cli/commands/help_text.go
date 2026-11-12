@@ -333,6 +333,7 @@ func addHelpToCommand(cmd *cobra.Command, help string) *cobra.Command {
 		Use:   "help",
 		Short: "",
 		Long:  "",
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Print(help)
 			return nil
