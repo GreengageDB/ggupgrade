@@ -344,7 +344,7 @@ func initialize() *cobra.Command {
 	subInit.Flags().MarkHidden("stop-before-cluster-creation") //nolint
 	subInit.Flags().BoolVar(&skipVersionCheck, "skip-version-check", false, "disable source and target version check")
 	subInit.Flags().MarkHidden("skip-version-check") //nolint
-	subInit.Flags().StringVar(&dataMigrationSeedDir, "seed-dir", "" /* Default value is set in PreRunE */, "path to the seed scripts")
+	subInit.Flags().StringVar(&dataMigrationSeedDir, "seed-dir", "" /* Default value is set in RunE */, "path to the seed scripts")
 
 	return addHelpToCommand(subInit, InitializeHelp)
 }
