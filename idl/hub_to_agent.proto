@@ -60,6 +60,7 @@ message PgOptions {
   string newDBID = 19;
   map<int32, TablespaceInfo> Tablespaces = 20;
   string pgUpgradeTimestamp = 21;
+  string targetCatalogVersion = 22;
 }
 
 message TablespaceInfo {

@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"reflect"
@@ -24,7 +25,30 @@ import (
 	"github.com/GreengageDB/ggupgrade/utils"
 	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 	"github.com/GreengageDB/ggupgrade/utils/rsync"
+	"golang.org/x/xerrors"
 )
+
+type MockDirEntry struct {
+	name string
+	mode fs.FileMode
+	info fs.FileInfo
+}
+
+func (e MockDirEntry) Name() string {
+	return e.name
+}
+
+func (e MockDirEntry) IsDir() bool {
+	return e.mode.IsDir()
+}
+
+func (e MockDirEntry) Type() fs.FileMode {
+	return e.mode.Type()
+}
+
+func (e MockDirEntry) Info() (fs.FileInfo, error) {
+	return e.info, nil
+}
 
 func TestUpgradePrimaries(t *testing.T) {
 	testlog.SetupTestLogger()
@@ -250,7 +274,7 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		if err != nil {
 			t.Fatalf("unexpected error %+v", err)
 		}
@@ -290,15 +314,20 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		if err != nil {
 			t.Fatalf("unexpected error %+v", err)
 		}
 	})
 
 	t.Run("errors when parse dbID fails", func(t *testing.T) {
-		err := agent.RestoreTablespaces(backupDir, nil, "", "")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, nil, "", "")
 		var expected *strconv.NumError
+		if !errors.As(err, &expected) {
+			t.Errorf("got error type %T want %T", err, expected)
+		}
+
+		err = agent.RestoreTablespacesTo7XAndNewer("", "", "", 0)
 		if !errors.As(err, &expected) {
 			t.Errorf("got error type %T want %T", err, expected)
 		}
@@ -312,7 +341,7 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		var expected rsync.RsyncError
 		if !errors.As(err, &expected) {
 			t.Errorf("got error type %T want %T", err, expected)
@@ -333,7 +362,7 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		if !errors.Is(err, expected) {
 			t.Errorf("got %#v want %#v", err, expected.Error())
 		}
@@ -358,7 +387,7 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		if !errors.Is(err, expected) {
 			t.Errorf("got %#v want %#v", err, expected)
 		}
@@ -388,9 +417,155 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		if !errors.Is(err, expected) {
 			t.Errorf("got %#v want %#v", err, expected)
+		}
+	})
+
+	t.Run("Error when read list of tablespaces", func(t *testing.T) {
+		expected := errors.New("oops")
+		utils.System.ReadDirFS = func(fsys fs.FS, name string) ([]fs.DirEntry, error) {
+			if fsys != os.DirFS("/datadir/pg_tblspc") {
+				t.Error()
+			}
+			return nil, expected
+		}
+		defer utils.ResetSystemFunctions()
+
+		err := agent.RestoreTablespacesTo7XAndNewer("1", "/datadir", "", 0)
+		if !errors.Is(err, expected) {
+			t.Errorf("got %#v want %#v", err, expected)
+		}
+	})
+
+	t.Run("Not a symlink in the tablespace directory", func(t *testing.T) {
+		expected := xerrors.Errorf("The file pg_tblspc is not a symlink: 16000")
+		utils.System.ReadDirFS = func(fsys fs.FS, name string) ([]fs.DirEntry, error) {
+			if fsys != os.DirFS("/datadir/pg_tblspc") {
+				t.Error()
+			}
+
+			tablespaces := make([]fs.DirEntry, 1)
+			tablespaces[0] = MockDirEntry{
+				name: "16000",
+				mode: 0,
+			}
+			return tablespaces, nil
+		}
+		defer utils.ResetSystemFunctions()
+		err := agent.RestoreTablespacesTo7XAndNewer("1", "/datadir", "", 0)
+		if expected.Error() != err.Error() {
+			t.Errorf("got %#v want %#v", err, expected)
+		}
+	})
+
+	t.Run("Readlink errors", func(t *testing.T) {
+		expected := xerrors.Errorf("The file pg_tblspc is not a symlink: 16000")
+
+		utils.System.ReadDirFS = func(fsys fs.FS, name string) ([]fs.DirEntry, error) {
+			if fsys != os.DirFS("/datadir/pg_tblspc") {
+				t.Error()
+			}
+
+			tablespaces := make([]fs.DirEntry, 1)
+			tablespaces[0] = MockDirEntry{
+				name: "16000",
+				mode: os.ModeSymlink,
+			}
+			return tablespaces, nil
+		}
+
+		utils.System.ReadLink = func(path string) (string, error) {
+			if path != "/datadir/pg_tblspc/16000" {
+				t.Error()
+			}
+			return "", expected
+		}
+		defer utils.ResetSystemFunctions()
+
+		err := agent.RestoreTablespacesTo7XAndNewer("1", "/datadir", "", 0)
+		if !errors.Is(err, expected) {
+			t.Errorf("got %#v want %#v", err, expected)
+		}
+	})
+
+	t.Run("errors when recreating the symlink fails to create the link 7X", func(t *testing.T) {
+		expected := errors.New("oops")
+		utils.System.ReadDirFS = func(fsys fs.FS, name string) ([]fs.DirEntry, error) {
+			if fsys != os.DirFS("/datadir/pg_tblspc") {
+				t.Error()
+			}
+
+			tablespaces := make([]fs.DirEntry, 1)
+			tablespaces[0] = MockDirEntry{
+				name: "16000",
+				mode: os.ModeSymlink,
+			}
+			return tablespaces, nil
+		}
+
+		utils.System.ReadLink = func(path string) (string, error) {
+			if path != "/datadir/pg_tblspc/16000" {
+				t.Error()
+			}
+			return "/tmp/ts1/1", nil
+		}
+		utils.System.Lstat = func(name string) (os.FileInfo, error) {
+			return nil, nil
+		}
+		utils.System.Remove = func(name string) error {
+			return nil
+		}
+		utils.System.Symlink = func(sourceDir, symLinkName string) error {
+			return expected
+		}
+
+		defer utils.ResetSystemFunctions()
+
+		err := agent.RestoreTablespacesTo7XAndNewer("1", "/datadir", "", 0)
+		if !errors.Is(err, expected) {
+			t.Errorf("got %#v want %#v", err, expected)
+		}
+	})
+
+	t.Run("errors when rsync fails 7X", func(t *testing.T) {
+		utils.System.ReadDirFS = func(fsys fs.FS, name string) ([]fs.DirEntry, error) {
+			if fsys != os.DirFS("/datadir/pg_tblspc") {
+				t.Error()
+			}
+
+			tablespaces := make([]fs.DirEntry, 1)
+			tablespaces[0] = MockDirEntry{
+				name: "16000",
+				mode: os.ModeSymlink,
+			}
+			return tablespaces, nil
+		}
+
+		utils.System.ReadLink = func(path string) (string, error) {
+			if path != "/datadir/pg_tblspc/16000" {
+				t.Error()
+			}
+			return "/tmp/ts1/1", nil
+		}
+		utils.System.Lstat = func(name string) (os.FileInfo, error) {
+			return nil, nil
+		}
+		utils.System.Remove = func(name string) error {
+			return nil
+		}
+		utils.System.Symlink = func(sourceDir, symLinkName string) error {
+			return nil
+		}
+
+		rsync.SetRsyncCommand(exectest.NewCommand(agent.FailedRsync))
+		defer utils.ResetSystemFunctions()
+
+		err := agent.RestoreTablespacesTo7XAndNewer("1", "/datadir", "", 0)
+		var expected rsync.RsyncError
+		if !errors.As(err, &expected) {
+			t.Errorf("got error type %T want %T", err, expected)
 		}
 	})
 }

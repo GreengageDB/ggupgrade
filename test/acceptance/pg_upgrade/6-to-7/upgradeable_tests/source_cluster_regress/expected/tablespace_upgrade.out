@@ -1,0 +1,8 @@
+! mkdir /tmp/tablespace;
+
+create tablespace test_tablespace location '/tmp/tablespace';
+CREATE TABLESPACE
+create table ts_test (a int,  b int) tablespace test_tablespace;
+CREATE TABLE
+insert into ts_test select a, a from generate_series(1, 10000)a;
+INSERT 0 10000

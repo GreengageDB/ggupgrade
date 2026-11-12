@@ -66,6 +66,7 @@ type SystemFunctions struct {
 	StatFS       func(fsys fs.FS, name string) (fs.FileInfo, error)
 	DirFS        func(dir string) fs.FS
 	Executable   func() (string, error)
+	ReadLink     func(link string) (string, error)
 }
 
 func InitializeSystemFunctions() *SystemFunctions {
@@ -96,6 +97,7 @@ func InitializeSystemFunctions() *SystemFunctions {
 		StatFS:       fs.Stat,
 		DirFS:        os.DirFS,
 		Executable:   os.Executable,
+		ReadLink:     os.Readlink,
 	}
 }
 
