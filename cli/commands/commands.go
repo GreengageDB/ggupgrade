@@ -143,6 +143,11 @@ var configCmd = &cobra.Command{
 	Args:  NoArgs,
 	Short: "subcommands to set parameters for subsequent ggupgrade commands",
 	Long:  "subcommands to set parameters for subsequent ggupgrade commands",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// Make the command runnable, because if it is not, Cobra
+		// will ignore NoArgs function that we specified
+		return cmd.Help()
+	},
 }
 
 func createConfigShowSubcommand() *cobra.Command {
