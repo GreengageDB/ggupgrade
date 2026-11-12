@@ -6,6 +6,8 @@ package hub
 import (
 	"context"
 	"os"
+	"path/filepath"
+	"strconv"
 	"sync"
 
 	"github.com/GreengageDB/ggupgrade/greengage"
@@ -46,7 +48,11 @@ func RsyncCoordinatorAndPrimariesTablespaces(stream step.OutStreams, agentConns 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		errs <- RsyncCoordinatorTablespaces(stream, source.StandbyHostname(), source.Tablespaces[int32(source.Coordinator().DbID)], source.Tablespaces[int32(source.Standby().DbID)])
+		if source.Version.Major == 5 {
+			errs <- RsyncCoordinatorTablespaces5X(stream, source.StandbyHostname(), source.Tablespaces[int32(source.Coordinator().DbID)], source.Tablespaces[int32(source.Standby().DbID)])
+		} else {
+			errs <- RsyncCoordinatorTablespaces6XAndNewer(stream, source.Tablespaces[int32(source.Coordinator().DbID)], source.Coordinator(), source.Standby())
+		}
 	}()
 
 	errs <- RsyncPrimariesTablespaces(agentConns, source, source.Tablespaces)
@@ -84,7 +90,7 @@ func RsyncCoordinator(stream step.OutStreams, standby greengage.SegConfig, coord
 	return rsync.Rsync(opts...)
 }
 
-func RsyncCoordinatorTablespaces(stream step.OutStreams, standbyHostname string, coordinatorTablespaces greengage.SegmentTablespaces, standbyTablespaces greengage.SegmentTablespaces) error {
+func RsyncCoordinatorTablespaces5X(stream step.OutStreams, standbyHostname string, coordinatorTablespaces greengage.SegmentTablespaces, standbyTablespaces greengage.SegmentTablespaces) error {
 	for oid, coordinatorTsInfo := range coordinatorTablespaces {
 		if !coordinatorTsInfo.GetUserDefined() {
 			continue
@@ -94,6 +100,30 @@ func RsyncCoordinatorTablespaces(stream step.OutStreams, standbyHostname string,
 			rsync.WithSourceHost(standbyHostname),
 			rsync.WithSources(standbyTablespaces[oid].GetLocation() + string(os.PathSeparator)),
 			rsync.WithDestination(coordinatorTsInfo.GetLocation()),
+			rsync.WithOptions(rsync.Options...),
+			rsync.WithStream(stream),
+		}
+
+		err := rsync.Rsync(opts...)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func RsyncCoordinatorTablespaces6XAndNewer(stream step.OutStreams, coordinatorTablespaces greengage.SegmentTablespaces,
+	coordinator greengage.SegConfig, standby greengage.SegConfig) error {
+	for _, coordinatorTsInfo := range coordinatorTablespaces {
+		if !coordinatorTsInfo.GetUserDefined() {
+			continue
+		}
+
+		opts := []rsync.Option{
+			rsync.WithSourceHost(standby.Hostname),
+			rsync.WithSources(filepath.Join(coordinatorTsInfo.Location, strconv.Itoa(standby.DbID)) + string(os.PathSeparator)),
+			rsync.WithDestination(filepath.Join(coordinatorTsInfo.Location, strconv.Itoa(coordinator.DbID))),
 			rsync.WithOptions(rsync.Options...),
 			rsync.WithStream(stream),
 		}
@@ -153,19 +183,33 @@ func RsyncPrimariesTablespaces(agentConns []*idl.Connection, source *greengage.C
 
 			primaryTablespaces := tablespaces[int32(primary.DbID)]
 			mirrorTablespaces := tablespaces[int32(mirror.DbID)]
-			for oid, mirrorTsInfo := range mirrorTablespaces {
-				if !mirrorTsInfo.GetUserDefined() {
-					continue
-				}
 
-				opt := &idl.RsyncRequest_RsyncOptions{
-					Sources:         []string{mirrorTsInfo.GetLocation() + string(os.PathSeparator)},
-					DestinationHost: primary.Hostname,
-					Destination:     primaryTablespaces[oid].GetLocation(),
-					Options:         rsync.Options,
-					ExcludedFiles:   rsync.Excludes,
+			if source.Version.Major == 5 {
+				for oid, mirrorTsInfo := range mirrorTablespaces {
+					if !mirrorTsInfo.GetUserDefined() {
+						continue
+					}
+
+					opt := &idl.RsyncRequest_RsyncOptions{
+						Sources:         []string{mirrorTsInfo.GetLocation() + string(os.PathSeparator)},
+						DestinationHost: primary.Hostname,
+						Destination:     primaryTablespaces[oid].GetLocation(),
+						Options:         rsync.Options,
+						ExcludedFiles:   rsync.Excludes,
+					}
+					opts = append(opts, opt)
 				}
-				opts = append(opts, opt)
+			} else {
+				for _, primaryTsInfo := range primaryTablespaces {
+					opt := &idl.RsyncRequest_RsyncOptions{
+						Sources:         []string{filepath.Join(primaryTsInfo.GetLocation(), strconv.Itoa(mirror.DbID)) + string(os.PathSeparator)},
+						DestinationHost: primary.Hostname,
+						Destination:     filepath.Join(primaryTsInfo.GetLocation(), strconv.Itoa(primary.DbID)),
+						Options:         rsync.Options,
+						ExcludedFiles:   rsync.Excludes,
+					}
+					opts = append(opts, opt)
+				}
 			}
 		}
 
@@ -224,4 +268,29 @@ func restorePrimariesPgControl(agentConns []*idl.Connection, source *greengage.C
 	}
 
 	return ExecuteRPC(agentConns, request)
+}
+
+func RelinkCoordinatorAndPrimariesTablespace(agentConns []*idl.Connection, source *greengage.Cluster) error {
+	var wg sync.WaitGroup
+	errs := make(chan error, 2)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		errs <- upgrade.RelinkTablespaces(strconv.Itoa(source.Coordinator().DbID), source.CoordinatorDataDir())
+	}()
+
+	errs <- RelinkTableSpacesOnSegments(agentConns, source, func(seg *greengage.SegConfig) bool {
+		return seg.IsPrimary()
+	})
+
+	wg.Wait()
+	close(errs)
+
+	var err error
+	for e := range errs {
+		err = errorlist.Append(err, e)
+	}
+
+	return err
 }

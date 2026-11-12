@@ -194,7 +194,7 @@ func VerifyLegacyTablespaceDbOIDDirectory(fsys fs.FS, dbOID string) (bool, error
 // The expected tablespace directory layout is:
 // /dir/<fsname>/<datadir>/<tablespaceOID>/<dbID>/GPDB_6_<catalogVersion>/<dbOID>/<relfilenode>
 func VerifyTablespaceDbIDDirectory(fsys fs.FS, dbID string) (bool, error) {
-	entries, err := fs.ReadDir(fsys, dbID)
+	entries, err := fs.ReadDir(fsys, ".")
 	if err != nil {
 		return false, xerrors.Errorf("read tablespace dbID directory %q: %w", dbID, err)
 	}

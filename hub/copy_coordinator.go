@@ -8,8 +8,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 
+	"github.com/GreengageDB/ggupgrade/upgrade"
 	"github.com/blang/semver/v4"
 	"golang.org/x/xerrors"
 
@@ -95,16 +97,10 @@ func CopyCoordinatorDataDir(streams step.OutStreams, coordinatorDataDir string, 
 	return Copy(streams, source, destinationHostToBackupDir)
 }
 
-func CopyCoordinatorTablespaces(streams step.OutStreams, sourceVersion semver.Version, tablespaces greengage.Tablespaces, agentHostsToBackupDir backupdir.AgentHostsToBackupDir) error {
-	if tablespaces == nil && sourceVersion.Major != 5 {
-		return nil
-	}
-
+func CopyCoordinatorTablespaces5X(streams step.OutStreams, tablespaces greengage.Tablespaces, agentHostsToBackupDir backupdir.AgentHostsToBackupDir) error {
 	var sourcePaths []string
-	if sourceVersion.Major == 5 {
-		// 5X always needs to include the --old-tablespaces-file
-		sourcePaths = append(sourcePaths, utils.GetStateDirOldTablespacesFile())
-	}
+	// 5X always needs to include the --old-tablespaces-file
+	sourcePaths = append(sourcePaths, utils.GetStateDirOldTablespacesFile())
 
 	sourcePaths = append(sourcePaths, tablespaces.GetCoordinatorTablespaces().UserDefinedTablespacesLocations()...)
 
@@ -116,4 +112,29 @@ func CopyCoordinatorTablespaces(streams step.OutStreams, sourceVersion semver.Ve
 	}
 
 	return Copy(streams, sourcePaths, destinationHostToBackupDir)
+}
+
+// CopyCoordinatorTablespaces7XAndNewer
+// copy coordinator's tablespaces target directories to the segment's.
+func CopyCoordinatorTablespaces7XAndNewer(streams step.OutStreams, targetVersion semver.Version, targetCatalogVersion string,
+	tablespaces greengage.Tablespaces, DbIdMap greengage.DbIdToHostname, coordinatorDbid int32) error {
+
+	for oid, coordinatorTablespace := range tablespaces[coordinatorDbid] {
+		sourcePath := upgrade.TablespacePath(coordinatorTablespace.Location, coordinatorDbid,
+			targetVersion.Major, targetCatalogVersion)
+
+		for dbid, segmentTablespace := range tablespaces {
+			if dbid == coordinatorDbid {
+				continue
+			}
+
+			destinationHostToBackupDir := make(backupdir.AgentHostsToBackupDir)
+			destinationHostToBackupDir[DbIdMap[int(dbid)]] = filepath.Join(segmentTablespace[oid].Location, strconv.Itoa(int(dbid))) + string(os.PathSeparator)
+
+			if err := Copy(streams, []string{sourcePath}, destinationHostToBackupDir); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

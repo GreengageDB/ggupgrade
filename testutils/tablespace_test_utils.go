@@ -23,8 +23,7 @@ func MustAddTablespace(t *testing.T, cluster greengage.Cluster, tablespaceDir st
 	}
 
 	if cluster.Version.Major >= 6 {
-		return
-		//MustCreateTablespace(t, cluster, tablespaceDir)
+		MustCreateTablespace(t, cluster, tablespaceDir)
 	}
 
 	// create databases in the tablespace
@@ -65,9 +64,7 @@ INSERT INTO public.tablespace_table_0 SELECT i from generate_series(1,100)i;`
 func MustCreateTablespace(t *testing.T, cluster greengage.Cluster, tablespaceDir string) {
 	t.Helper()
 
-	path := filepath.Join(tablespaceDir, "testfs")
-	MustCreateDir(t, path)
-	MustExecuteSQL(t, cluster.Connection(greengage.Database("postgres")), fmt.Sprintf(`CREATE TABLESPACE test_tablespace LOCATION '%s';`, path))
+	MustExecuteSQL(t, cluster.Connection(greengage.Database("postgres")), fmt.Sprintf(`CREATE TABLESPACE test_tablespace LOCATION '%s';`, tablespaceDir))
 }
 
 func MustCreateFilespaceAndTablespace(t *testing.T, cluster greengage.Cluster, tablespaceDir string) {
@@ -110,10 +107,6 @@ func MustCreateFilespaceAndTablespace(t *testing.T, cluster greengage.Cluster, t
 func MustDeleteTablespaces(t *testing.T, source greengage.Cluster, target greengage.Cluster) {
 	t.Helper()
 
-	if source.Version.Major >= 6 {
-		return
-	}
-
 	conn := target.Connection(greengage.Database("foodb"))
 	MustExecuteSQL(t, conn, `DROP TABLE IF EXISTS public.tablespace_table_0;`)
 
@@ -141,10 +134,6 @@ DROP TABLE IF EXISTS public.tablespace_table_3;`
 func MustTruncateTablespaces(t *testing.T, cluster greengage.Cluster) {
 	t.Helper()
 
-	if cluster.Version.Major >= 6 {
-		return
-	}
-
 	sql := `
 TRUNCATE public.tablespace_table_0;
 TRUNCATE public.tablespace_table_1;
@@ -161,10 +150,6 @@ TRUNCATE public.tablespace_table_3;`
 
 func VerifyTablespaceData(t *testing.T, cluster greengage.Cluster) {
 	t.Helper()
-
-	if cluster.Version.Major >= 6 {
-		return
-	}
 
 	tables := []string{"public.tablespace_table_0", "public.tablespace_table_1", "public.tablespace_table_2", "public.tablespace_table_3"}
 	for _, table := range tables {

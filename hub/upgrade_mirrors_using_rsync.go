@@ -41,8 +41,16 @@ func UpgradeMirrorsUsingRsync(agentConns []*idl.Connection, source *greengage.Cl
 		return err
 	}
 
-	if err := RenameMirrorTablespacesOnSegments(agentConns, source, intermediate); err != nil {
-		return err
+	if source.Version.Major == 5 {
+		if err := RenameMirrorTablespacesOnSegments(agentConns, source, intermediate); err != nil {
+			return err
+		}
+	} else {
+		if err := RelinkTableSpacesOnSegments(agentConns, intermediate, func(seg *greengage.SegConfig) bool {
+			return !seg.IsStandby() && seg.IsMirror()
+		}); err != nil {
+			return err
+		}
 	}
 
 	if err := CreateRecoveryConfOnSegments(agentConns, intermediate); err != nil {
@@ -125,9 +133,15 @@ func RsyncMirrorTablespacesOnSegments(agentConns []*idl.Connection, source *gree
 				if !sourcePrimaryTsInfo.GetUserDefined() {
 					continue
 				}
-
-				sourcePrimaryTsLocation := sourcePrimaryTsInfo.GetLocation() + string(os.PathSeparator)
-				sourceMirrorTsLocation := source.Tablespaces[int32(intermediateMirror.DbID)][tsOid].GetLocation()
+				var sourcePrimaryTsLocation string
+				var sourceMirrorTsLocation string
+				if source.Version.Major == 5 {
+					sourcePrimaryTsLocation = sourcePrimaryTsInfo.GetLocation() + string(os.PathSeparator)
+					sourceMirrorTsLocation = source.Tablespaces[int32(intermediateMirror.DbID)][tsOid].GetLocation()
+				} else {
+					sourcePrimaryTsLocation = filepath.Join(sourcePrimaryTsInfo.GetLocation(), strconv.Itoa(sourcePrimary.DbID)) + string(os.PathSeparator)
+					sourceMirrorTsLocation = filepath.Join(sourcePrimaryTsInfo.GetLocation(), strconv.Itoa(intermediateMirror.DbID))
+				}
 
 				// On the source primary host rsync to the intermediate mirror host the source primary tablespaces.
 				opt := &idl.RsyncRequest_RsyncOptions{
@@ -183,5 +197,24 @@ func RenameMirrorTablespacesOnSegments(agentConns []*idl.Connection, source *gre
 		return err
 	}
 
+	return ExecuteRPC(agentConns, request)
+}
+
+func RelinkTableSpacesOnSegments(agentConns []*idl.Connection, intermediate *greengage.Cluster, segSelector func(segment *greengage.SegConfig) bool) error {
+	request := func(conn *idl.Connection) error {
+		intermediateMirrors := intermediate.SelectSegments(func(seg *greengage.SegConfig) bool {
+			return seg.IsOnHost(conn.Hostname) && segSelector(seg)
+		})
+		for _, intermediateMirror := range intermediateMirrors {
+			_, err := conn.AgentClient.RelinkTablespacesOnSegment(context.Background(), &idl.RelinkTablespacesRequest{
+				DataDir: intermediateMirror.DataDir,
+				Dbid:    int32(intermediateMirror.DbID),
+			})
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
 	return ExecuteRPC(agentConns, request)
 }

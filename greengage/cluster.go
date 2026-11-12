@@ -46,6 +46,7 @@ type Cluster struct {
 }
 
 type ContentToSegConfig map[int]SegConfig
+type DbIdToHostname map[int]string
 
 func (c ContentToSegConfig) ExcludingCoordinator() ContentToSegConfig {
 	return c.excludingCoordinatorOrStandby()
@@ -243,6 +244,20 @@ func (c *Cluster) PrimaryHostnames() []string {
 	}
 
 	return list
+}
+
+// Map the segment's dbid to its hostname.
+func (c *Cluster) DbidToHostnames() DbIdToHostname {
+	result := make(map[int]string)
+	for _, seg := range c.Primaries {
+		result[seg.DbID] = seg.Hostname
+	}
+	for _, seg := range c.Mirrors {
+		result[seg.DbID] = seg.Hostname
+	}
+	result[c.Coordinator().DbID] = c.CoordinatorHostname()
+	result[c.Standby().DbID] = c.StandbyHostname()
+	return result
 }
 
 // Hosts returns all hosts including the coordinator and standby

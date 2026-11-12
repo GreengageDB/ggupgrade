@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"sync"
 
+	"github.com/blang/semver/v4"
 	"golang.org/x/xerrors"
 
 	"github.com/GreengageDB/ggupgrade/greengage"
@@ -68,7 +69,13 @@ func upgradePrimarySegment(host string, opt *idl.PgOptions) error {
 			return xerrors.Errorf("restore backup of upgraded master data directory on host %s for content id %d: %w", host, opt.GetContentID(), err)
 		}
 
-		err = RestoreTablespaces(opt.GetBackupDir(), opt.GetTablespaces(), opt.GetOldDBID(), opt.GetNewDataDir())
+		targetMajorVersion := semver.MustParse(opt.TargetVersion).Major
+		if targetMajorVersion <= 6 {
+			err = RestoreTablespaces5Xto6X(opt.GetBackupDir(), opt.GetTablespaces(), opt.GetOldDBID(), opt.GetNewDataDir())
+		} else {
+			err = upgrade.RelinkTablespaces(opt.GetOldDBID(), opt.GetNewDataDir())
+		}
+
 		if err != nil {
 			return xerrors.Errorf("restore tablespace on host %s for content id %d: %w", host, opt.GetContentID(), err)
 		}
@@ -100,7 +107,7 @@ func restoreBackup(backupDir string, newDataDir string) error {
 	return rsync.Rsync(options...)
 }
 
-func RestoreTablespaces(backupDir string, tablespaces map[int32]*idl.TablespaceInfo, oldDBID string, newDataDir string) error {
+func RestoreTablespaces5Xto6X(backupDir string, tablespaces map[int32]*idl.TablespaceInfo, oldDBID string, newDataDir string) error {
 	dbid, err := strconv.Atoi(oldDBID)
 	if err != nil {
 		return err
@@ -125,26 +132,9 @@ func RestoreTablespaces(backupDir string, tablespaces map[int32]*idl.TablespaceI
 		}
 
 		symLinkName := fmt.Sprintf("%s/pg_tblspc/%s", newDataDir, strconv.Itoa(int(oid)))
-		if err := recreateSymlink(targetDir, symLinkName); err != nil {
+		if err := utils.RecreateSymlink(targetDir, symLinkName); err != nil {
 			return xerrors.Errorf("recreate symbolic link: %w", err)
 		}
-	}
-
-	return nil
-}
-
-func recreateSymlink(sourceDir, symLinkName string) error {
-	_, err := utils.System.Lstat(symLinkName)
-	if err == nil {
-		if err := utils.System.Remove(symLinkName); err != nil {
-			return xerrors.Errorf("unlink %q: %w", symLinkName, err)
-		}
-	} else if !os.IsNotExist(err) {
-		return xerrors.Errorf("stat symbolic link %q: %w", symLinkName, err)
-	}
-
-	if err := utils.System.Symlink(sourceDir, symLinkName); err != nil {
-		return xerrors.Errorf("create symbolic link %q to directory %q: %w", symLinkName, sourceDir, err)
 	}
 
 	return nil

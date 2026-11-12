@@ -1,0 +1,20 @@
+select spcname from pg_tablespace;
+ spcname         
+-----------------
+ pg_default      
+ pg_global       
+ test_tablespace 
+(3 rows)
+
+select count(*) from ts_test;
+ count 
+-------
+ 10000 
+(1 row)
+
+drop table ts_test;
+DROP TABLE
+drop tablespace test_tablespace;
+DROP TABLESPACE
+! rm -rf /tmp/tablespace;
+

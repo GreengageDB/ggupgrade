@@ -169,3 +169,8 @@ func (m *MockAgentServer) CreateRecoveryConf(context context.Context, in *idl.Cr
 func (m *MockAgentServer) AddReplicationEntries(context context.Context, in *idl.AddReplicationEntriesRequest) (*idl.AddReplicationEntriesReply, error) {
 	return &idl.AddReplicationEntriesReply{}, nil
 }
+
+func (m *MockAgentServer) RelinkTablespacesOnSegment(ctx context.Context, request *idl.RelinkTablespacesRequest) (*idl.RelinkTablespacesReplay, error) {
+	m.increaseCalls()
+	return &idl.RelinkTablespacesReplay{}, nil
+}

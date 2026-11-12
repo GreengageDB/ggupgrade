@@ -9,9 +9,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 
 	"github.com/GreengageDB/ggupgrade/idl"
+	"github.com/GreengageDB/ggupgrade/upgrade"
 	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 )
 
@@ -63,4 +65,15 @@ func renameTablespaces(pairs []*idl.RenameTablespacesRequest_RenamePair) error {
 	}
 
 	return err
+}
+
+func (s *Server) RelinkTablespacesOnSegment(ctx context.Context, req *idl.RelinkTablespacesRequest) (*idl.RelinkTablespacesReplay, error) {
+	log.Print("starting relink tablespaces")
+
+	err := upgrade.RelinkTablespaces(strconv.Itoa(int(req.Dbid)), req.DataDir)
+	if err != nil {
+		return &idl.RelinkTablespacesReplay{}, err
+	}
+
+	return &idl.RelinkTablespacesReplay{}, nil
 }

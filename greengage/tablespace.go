@@ -10,14 +10,13 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"golang.org/x/xerrors"
-
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/utils"
 	"github.com/GreengageDB/ggupgrade/utils/errorlist"
+	"golang.org/x/xerrors"
 )
 
-const tablespacesQuery = `
+const tablespacesQuery5X = `
 	SELECT
 		fsedbid as dbid,
 		upgrade_tablespace.oid as oid,
@@ -34,6 +33,17 @@ const tablespacesQuery = `
 			INNER JOIN pg_filespace_entry
 			ON fsefsoid = spcfsoid
 		) upgrade_tablespace`
+
+// In 6X and newer we only need tablespace location on the coordinator
+const tablespacesQuery6XAndNewer = `
+select 
+    dbid,
+    pg_tablespace.oid,
+    spcname as name,
+    pg_tablespace_location(pg_tablespace.oid) as location,
+    1 as userdefined
+    from pg_tablespace, gp_segment_configuration
+    where spcname not in ('pg_default', 'pg_global') and role = 'p';`
 
 // map<tablespaceOid, tablespaceInfo>
 type SegmentTablespaces map[int32]*idl.TablespaceInfo
@@ -76,8 +86,15 @@ func GetCoordinatorTablespaceLocation(basePath string, oid int) string {
 	return filepath.Join(basePath, strconv.Itoa(oid), strconv.Itoa(CoordinatorDbid))
 }
 
-func GetTablespaceTuples(db *sql.DB) (TablespaceTuples, error) {
-	rows, err := db.Query(tablespacesQuery)
+func GetTablespaceTuples(db *sql.DB, version uint) (TablespaceTuples, error) {
+	var query string
+	if version == 5 {
+		query = tablespacesQuery5X
+	} else {
+		query = tablespacesQuery6XAndNewer
+	}
+
+	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -154,8 +171,8 @@ func boolToStrInt(b bool) string {
 // 1. query the database to get tablespace information
 // 2. write the tablespace information to a file
 // 3. converts the tablespace information to an internal structure
-func TablespacesFromDB(db *sql.DB, tablespacesFile string) (Tablespaces, error) {
-	tablespaceTuples, err := GetTablespaceTuples(db)
+func TablespacesFromDB5X(db *sql.DB, tablespacesFile string) (Tablespaces, error) {
+	tablespaceTuples, err := GetTablespaceTuples(db, 5)
 	if err != nil {
 		return nil, xerrors.Errorf("retrieve tablespace information: %w", err)
 	}
@@ -171,6 +188,18 @@ func TablespacesFromDB(db *sql.DB, tablespacesFile string) (Tablespaces, error) 
 	}()
 	if err := tablespaceTuples.Write(file); err != nil {
 		return nil, xerrors.Errorf("populate tablespace mapping file: %w", err)
+	}
+
+	return NewTablespaces(tablespaceTuples), nil
+}
+
+// main function which does the following:
+// 1. query the database to get tablespace information
+// 2. converts the tablespace information to an internal structure
+func TablespacesFromDB6XAndNewer(db *sql.DB) (Tablespaces, error) {
+	tablespaceTuples, err := GetTablespaceTuples(db, 6)
+	if err != nil {
+		return nil, xerrors.Errorf("retrieve tablespace information: %w", err)
 	}
 
 	return NewTablespaces(tablespaceTuples), nil

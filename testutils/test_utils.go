@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -122,6 +123,47 @@ func CreateTablespaces() greengage.Tablespaces {
 			1663: {
 				Location:    "/tmp/m2/base",
 				UserDefined: false,
+			},
+		},
+	}
+}
+
+func CreateTablespaces6XAndNewer() greengage.Tablespaces {
+	return greengage.Tablespaces{
+		1: {
+			16000: {
+				Location:    "/tmp/ts1/",
+				UserDefined: true,
+			},
+		},
+		2: {
+			16000: {
+				Location:    "/tmp/ts1/",
+				UserDefined: true,
+			},
+		},
+		3: {
+			16000: {
+				Location:    "/tmp/ts1/",
+				UserDefined: true,
+			},
+		},
+		4: {
+			16000: {
+				Location:    "/tmp/ts1/",
+				UserDefined: true,
+			},
+		},
+		5: {
+			16000: {
+				Location:    "/tmp/ts1/",
+				UserDefined: true,
+			},
+		},
+		6: {
+			16000: {
+				Location:    "/tmp/ts1/",
+				UserDefined: true,
 			},
 		},
 	}
@@ -534,5 +576,61 @@ func MustApplySQLFile(t *testing.T, gphome string, port string, path string) {
 	_, err := commanders.ApplySQLFile(gphome, MustConvertStringToInt(t, port), "template1", path, "-v", "ON_ERROR_STOP=1")
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func VerifyTablespaceLinks(t *testing.T, target greengage.Cluster) {
+	t.Helper()
+
+	verifyTablespacesOnSegment := func(hostname string, datadir string, dbid string) {
+		remoteCmd := fmt.Sprintf("for f in %s/*; do [ -L \"$f\" ] || exit 1; readlink \"$f\"; done", filepath.Join(datadir, "pg_tblspc"))
+		cmd := exec.Command("ssh", hostname, remoteCmd)
+
+		rawOutput, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		lines := strings.Split(string(rawOutput), "\n")
+		for _, link := range lines[:len(lines)-1] {
+			tablespaceDbid := filepath.Base(link)
+			if tablespaceDbid != dbid {
+				t.Fatalf("%s is not a table space dbid %s\n", link, dbid)
+			}
+		}
+	}
+
+	for _, seg := range target.Primaries {
+		verifyTablespacesOnSegment(seg.Hostname, seg.DataDir, strconv.Itoa(seg.DbID))
+	}
+
+	for _, seg := range target.Mirrors {
+		verifyTablespacesOnSegment(seg.Hostname, seg.DataDir, strconv.Itoa(seg.DbID))
+	}
+
+	verifyTablespacesOnSegment(target.Coordinator().Hostname, target.Coordinator().DataDir,
+		strconv.Itoa(target.Coordinator().DbID))
+	verifyTablespacesOnSegment(target.Standby().Hostname, target.Standby().DataDir,
+		strconv.Itoa(target.Standby().DbID))
+}
+
+func RecreateDirectoryOnAllHosts(t *testing.T, cluster greengage.Cluster, dir string) {
+	t.Helper()
+
+	// Just in case
+	if dir == "" || dir == "/" {
+		t.Fatalf("%s is root", dir)
+	}
+
+	hosts := cluster.Hosts()
+	for _, host := range hosts {
+		output, err := exec.Command("ssh", host, "rm", "-rf", dir).CombinedOutput()
+		if err != nil {
+			t.Fatalf("failed to remove directory %s on host %s: %s", dir, host, string(output))
+		}
+		output, err = exec.Command("ssh", host, "mkdir", "-p", dir).CombinedOutput()
+		if err != nil {
+			t.Fatalf("failed to create directory %s on host %s: %s", dir, host, string(output))
+		}
 	}
 }

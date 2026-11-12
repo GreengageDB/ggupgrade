@@ -250,7 +250,7 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		if err != nil {
 			t.Fatalf("unexpected error %+v", err)
 		}
@@ -290,14 +290,14 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		if err != nil {
 			t.Fatalf("unexpected error %+v", err)
 		}
 	})
 
 	t.Run("errors when parse dbID fails", func(t *testing.T) {
-		err := agent.RestoreTablespaces(backupDir, nil, "", "")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, nil, "", "")
 		var expected *strconv.NumError
 		if !errors.As(err, &expected) {
 			t.Errorf("got error type %T want %T", err, expected)
@@ -312,7 +312,7 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		var expected rsync.RsyncError
 		if !errors.As(err, &expected) {
 			t.Errorf("got error type %T want %T", err, expected)
@@ -333,7 +333,7 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		if !errors.Is(err, expected) {
 			t.Errorf("got %#v want %#v", err, expected.Error())
 		}
@@ -358,7 +358,7 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		if !errors.Is(err, expected) {
 			t.Errorf("got %#v want %#v", err, expected)
 		}
@@ -388,7 +388,7 @@ func TestRestoreTablespaces(t *testing.T) {
 			1664: {Location: "/tmp/primary1/1664", UserDefined: true},
 		}
 
-		err := agent.RestoreTablespaces(backupDir, tablespaces, "2", "/new/data/dir")
+		err := agent.RestoreTablespaces5Xto6X(backupDir, tablespaces, "2", "/new/data/dir")
 		if !errors.Is(err, expected) {
 			t.Errorf("got %#v want %#v", err, expected)
 		}

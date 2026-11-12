@@ -24,6 +24,7 @@ service Agent {
   rpc RenameTablespaces (RenameTablespacesRequest) returns (RenameTablespacesReply) {}
   rpc CreateRecoveryConf (CreateRecoveryConfRequest) returns (CreateRecoveryConfReply) {}
   rpc AddReplicationEntries (AddReplicationEntriesRequest) returns (AddReplicationEntriesReply) {}
+  rpc RelinkTablespacesOnSegment (RelinkTablespacesRequest) returns (RelinkTablespacesReplay) {}
 }
 
 message PgOptions {
@@ -200,3 +201,10 @@ message AddReplicationEntriesRequest {
 }
 
 message AddReplicationEntriesReply {}
+
+message RelinkTablespacesRequest {
+  string dataDir = 1;
+  int32 dbid = 2;
+}
+
+message RelinkTablespacesReplay {} 

@@ -11,9 +11,8 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+	"sync"
 	"testing"
-
-	"github.com/blang/semver/v4"
 
 	"github.com/GreengageDB/ggupgrade/config/backupdir"
 	"github.com/GreengageDB/ggupgrade/greengage"
@@ -26,6 +25,7 @@ import (
 	"github.com/GreengageDB/ggupgrade/utils"
 	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 	"github.com/GreengageDB/ggupgrade/utils/rsync"
+	"github.com/blang/semver/v4"
 )
 
 const (
@@ -230,7 +230,7 @@ func TestCopyCoordinatorDataDir(t *testing.T) {
 	})
 }
 
-func TestCopyCoordinatorTablespaces(t *testing.T) {
+func TestCopyCoordinatorTablespaces5X(t *testing.T) {
 	testlog.SetupTestLogger()
 
 	stateDir := testutils.GetTempDir(t, "")
@@ -295,7 +295,7 @@ func TestCopyCoordinatorTablespaces(t *testing.T) {
 		rsync.SetRsyncCommand(cmd)
 		defer rsync.ResetRsyncCommand()
 
-		err := hub.CopyCoordinatorTablespaces(step.DevNullStream, semver.MustParse("5.0.0"), Tablespaces, backupDirs.AgentHostsToBackupDir)
+		err := hub.CopyCoordinatorTablespaces5X(step.DevNullStream, Tablespaces, backupDirs.AgentHostsToBackupDir)
 		if err != nil {
 			t.Errorf("copying coordinator tablespace directories and mapping file: %+v", err)
 		}
@@ -327,7 +327,7 @@ func TestCopyCoordinatorTablespaces(t *testing.T) {
 		rsync.SetRsyncCommand(cmd)
 		defer rsync.ResetRsyncCommand()
 
-		err := hub.CopyCoordinatorTablespaces(step.DevNullStream, semver.MustParse("5.0.0"), nil, backupDirs.AgentHostsToBackupDir)
+		err := hub.CopyCoordinatorTablespaces5X(step.DevNullStream, nil, backupDirs.AgentHostsToBackupDir)
 		if err != nil {
 			t.Errorf("got %+v, want nil", err)
 		}
@@ -344,67 +344,96 @@ func TestCopyCoordinatorTablespaces(t *testing.T) {
 
 		verifyArgs(t, actualArgsChan, expectedArgs)
 	})
+}
 
-	t.Run("when source version is 6X and higher it does not copy the --old-tablespace-file", func(t *testing.T) {
-		actualArgsChan := make(chan []string, len(backupDirs.AgentHostsToBackupDir))
+func TestCopyCoordinatorTablespaces6X(t *testing.T) {
+	testlog.SetupTestLogger()
 
-		cmd := exectest.NewCommandWithVerifier(hub.Success, func(name string, args ...string) {
-			expected := "rsync"
-			if !strings.HasSuffix(name, expected) {
-				t.Errorf("got %q, want %q", name, expected)
-			}
-
-			actualArgsChan <- args
-		})
-		rsync.SetRsyncCommand(cmd)
-		defer rsync.ResetRsyncCommand()
-
-		err := hub.CopyCoordinatorTablespaces(step.DevNullStream, semver.MustParse("6.0.0"), Tablespaces, backupDirs.AgentHostsToBackupDir)
-		if err != nil {
-			t.Errorf("copying coordinator tablespace directories and mapping file: %+v", err)
+	stateDir := testutils.GetTempDir(t, "")
+	defer func() {
+		if err := os.RemoveAll(stateDir); err != nil {
+			t.Errorf("removing temp directory: %v", err)
 		}
+	}()
 
-		close(actualArgsChan)
+	resetEnv := testutils.SetEnv(t, "GGUPGRADE_HOME", stateDir)
+	defer resetEnv()
 
-		var expectedArgs Args
-		for host, backupDir := range backupDirs.AgentHostsToBackupDir {
-			expectedArgs = append(expectedArgs, []string{
-				"--archive", "--compress", "--delete", "--stats",
-				"/tmp/tblspc2",
-				fmt.Sprintf("%s:%s", host, utils.GetTablespaceBackupDir(backupDir)+string(os.PathSeparator))})
-		}
-
-		verifyArgs(t, actualArgsChan, expectedArgs)
+	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, DbID: 1, Port: 15432, Hostname: "localhost", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole},
+		{ContentID: 0, DbID: 2, Port: 25432, Hostname: "host1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+		{ContentID: 1, DbID: 3, Port: 25433, Hostname: "host2", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
 	})
 
-	t.Run("when source version is 6X and there are no tablespaces it does not copy", func(t *testing.T) {
-		actualArgsChan := make(chan []string, len(backupDirs.AgentHostsToBackupDir))
+	Tablespaces := greengage.Tablespaces{
+		1: greengage.SegmentTablespaces{
+			16000: &idl.TablespaceInfo{
+				Location:    "/tmp/ts1",
+				UserDefined: true},
+			17000: &idl.TablespaceInfo{
+				Location:    "/tmp/ts2",
+				UserDefined: true},
+		},
+		2: greengage.SegmentTablespaces{
+			16000: &idl.TablespaceInfo{
+				Location:    "/tmp/ts1",
+				UserDefined: true},
+			17000: &idl.TablespaceInfo{
+				Location:    "/tmp/ts2",
+				UserDefined: true},
+		},
+		3: greengage.SegmentTablespaces{
+			16000: &idl.TablespaceInfo{
+				Location:    "/tmp/ts1",
+				UserDefined: true},
+			17000: &idl.TablespaceInfo{
+				Location:    "/tmp/ts2",
+				UserDefined: true},
+		},
+	}
 
+	t.Run("Copy coordinator target tablespace directories to segments", func(t *testing.T) {
+		expectedArgs := []string{
+			"--archive --compress --delete --stats /tmp/ts1/1/GPDB_7_302307241 host1:/tmp/ts1/2/",
+			"--archive --compress --delete --stats /tmp/ts1/1/GPDB_7_302307241 host2:/tmp/ts1/3/",
+			"--archive --compress --delete --stats /tmp/ts2/1/GPDB_7_302307241 host1:/tmp/ts2/2/",
+			"--archive --compress --delete --stats /tmp/ts2/1/GPDB_7_302307241 host2:/tmp/ts2/3/",
+		}
+		var actualArgs []string
+		var mutex sync.Mutex
 		cmd := exectest.NewCommandWithVerifier(hub.Success, func(name string, args ...string) {
 			expected := "rsync"
 			if !strings.HasSuffix(name, expected) {
 				t.Errorf("got %q, want %q", name, expected)
 			}
-
-			actualArgsChan <- args
+			mutex.Lock()
+			defer mutex.Unlock()
+			actualArgs = append(actualArgs, strings.Join(args, " "))
 		})
 		rsync.SetRsyncCommand(cmd)
 		defer rsync.ResetRsyncCommand()
 
-		err := hub.CopyCoordinatorTablespaces(step.DevNullStream, semver.MustParse("6.0.0"), nil, backupDirs.AgentHostsToBackupDir)
+		err := hub.CopyCoordinatorTablespaces7XAndNewer(step.DevNullStream, semver.MustParse("7.0.0"),
+			"302307241", Tablespaces, intermediate.DbidToHostnames(), 1)
 		if err != nil {
-			t.Errorf("copying coordinator tablespace directories and mapping file: %+v", err)
+			t.Errorf("copying coordinator tablespace directories: %+v", err)
 		}
 
-		close(actualArgsChan)
-		var actualArgs Args
-		for args := range actualArgsChan {
-			actualArgs = append(actualArgs, args)
+		var actualArgsAll []string
+		for _, args := range actualArgs {
+			actualArgsAll = append(actualArgsAll, args)
 		}
-		sort.Sort(actualArgs)
 
-		if actualArgs != nil {
-			t.Errorf("Rsync() should not be invoked")
+		if len(actualArgsAll) != len(expectedArgs) {
+			t.Errorf("got %v, want %v", actualArgsAll, expectedArgs)
+		}
+
+		sort.Strings(actualArgsAll)
+		for i, actual := range actualArgsAll {
+			expected := expectedArgs[i]
+			if actual != expected {
+				t.Errorf("actual %+v\nwant %+v", actual, expected)
+			}
 		}
 	})
 }
