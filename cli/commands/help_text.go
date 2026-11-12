@@ -25,7 +25,6 @@ var ExecuteHelp string
 var FinalizeHelp string
 var RevertHelp string
 var GlobalHelp string
-var Help map[idl.Step]string
 
 func init() {
 	logDir, err := utils.GetLogDir()
@@ -109,13 +108,6 @@ func init() {
 	FinalizeHelp = fmt.Sprintf(finalizeHelpText, cases.Title(language.English).String(idl.Step_finalize.String()), finalizeSubsteps, logDir)
 	RevertHelp = fmt.Sprintf(revertHelpText, cases.Title(language.English).String(idl.Step_revert.String()), revertSubsteps, logDir)
 	GlobalHelp = fmt.Sprintf(globalHelpText, logDir)
-
-	Help = map[idl.Step]string{
-		idl.Step_initialize: InitializeHelp,
-		idl.Step_execute:    ExecuteHelp,
-		idl.Step_finalize:   FinalizeHelp,
-		idl.Step_revert:     RevertHelp,
-	}
 }
 
 const initializeHelpText = `
@@ -158,7 +150,7 @@ Optional Flags:
   -h, --help                 displays help output for execute
   -v, --verbose              outputs detailed logs for execute
       --pg-upgrade-verbose   execute pg_upgrade with verbose internal logging. Requires the verbose flag.
-      --parent-backup-dir    The parent directory location used internally to store the backup of the 
+      --parent-backup-dirs   The parent directory location used internally to store the backup of the
                              master data directory and user defined master tablespaces. Defaults to the 
                              parent directory of the master data directory such as /data given 
                              /data/master/gpseg-1.
@@ -240,8 +232,8 @@ Required Flags:
 
   --gphome       path to the Greengage installation
   --port         master port for Greengage cluster
-  --phase        the data migration phase. Either "pre-initialize", 
-                 "post-finalize", "post-revert", or "stats".
+  --phase        the data migration phase. Either "initialize",
+                 "finalize", "revert", or "stats".
 
 Optional Flags:
 
@@ -341,6 +333,7 @@ func addHelpToCommand(cmd *cobra.Command, help string) *cobra.Command {
 		Use:   "help",
 		Short: "",
 		Long:  "",
+		Args:  NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Print(help)
 			return nil

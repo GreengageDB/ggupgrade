@@ -32,8 +32,8 @@ func execute() *cobra.Command {
 		Use:   "execute",
 		Short: "executes the upgrade",
 		Long:  ExecuteHelp,
+		Args:  NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			cmd.SilenceUsage = true
 			var response *idl.ExecuteResponse
 
 			if cmd.Flag("pg-upgrade-verbose").Changed && !cmd.Flag("verbose").Changed {

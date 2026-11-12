@@ -26,7 +26,7 @@ func Hub() *cobra.Command {
 		Short:  "start the hub",
 		Long:   "start the hub",
 		Hidden: true,
-		Args:   cobra.MaximumNArgs(0), //no positional args allowed
+		Args:   NoArgs, //no positional args allowed
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.Initialize("hub")
 			defer logger.WritePanics()

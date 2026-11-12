@@ -9,10 +9,8 @@ import (
 	"log"
 	"os"
 	"runtime/debug"
-	"strings"
 
 	"github.com/GreengageDB/ggupgrade/cli/commands"
-	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/utils"
 	"github.com/GreengageDB/ggupgrade/utils/daemon"
 	"github.com/GreengageDB/ggupgrade/utils/logger"
@@ -25,18 +23,8 @@ func main() {
 	defer logger.WritePanics()
 
 	root := commands.BuildRootCommand()
-	// Silence usage since Cobra prints usage for all errors rather than just
-	// "unknown flag" errors.
-	root.SilenceUsage = true
-
 	err := root.Execute()
 	if err != nil && err != daemon.ErrSuccessfullyDaemonized {
-		if strings.HasPrefix(err.Error(), "unknown flag") {
-			cmd := strings.TrimSpace(os.Args[1])
-			step := idl.Step(idl.Step_value[cmd])
-			fmt.Println(commands.Help[step])
-		}
-
 		// We use gplog.Debug instead of Error so the error is not displayed
 		// twice to the user in the terminal.
 		log.Printf("%+v", err)
