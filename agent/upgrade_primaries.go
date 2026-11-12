@@ -7,11 +7,14 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"sync"
 
+	"github.com/blang/semver/v4"
 	"golang.org/x/xerrors"
 
 	"github.com/GreengageDB/ggupgrade/greengage"
@@ -68,7 +71,13 @@ func upgradePrimarySegment(host string, opt *idl.PgOptions) error {
 			return xerrors.Errorf("restore backup of upgraded master data directory on host %s for content id %d: %w", host, opt.GetContentID(), err)
 		}
 
-		err = RestoreTablespaces(opt.GetBackupDir(), opt.GetTablespaces(), opt.GetOldDBID(), opt.GetNewDataDir())
+		targetMajorVersion := semver.MustParse(opt.TargetVersion).Major
+		if targetMajorVersion <= 6 {
+			err = RestoreTablespaces5Xto6X(opt.GetBackupDir(), opt.GetTablespaces(), opt.GetOldDBID(), opt.GetNewDataDir())
+		} else {
+			err = RestoreTablespacesTo7XAndNewer(opt.GetOldDBID(), opt.GetNewDataDir(), opt.TargetCatalogVersion, targetMajorVersion)
+		}
+
 		if err != nil {
 			return xerrors.Errorf("restore tablespace on host %s for content id %d: %w", host, opt.GetContentID(), err)
 		}
@@ -100,7 +109,7 @@ func restoreBackup(backupDir string, newDataDir string) error {
 	return rsync.Rsync(options...)
 }
 
-func RestoreTablespaces(backupDir string, tablespaces map[int32]*idl.TablespaceInfo, oldDBID string, newDataDir string) error {
+func RestoreTablespaces5Xto6X(backupDir string, tablespaces map[int32]*idl.TablespaceInfo, oldDBID string, newDataDir string) error {
 	dbid, err := strconv.Atoi(oldDBID)
 	if err != nil {
 		return err
@@ -130,6 +139,60 @@ func RestoreTablespaces(backupDir string, tablespaces map[int32]*idl.TablespaceI
 		}
 	}
 
+	return nil
+}
+
+func RestoreTablespacesTo7XAndNewer(oldDBID string, newDataDir string, targetCatalogVersion string, targetMajorVersion uint64) error {
+	dbid, err := strconv.Atoi(oldDBID)
+	if err != nil {
+		return err
+	}
+
+	// Since the segment's data directories are a copy of the coordinator data directory, the
+	// symbolic link in the pg_tblspc targets a tablespace directory for the coordinator.
+	// We need to relink them to the appropriate tablespace directory and create a prefix directory
+	// for the target version.
+	//
+	// Read tablespace links from pg_tblspc and link them to the tablespace directory with the
+	//appropriate dbid. Then copy the target prefix from the coordinator. We need a non-empty prefix
+	// since pg_upgrade does vacuum, and the absence of table files leads to the failure.
+
+	targetTablespacePrefix := fmt.Sprintf("GPDB_%d_%s", targetMajorVersion, targetCatalogVersion)
+	tablespaceDir := fmt.Sprintf("%s/pg_tblspc", newDataDir)
+	tablespaces, err := utils.System.ReadDirFS(utils.System.DirFS(tablespaceDir), ".")
+	if err != nil {
+		return xerrors.Errorf("read tablespace directory: %w", err)
+	}
+	for _, spaceDir := range tablespaces {
+		if spaceDir.Type() != fs.ModeSymlink {
+			return xerrors.Errorf("The file pg_tblspc is not a symlink: %s", spaceDir.Name())
+		}
+
+		link, err := utils.System.ReadLink(filepath.Join(tablespaceDir, spaceDir.Name()))
+		if err != nil {
+			return xerrors.Errorf("read link: %w", err)
+		}
+
+		location := filepath.Dir(filepath.Clean(link))
+
+		symLinkName := filepath.Join(tablespaceDir, spaceDir.Name())
+		targetDir := filepath.Join(location, strconv.Itoa(dbid))
+
+		coordinatorTableSpace := filepath.Join(link, targetTablespacePrefix)
+
+		if err := recreateSymlink(targetDir, symLinkName); err != nil {
+			return xerrors.Errorf("recreate symbolic link: %w", err)
+		}
+		options := []rsync.Option{
+			rsync.WithSources(coordinatorTableSpace),
+			rsync.WithDestination(symLinkName),
+			rsync.WithOptions("--archive"),
+		}
+
+		if err := rsync.Rsync(options...); err != nil {
+			return xerrors.Errorf("rsync coordinator tablespace directory to segment tablespace directory: %w", err)
+		}
+	}
 	return nil
 }
 
