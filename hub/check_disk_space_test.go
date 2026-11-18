@@ -307,6 +307,7 @@ func TestCheckDiskSpace_OnSegments(t *testing.T) {
 		diskFreeRatio := 0.3
 
 		tablespaces := testutils.CreateTablespaces6XAndNewer()
+		hub.SetCheckDiskUsage(CoordinatorHostCheckDiskUsagePasses)
 
 		smdw := mock_idl.NewMockAgentClient(ctrl)
 		smdw.EXPECT().CheckDiskSpace(
