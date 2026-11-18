@@ -65,6 +65,7 @@ type SystemFunctions struct {
 	ReadDirFS    func(fsys fs.FS, name string) ([]fs.DirEntry, error)
 	StatFS       func(fsys fs.FS, name string) (fs.FileInfo, error)
 	DirFS        func(dir string) fs.FS
+	EvalSymlinks func(path string) (string, error)
 	Executable   func() (string, error)
 	ReadLink     func(link string) (string, error)
 }
@@ -98,6 +99,7 @@ func InitializeSystemFunctions() *SystemFunctions {
 		DirFS:        os.DirFS,
 		Executable:   os.Executable,
 		ReadLink:     os.Readlink,
+		EvalSymlinks: filepath.EvalSymlinks,
 	}
 }
 
@@ -125,11 +127,16 @@ func GetLogDir() (string, error) {
 }
 
 // There are several commands that have 'seed-dir' flag, so handle it in one place.
-func HandleDataMigrationSeedDir(dir string, dirIsSetByUser bool) (string, error) {
+func HandleDataMigrationSeedDir(dir string, dirIsSetByUser bool, configIsUsed bool) (string, error) {
 	// Try to find data migration scripts if their directory is not set by the user;
 	// our best guess it that they are located near the executable.
 	if !dirIsSetByUser {
 		executablePath, err := System.Executable()
+		if err != nil {
+			return "", xerrors.Errorf("Enexpected error when trying to detect migration scripts: %w", err)
+		}
+
+		executablePath, err = System.EvalSymlinks(executablePath)
 		if err != nil {
 			return "", xerrors.Errorf("Enexpected error when trying to detect migration scripts: %w", err)
 		}
@@ -142,7 +149,14 @@ func HandleDataMigrationSeedDir(dir string, dirIsSetByUser bool) (string, error)
 		if dirIsSetByUser {
 			return "", xerrors.Errorf("Specified migration script directory doesn't exist.")
 		} else {
-			return "", xerrors.Errorf("Unable to automatically detect migration scripts. Set '--seed-dir' flag to '<path to your ggupgrade installation>/data-migration-scripts' directory manually.")
+			var overrideOption string
+			if configIsUsed {
+				overrideOption = "'seed_dir' option"
+			} else {
+				overrideOption = "'--seed-dir' flag"
+			}
+
+			return "", xerrors.Errorf("Unable to automatically detect migration scripts. Set %v to '<path to your ggupgrade installation>/data-migration-scripts' directory manually.", overrideOption)
 		}
 	}
 
