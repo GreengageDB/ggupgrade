@@ -476,9 +476,6 @@ func TestVerifyTablespaceDirectory(t *testing.T) {
 
 	t.Run("errors when failing to read directory", func(t *testing.T) {
 		exists, err := upgrade.VerifyTablespaceDbIDDirectory(fstest.MapFS{}, "1")
-		//if !errors.Is(err, os.ErrNotExist) {
-		//	t.Errorf("got error %#v want %#v", err, os.ErrNotExist)
-		//}
 		if err != nil {
 			t.Errorf("unexpected error %+v", err)
 		}
