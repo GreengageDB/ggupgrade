@@ -205,7 +205,7 @@ func VerifyTablespaceDbIDDirectory(fsys fs.FS, dbID string) (bool, error) {
 		}
 
 		if !strings.HasPrefix(entry.Name(), "GPDB_") {
-			return false, xerrors.Errorf(`Invalid tablespace directory. Expected %q to start with "GPDB_".`, filepath.Join(dbID, entry.Name()))
+			return false, xerrors.Errorf(`Invalid tablespace directory. Expected %q to start with "GPDB_".`, entry.Name())
 		}
 
 		return true, nil
