@@ -419,17 +419,12 @@ func TestCopyCoordinatorTablespaces6X(t *testing.T) {
 			t.Errorf("copying coordinator tablespace directories: %+v", err)
 		}
 
-		var actualArgsAll []string
-		for _, args := range actualArgs {
-			actualArgsAll = append(actualArgsAll, args)
+		if len(actualArgs) != len(expectedArgs) {
+			t.Errorf("got %v, want %v", actualArgs, expectedArgs)
 		}
 
-		if len(actualArgsAll) != len(expectedArgs) {
-			t.Errorf("got %v, want %v", actualArgsAll, expectedArgs)
-		}
-
-		sort.Strings(actualArgsAll)
-		for i, actual := range actualArgsAll {
+		sort.Strings(actualArgs)
+		for i, actual := range actualArgs {
 			expected := expectedArgs[i]
 			if actual != expected {
 				t.Errorf("actual %+v\nwant %+v", actual, expected)
