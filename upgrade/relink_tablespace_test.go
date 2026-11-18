@@ -60,7 +60,7 @@ func TestRelinkTablespace(t *testing.T) {
 	})
 
 	t.Run("Not a symlink in the tablespace directory", func(t *testing.T) {
-		expected := xerrors.Errorf("The file pg_tblspc is not a symlink: 16000")
+		expected := xerrors.Errorf("the file in the pg_tblspc is not a symlink: 16000")
 		utils.System.ReadDirFS = func(fsys fs.FS, name string) ([]fs.DirEntry, error) {
 			if fsys != os.DirFS("/datadir/pg_tblspc") {
 				t.Error()

@@ -10,6 +10,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/blang/semver/v4"
 	"github.com/golang/mock/gomock"
 
 	"github.com/GreengageDB/ggupgrade/greengage"
@@ -92,6 +93,7 @@ func TestCheckDiskSpace_OnSegments(t *testing.T) {
 		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast/seg2", Role: greengage.PrimaryRole},
 		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
 	})
+	source.Version = semver.MustParse("5.0.0")
 
 	tablespaces := testutils.CreateTablespaces()
 
@@ -283,6 +285,63 @@ func TestCheckDiskSpace_OnSegments(t *testing.T) {
 		})
 
 		err := hub.CheckDiskSpace(step.DevNullStream, agentConns, 0, coordinatorOnlyCluster, tablespaces)
+		if err != nil {
+			t.Errorf("unexpected error %#v", err)
+		}
+	})
+
+	t.Run("no duplicate directories on 6X", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		source := hub.MustCreateCluster(t, greengage.SegConfigs{
+			{DbID: 1, ContentID: -1, Hostname: "mdw", DataDir: "/data/qddir/seg-1", Role: greengage.PrimaryRole},
+			{DbID: 2, ContentID: -1, Hostname: "smdw", DataDir: "/data/standby", Role: greengage.MirrorRole},
+			{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast/seg1", Role: greengage.PrimaryRole},
+			{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+			{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast/seg2", Role: greengage.PrimaryRole},
+			{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
+		})
+		source.Version = semver.MustParse("6.0.0")
+
+		diskFreeRatio := 0.3
+
+		tablespaces := testutils.CreateTablespaces6XAndNewer()
+
+		smdw := mock_idl.NewMockAgentClient(ctrl)
+		smdw.EXPECT().CheckDiskSpace(
+			gomock.Any(),
+			equivalentCheckDiskRequest(&idl.CheckSegmentDiskSpaceRequest{
+				DiskFreeRatio: diskFreeRatio,
+				Dirs:          []string{"/data/standby", "/tmp/ts1/"},
+			}),
+		).Return(&idl.CheckDiskSpaceReply{}, nil)
+
+		sdw1 := mock_idl.NewMockAgentClient(ctrl)
+		sdw1.EXPECT().CheckDiskSpace(
+			gomock.Any(),
+			equivalentCheckDiskRequest(&idl.CheckSegmentDiskSpaceRequest{
+				DiskFreeRatio: diskFreeRatio,
+				Dirs:          []string{"/data/dbfast/seg1", "/data/dbfast_mirror2/seg2", "/tmp/ts1/"},
+			}),
+		).Return(&idl.CheckDiskSpaceReply{}, nil)
+
+		sdw2 := mock_idl.NewMockAgentClient(ctrl)
+		sdw2.EXPECT().CheckDiskSpace(
+			gomock.Any(),
+			equivalentCheckDiskRequest(&idl.CheckSegmentDiskSpaceRequest{
+				DiskFreeRatio: diskFreeRatio,
+				Dirs:          []string{"/data/dbfast_mirror1/seg1", "/data/dbfast/seg2", "/tmp/ts1/"},
+			}),
+		).Return(&idl.CheckDiskSpaceReply{}, nil)
+
+		agentConns := []*idl.Connection{
+			{AgentClient: smdw, Hostname: "smdw"},
+			{AgentClient: sdw1, Hostname: "sdw1"},
+			{AgentClient: sdw2, Hostname: "sdw2"},
+		}
+
+		err := hub.CheckDiskSpace(step.DevNullStream, agentConns, diskFreeRatio, source, tablespaces)
 		if err != nil {
 			t.Errorf("unexpected error %#v", err)
 		}
