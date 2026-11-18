@@ -545,7 +545,7 @@ func TestRelinkCoordinatorAndPrimariesTablespace(t *testing.T) {
 				DataDir: "/data/dbfast1/seg1",
 				Dbid:    3,
 			},
-		).Return(&idl.RelinkTablespacesReplay{}, nil)
+		).Return(&idl.RelinkTablespacesReply{}, nil)
 
 		sdw2.EXPECT().RelinkTablespacesOnSegment(
 			gomock.Any(),
@@ -553,7 +553,7 @@ func TestRelinkCoordinatorAndPrimariesTablespace(t *testing.T) {
 				DataDir: "/data/dbfast2/seg2",
 				Dbid:    5,
 			},
-		).Return(&idl.RelinkTablespacesReplay{}, nil)
+		).Return(&idl.RelinkTablespacesReply{}, nil)
 
 		// The coordinator just call relink directly
 		utils.System.ReadDirFS = func(fsys fs.FS, name string) ([]fs.DirEntry, error) {
@@ -592,7 +592,7 @@ func TestRelinkCoordinatorAndPrimariesTablespace(t *testing.T) {
 		sdw1.EXPECT().RelinkTablespacesOnSegment(
 			gomock.Any(),
 			gomock.Any(),
-		).Return(&idl.RelinkTablespacesReplay{}, expected)
+		).Return(&idl.RelinkTablespacesReply{}, expected)
 
 		sdw2.EXPECT().RelinkTablespacesOnSegment(
 			gomock.Any(),
@@ -600,7 +600,7 @@ func TestRelinkCoordinatorAndPrimariesTablespace(t *testing.T) {
 				DataDir: "/data/dbfast2/seg2",
 				Dbid:    5,
 			},
-		).Return(&idl.RelinkTablespacesReplay{}, nil)
+		).Return(&idl.RelinkTablespacesReply{}, nil)
 
 		// The coordinator just call relink directly
 		utils.System.ReadDirFS = func(fsys fs.FS, name string) ([]fs.DirEntry, error) {

@@ -170,7 +170,7 @@ func (m *MockAgentServer) AddReplicationEntries(context context.Context, in *idl
 	return &idl.AddReplicationEntriesReply{}, nil
 }
 
-func (m *MockAgentServer) RelinkTablespacesOnSegment(ctx context.Context, request *idl.RelinkTablespacesRequest) (*idl.RelinkTablespacesReplay, error) {
+func (m *MockAgentServer) RelinkTablespacesOnSegment(ctx context.Context, request *idl.RelinkTablespacesRequest) (*idl.RelinkTablespacesReply, error) {
 	m.increaseCalls()
-	return &idl.RelinkTablespacesReplay{}, nil
+	return &idl.RelinkTablespacesReply{}, nil
 }

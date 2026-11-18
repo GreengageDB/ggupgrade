@@ -67,13 +67,13 @@ func renameTablespaces(pairs []*idl.RenameTablespacesRequest_RenamePair) error {
 	return err
 }
 
-func (s *Server) RelinkTablespacesOnSegment(ctx context.Context, req *idl.RelinkTablespacesRequest) (*idl.RelinkTablespacesReplay, error) {
+func (s *Server) RelinkTablespacesOnSegment(ctx context.Context, req *idl.RelinkTablespacesRequest) (*idl.RelinkTablespacesReply, error) {
 	log.Print("starting relink tablespaces")
 
 	err := upgrade.RelinkTablespaces(strconv.Itoa(int(req.Dbid)), req.DataDir)
 	if err != nil {
-		return &idl.RelinkTablespacesReplay{}, err
+		return &idl.RelinkTablespacesReply{}, err
 	}
 
-	return &idl.RelinkTablespacesReplay{}, nil
+	return &idl.RelinkTablespacesReply{}, nil
 }
