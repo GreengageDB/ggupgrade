@@ -69,8 +69,12 @@ func upgradePrimarySegment(host string, opt *idl.PgOptions) error {
 			return xerrors.Errorf("restore backup of upgraded master data directory on host %s for content id %d: %w", host, opt.GetContentID(), err)
 		}
 
-		targetMajorVersion := semver.MustParse(opt.TargetVersion).Major
-		if targetMajorVersion <= 6 {
+		targetMajorVersion, err := semver.Parse(opt.TargetVersion)
+		if err != nil {
+			return xerrors.Errorf("parse target version: %w", err)
+		}
+
+		if targetMajorVersion.Major <= 6 {
 			err = RestoreTablespaces5Xto6X(opt.GetBackupDir(), opt.GetTablespaces(), opt.GetOldDBID(), opt.GetNewDataDir())
 		} else {
 			err = upgrade.RelinkTablespaces(opt.GetOldDBID(), opt.GetNewDataDir())
