@@ -109,6 +109,26 @@ func Apply(t *testing.T, gphome string, port string, phase idl.Step, inputDir st
 	return strings.TrimSpace(string(output))
 }
 
+func Initialize_withDynamicLibraryPath(t *testing.T, mode idl.Mode, dynamicLibraryPath string) string {
+	t.Helper()
+
+	cmd := exec.Command("ggupgrade", "initialize",
+		"--non-interactive", "--verbose",
+		"--mode", mode.String(),
+		"--source-gphome", GPHOME_SOURCE,
+		"--target-gphome", GPHOME_TARGET,
+		"--source-master-port", PGPORT,
+		"--temp-port-range", TARGET_PGPORT+"-6040",
+		"--disk-free-ratio", "0",
+		"--dynamic-library-path", dynamicLibraryPath)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("unexpected err: %#v stderr %s", err, output)
+	}
+
+	return strings.TrimSpace(string(output))
+}
+
 func Initialize_stopBeforeClusterCreation(t *testing.T) string {
 	t.Helper()
 

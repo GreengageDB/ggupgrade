@@ -97,18 +97,12 @@ func initialize() *cobra.Command {
 				}
 			}
 
-			var err error
-			dataMigrationSeedDirIsSetByUser := cmd.Flag("seed-dir").Changed
-			dataMigrationSeedDir, err = utils.HandleDataMigrationSeedDir(dataMigrationSeedDir, dataMigrationSeedDirIsSetByUser)
-			if err != nil {
-				return err
-			}
-
 			return nil
 		},
 
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			if cmd.Flag("file").Changed {
+			useConfig := cmd.Flag("file").Changed
+			if useConfig {
 				configFile, err := os.Open(file)
 				if err != nil {
 					return err
@@ -131,6 +125,13 @@ func initialize() *cobra.Command {
 			}
 
 			mode, err := parseMode(mode)
+			if err != nil {
+				return err
+			}
+
+			// if dataMigrationSeedDir is not explicitly set, try to find it near the executable
+			dataMigrationSeedDirIsSetByUser := cmd.Flag("seed-dir").Changed
+			dataMigrationSeedDir, err = utils.HandleDataMigrationSeedDir(dataMigrationSeedDir, dataMigrationSeedDirIsSetByUser, useConfig)
 			if err != nil {
 				return err
 			}
@@ -340,7 +341,7 @@ func initialize() *cobra.Command {
 	subInit.Flags().MarkHidden("stop-before-cluster-creation") //nolint
 	subInit.Flags().BoolVar(&skipVersionCheck, "skip-version-check", false, "disable source and target version check")
 	subInit.Flags().MarkHidden("skip-version-check") //nolint
-	subInit.Flags().StringVar(&dataMigrationSeedDir, "seed-dir", "" /* Default value is set in PreRunE */, "path to the seed scripts")
+	subInit.Flags().StringVar(&dataMigrationSeedDir, "seed-dir", "" /* Default value is set in RunE */, "path to the seed scripts")
 
 	return addHelpToCommand(subInit, InitializeHelp)
 }
