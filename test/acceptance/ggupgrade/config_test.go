@@ -58,7 +58,15 @@ func TestConfig(t *testing.T) {
 func configShow(t *testing.T, parameter string) string {
 	t.Helper()
 
-	cmd := exec.Command("ggupgrade", "config", "show", parameter)
+	// an empty parameter will be treated as an unknown command
+	// by ggupgrade, so avoid passing one
+	args := []string{"config", "show"}
+	if parameter != "" {
+		args = append(args, parameter)
+	}
+	cmd := exec.Command("ggupgrade", args...)
+
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("unexpected err: %v stderr: %q", err, output)
