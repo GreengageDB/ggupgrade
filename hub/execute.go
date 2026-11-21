@@ -123,7 +123,7 @@ the master.`
 		if s.Source.Version.Major == 5 {
 			err = CopyCoordinatorTablespaces5X(streams, s.Source.Tablespaces, s.BackupDirs.AgentHostsToBackupDir)
 		} else {
-			err = CopyCoordinatorTablespaces7XAndNewer(streams, s.Target.Version, s.Intermediate.CatalogVersion,
+			err = CopyCoordinatorTablespaces6XAndNewer(streams, s.Target.Version, s.Intermediate.CatalogVersion,
 				s.Source.Tablespaces, s.Source.DbidToHostnames(), int32(s.Intermediate.Coordinator().DbID))
 		}
 

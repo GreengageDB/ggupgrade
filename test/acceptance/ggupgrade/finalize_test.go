@@ -350,7 +350,7 @@ func testFinalizeInDistributedCluster(t *testing.T, mode idl.Mode) {
 	tablespaceDir := "/tmp/test_tablespace"
 	testutils.RecreateDirectoriesOnAllHosts(t, source, []string{tablespaceDir, tablespaceDir + "2", tablespaceDir + "3"})
 	testutils.MustAddTablespace(t, source, tablespaceDir)
-	defer testutils.MustDeleteTablespaces(t, source, source) // since we revert we need to remove tablespaces from the source cluster and not the target
+	defer testutils.MustDeleteTablespaces(t, source, source)
 
 	acceptance.Initialize(t, mode)
 	acceptance.Execute(t)

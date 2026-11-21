@@ -231,7 +231,7 @@ func TestUpgradePrimaries(t *testing.T) {
 	})
 }
 
-func TestRestoreTablespaces(t *testing.T) {
+func TestRestoreTablespaces5Xto6X(t *testing.T) {
 	testlog.SetupTestLogger()
 
 	backupDir := "/tmp/backup/.ggupgrade"

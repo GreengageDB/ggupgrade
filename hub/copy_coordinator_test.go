@@ -413,7 +413,7 @@ func TestCopyCoordinatorTablespaces6X(t *testing.T) {
 		rsync.SetRsyncCommand(cmd)
 		defer rsync.ResetRsyncCommand()
 
-		err := hub.CopyCoordinatorTablespaces7XAndNewer(step.DevNullStream, semver.MustParse("7.0.0"),
+		err := hub.CopyCoordinatorTablespaces6XAndNewer(step.DevNullStream, semver.MustParse("7.0.0"),
 			"302307241", Tablespaces, intermediate.DbidToHostnames(), 1)
 		if err != nil {
 			t.Errorf("copying coordinator tablespace directories: %+v", err)

@@ -93,11 +93,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - test: acceptance
+          - test: acceptance TestRevert$
             command: "go test --cover -count=1 -timeout 30m -v -run '^TestRevert$' ./test/acceptance/ggupgrade"
-          - test: acceptance
+          - test: acceptance Upgrade cluster with user tablespaces in copy mode
             command: "go test --cover -count=1 -timeout 30m -v -run '^TestFinalize/Upgrade_cluster_with_user_tablespaces_in_copy_mode$' ./test/acceptance/ggupgrade"
-          - test: acceptance
+          - test: acceptance Upgrade cluster with user tablespaces in link mode
             command: "go test --cover -count=1 -timeout 30m -v -run '^TestFinalize/Upgrade_cluster_with_user_tablespaces_in_link_mode$' ./test/acceptance/ggupgrade"
           - test: e2e_copy
             command: ci/new/e2e.bash copy

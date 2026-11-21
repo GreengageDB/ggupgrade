@@ -114,9 +114,9 @@ func CopyCoordinatorTablespaces5X(streams step.OutStreams, tablespaces greengage
 	return Copy(streams, sourcePaths, destinationHostToBackupDir)
 }
 
-// CopyCoordinatorTablespaces7XAndNewer
+// CopyCoordinatorTablespaces6XAndNewer
 // copy coordinator's tablespaces target directories to the segment's.
-func CopyCoordinatorTablespaces7XAndNewer(streams step.OutStreams, targetVersion semver.Version, targetCatalogVersion string,
+func CopyCoordinatorTablespaces6XAndNewer(streams step.OutStreams, targetVersion semver.Version, targetCatalogVersion string,
 	tablespaces greengage.Tablespaces, DbIdMap greengage.DbIdToHostname, coordinatorDbid int32) error {
 
 	for oid, coordinatorTablespace := range tablespaces[coordinatorDbid] {

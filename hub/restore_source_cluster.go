@@ -201,6 +201,10 @@ func RsyncPrimariesTablespaces(agentConns []*idl.Connection, source *greengage.C
 				}
 			} else {
 				for _, primaryTsInfo := range primaryTablespaces {
+					if !primaryTsInfo.GetUserDefined() {
+						continue
+					}
+
 					opt := &idl.RsyncRequest_RsyncOptions{
 						Sources:         []string{filepath.Join(primaryTsInfo.GetLocation(), strconv.Itoa(mirror.DbID)) + string(os.PathSeparator)},
 						DestinationHost: primary.Hostname,
