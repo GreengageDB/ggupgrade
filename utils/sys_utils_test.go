@@ -185,6 +185,51 @@ func TestRemoveDuplicates(t *testing.T) {
 	})
 }
 
+func TestRecreateSymlink(t *testing.T) {
+	t.Run("Recreate symlink successful", func(t *testing.T) {
+		tempDir := testutils.GetTempDir(t, "")
+		defer testutils.MustRemoveAll(t, tempDir)
+		file, err := os.Create(filepath.Join(tempDir, "file1"))
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
+		err = file.Close()
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
+		file, err = os.Create(filepath.Join(tempDir, "file2"))
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
+		err = file.Close()
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
+		err = utils.System.Symlink(filepath.Join(tempDir, "file1"), filepath.Join(tempDir, "link1"))
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
+		err = utils.RecreateSymlink(filepath.Join(tempDir, "file2"), filepath.Join(tempDir, "link1"))
+		if err != nil {
+			t.Errorf("recreate symlink returned error %v", err)
+		}
+		stat, err := utils.System.Lstat(filepath.Join(tempDir, "link1"))
+		if err != nil {
+			t.Fatalf("recreate symlink returned error %v", err)
+		}
+		if stat.Mode()&os.ModeSymlink != os.ModeSymlink {
+			t.Error("link is not symbolic link")
+		}
+		link, err := utils.System.ReadLink(filepath.Join(tempDir, "link1"))
+		if err != nil {
+			t.Fatalf("readlink returned error %v", err)
+		}
+		if link != filepath.Join(tempDir, "file2") {
+			t.Errorf("symbolic link is not point to expected location. expect: %s got %s", filepath.Join(tempDir, "file2"), link)
+		}
+	})
+}
+
 func TestHandleDataMigrationSeedDir(t *testing.T) {
 	t.Run("Gives an error when default seed directory doesn't exist", func(t *testing.T) {
 		utils.System.Stat = func(name string) (os.FileInfo, error) {

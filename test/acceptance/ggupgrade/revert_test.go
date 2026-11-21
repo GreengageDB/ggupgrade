@@ -178,9 +178,13 @@ func testRevertAfterExecute(t *testing.T, mode idl.Mode, upgradeFailure UpgradeF
 
 	tempDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, tempDir)
+	tablespaceDir := "/tmp/test_tablespace"
+	tablespaceDir2 := "/tmp/test_tablespace2"
+	tablespaceDir3 := "/tmp/test_tablespace3"
 
+	testutils.RecreateDirectoriesOnAllHosts(t, source, []string{tablespaceDir, tablespaceDir2, tablespaceDir3})
 	// add tablespace
-	testutils.MustAddTablespace(t, source, tempDir)
+	testutils.MustAddTablespace(t, source, tablespaceDir)
 	defer testutils.MustDeleteTablespaces(t, source, source) // since we revert we need to remove tablespaces from the source cluster and not the target
 
 	// dump all databases before the upgrade
@@ -224,6 +228,8 @@ func testRevertAfterExecute(t *testing.T, mode idl.Mode, upgradeFailure UpgradeF
 	if rows != expected {
 		t.Fatalf("got %d want %d rows", rows, expected)
 	}
+
+	testutils.VerifyTablespaceLinks(t, source)
 
 	// verify tablespace modifications were reverted
 	testutils.VerifyTablespaceData(t, source)
@@ -328,6 +334,10 @@ func setupCoordinatorUpgradeFailure(t *testing.T, source greengage.Cluster) stri
 	testutils.MustExecuteSQL(t, conn, `CREATE TABLE public.coordinator_failure (a int, b int); INSERT INTO public.coordinator_failure SELECT i, i FROM generate_series(1,10) i;`)
 	relfile := testutils.MustQueryRow(t, conn, `SELECT relfilenode FROM pg_class WHERE relname='coordinator_failure';`)
 	dbOid := testutils.MustQueryRow(t, conn, `SELECT oid FROM pg_database WHERE datname='postgres';`)
+	// NOTE: Before removing the relfile for primary_failure_tbl issue a checkpoint to flush the dirty buffers to disk.
+	// Later we have a CREATE DATABASE statement which indirectly creates a checkpoint and if the dirty buffers exist at
+	// that point the statement will fail.
+	testutils.MustExecuteSQL(t, conn, `CHECKPOINT;`)
 
 	path := filepath.Join(source.CoordinatorDataDir(), "base", strconv.Itoa(dbOid), strconv.Itoa(relfile))
 	err := os.Rename(path, path+".bak")

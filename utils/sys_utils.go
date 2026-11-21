@@ -67,6 +67,7 @@ type SystemFunctions struct {
 	DirFS        func(dir string) fs.FS
 	EvalSymlinks func(path string) (string, error)
 	Executable   func() (string, error)
+	ReadLink     func(link string) (string, error)
 }
 
 func InitializeSystemFunctions() *SystemFunctions {
@@ -97,6 +98,7 @@ func InitializeSystemFunctions() *SystemFunctions {
 		StatFS:       fs.Stat,
 		DirFS:        os.DirFS,
 		Executable:   os.Executable,
+		ReadLink:     os.Readlink,
 		EvalSymlinks: filepath.EvalSymlinks,
 	}
 }
@@ -337,6 +339,23 @@ func RemoveDuplicates(input []string) []string {
 	}
 
 	return dedupe
+}
+
+func RecreateSymlink(sourceDir, symLinkName string) error {
+	_, err := System.Lstat(symLinkName)
+	if err == nil {
+		if err := System.Remove(symLinkName); err != nil {
+			return xerrors.Errorf("unlink %q: %w", symLinkName, err)
+		}
+	} else if !os.IsNotExist(err) {
+		return xerrors.Errorf("stat symbolic link %q: %w", symLinkName, err)
+	}
+
+	if err := System.Symlink(sourceDir, symLinkName); err != nil {
+		return xerrors.Errorf("create symbolic link %q to directory %q: %w", symLinkName, sourceDir, err)
+	}
+
+	return nil
 }
 
 // TableRows attaches sort.Interface to a slice of string slices.

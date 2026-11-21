@@ -84,7 +84,15 @@ Cannot revert and restore the source cluster. Please contact support.`)
 			return err
 		}
 
-		return RsyncCoordinatorAndPrimariesTablespaces(stream, s.agentConns, s.Source)
+		err = RsyncCoordinatorAndPrimariesTablespaces(stream, s.agentConns, s.Source)
+		if err != nil {
+			return err
+		}
+
+		if s.Source.Version.Major >= 6 {
+			return RelinkCoordinatorAndPrimariesTablespace(s.agentConns, s.Source)
+		}
+		return nil
 	})
 
 	primariesUpgraded, err := step.HasRun(idl.Step_execute, idl.Substep_upgrade_primaries)

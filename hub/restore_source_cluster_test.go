@@ -6,6 +6,7 @@ package hub_test
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -14,6 +15,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/GreengageDB/ggupgrade/utils"
 	"github.com/blang/semver/v4"
 	"github.com/golang/mock/gomock"
 
@@ -29,7 +31,7 @@ import (
 	"github.com/GreengageDB/ggupgrade/utils/rsync"
 )
 
-func TestRsyncCoordinatorAndPrimaries(t *testing.T) {
+func TestRsyncCoordinatorAndPrimaries5X(t *testing.T) {
 	testlog.SetupTestLogger()
 
 	cluster := hub.MustCreateCluster(t, greengage.SegConfigs{
@@ -107,7 +109,7 @@ func TestRsyncCoordinatorAndPrimaries(t *testing.T) {
 			}
 		}))
 
-		err := hub.RsyncCoordinatorTablespaces(step.DevNullStream, cluster.StandbyHostname(), tablespaces[int32(cluster.Coordinator().DbID)], tablespaces[int32(cluster.Standby().DbID)])
+		err := hub.RsyncCoordinatorTablespaces5X(step.DevNullStream, cluster.StandbyHostname(), tablespaces[int32(cluster.Coordinator().DbID)], tablespaces[int32(cluster.Standby().DbID)])
 		if err != nil {
 			t.Errorf("unexpected err %#v", err)
 		}
@@ -219,7 +221,7 @@ func TestRsyncCoordinatorAndPrimaries(t *testing.T) {
 		rsync.SetRsyncCommand(exectest.NewCommand(hub.Failure))
 		defer rsync.ResetRsyncCommand()
 
-		err := hub.RsyncCoordinatorTablespaces(step.DevNullStream, cluster.CoordinatorHostname(), tablespaces[int32(greengage.CoordinatorDbid)], tablespaces[int32(cluster.Standby().DbID)])
+		err := hub.RsyncCoordinatorTablespaces5X(step.DevNullStream, cluster.CoordinatorHostname(), tablespaces[int32(greengage.CoordinatorDbid)], tablespaces[int32(cluster.Standby().DbID)])
 		if err == nil {
 			t.Error("unexpected nil error")
 		}
@@ -288,6 +290,110 @@ func TestRsyncCoordinatorAndPrimaries(t *testing.T) {
 
 		if !errors.Is(err, expected) {
 			t.Errorf("got error %#v, want %#v", err, expected)
+		}
+	})
+}
+
+func TestRsyncCoordinatorAndPrimaries6X(t *testing.T) {
+	cluster := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir", Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "msdw2", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
+	})
+	cluster.GPHome = "/usr/local/greengage-db"
+	cluster.Version = semver.MustParse("6.0.0")
+
+	tablespaces := testutils.CreateTablespaces6XAndNewer()
+
+	t.Run("restores coordinator tablespaces in link mode using correct rsync arguments", func(t *testing.T) {
+		defer rsync.ResetRsyncCommand()
+		rsync.SetRsyncCommand(exectest.NewCommandWithVerifier(hub.Success, func(utility string, args ...string) {
+			if !strings.HasSuffix(utility, "rsync") {
+				t.Errorf("got %q want rsync", utility)
+			}
+
+			options := args[:3]
+			if !reflect.DeepEqual(options, rsync.Options) {
+				t.Errorf("got options %q want %q", options, rsync.Options)
+			}
+
+			source := args[3]
+			expected := "standby:/tmp/ts1/2/"
+			if source != expected {
+				t.Errorf("got source %q want %q", source, expected)
+			}
+
+			destination := args[4]
+			expected = "/tmp/ts1/1"
+			if destination != expected {
+				t.Errorf("got destination %q want %q", destination, expected)
+			}
+		}))
+
+		err := hub.RsyncCoordinatorTablespaces6XAndNewer(step.DevNullStream, tablespaces[int32(cluster.Coordinator().DbID)],
+			cluster.Coordinator(), cluster.Standby())
+		if err != nil {
+			t.Errorf("unexpected err %#v", err)
+		}
+	})
+
+	t.Run("restores primary tablespaces using correct gRPC arguments", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		msdw1 := mock_idl.NewMockAgentClient(ctrl)
+		msdw1.EXPECT().RsyncTablespaceDirectories(
+			gomock.Any(),
+			&idl.RsyncRequest{
+				Options: []*idl.RsyncRequest_RsyncOptions{{
+					Sources:         []string{"/tmp/ts1/4/"},
+					DestinationHost: "sdw1",
+					Destination:     "/tmp/ts1/3",
+					Options:         rsync.Options,
+					ExcludedFiles:   rsync.Excludes,
+				}},
+			},
+		).Return(&idl.RsyncReply{}, nil)
+
+		msdw2 := mock_idl.NewMockAgentClient(ctrl)
+		msdw2.EXPECT().RsyncTablespaceDirectories(
+			gomock.Any(),
+			&idl.RsyncRequest{
+				Options: []*idl.RsyncRequest_RsyncOptions{{
+					Sources:         []string{"/tmp/ts1/6/"},
+					DestinationHost: "sdw2",
+					Destination:     "/tmp/ts1/5",
+					Options:         rsync.Options,
+					ExcludedFiles:   rsync.Excludes,
+				}},
+			},
+		).Return(&idl.RsyncReply{}, nil)
+
+		standby := mock_idl.NewMockAgentClient(ctrl)
+
+		agentConns := []*idl.Connection{
+			{AgentClient: msdw1, Hostname: "msdw1"},
+			{AgentClient: msdw2, Hostname: "msdw2"},
+			{AgentClient: standby, Hostname: "standby"},
+		}
+
+		err := hub.RsyncPrimariesTablespaces(agentConns, cluster, tablespaces)
+		if err != nil {
+			t.Errorf("unexpected err %#v", err)
+		}
+	})
+
+	t.Run("errors when restoring the coordinator tablespaces fails in link mode", func(t *testing.T) {
+		rsync.SetRsyncCommand(exectest.NewCommand(hub.Failure))
+		defer rsync.ResetRsyncCommand()
+
+		err := hub.RsyncCoordinatorTablespaces6XAndNewer(step.DevNullStream, tablespaces[int32(greengage.CoordinatorDbid)],
+			cluster.Coordinator(), cluster.Standby())
+		if err == nil {
+			t.Error("unexpected nil error")
 		}
 	})
 }
@@ -404,6 +510,134 @@ func TestRestoreCoordinatorAndPrimariesPgControl(t *testing.T) {
 
 		err = hub.RestoreCoordinatorAndPrimariesPgControl(step.DevNullStream, agentConns, cluster)
 		if err != nil {
+			t.Errorf("unexpected err %#v", err)
+		}
+	})
+}
+
+func TestRelinkCoordinatorAndPrimariesTablespace(t *testing.T) {
+	testlog.SetupTestLogger()
+
+	t.Run("relink successful", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		sdw1 := mock_idl.NewMockAgentClient(ctrl)
+		sdw2 := mock_idl.NewMockAgentClient(ctrl)
+
+		cluster := hub.MustCreateCluster(t, greengage.SegConfigs{
+			{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir", Role: greengage.PrimaryRole},
+			{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greengage.MirrorRole},
+			{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+			{DbID: 4, ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+			{DbID: 5, ContentID: 2, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
+			{DbID: 6, ContentID: 2, Hostname: "msdw2", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
+		})
+
+		tablespaces := greengage.Tablespaces{
+			1: {
+				16000: {
+					Location:    "/tmp/ts1",
+					Name:        "ts1",
+					UserDefined: true,
+				},
+			},
+			3: {
+				16000: {
+					Location:    "/tmp/ts1",
+					Name:        "ts1",
+					UserDefined: true,
+				},
+			},
+			5: {
+				16000: {
+					Location:    "/tmp/ts1",
+					Name:        "ts1",
+					UserDefined: true,
+				},
+			},
+		}
+
+		cluster.Tablespaces = tablespaces
+
+		agentConns := []*idl.Connection{
+			{AgentClient: sdw1, Hostname: "sdw1"},
+			{AgentClient: sdw2, Hostname: "sdw2"},
+		}
+
+		sdw1.EXPECT().RelinkTablespacesOnSegment(
+			gomock.Any(),
+			&idl.RelinkTablespacesRequest{
+				DataDir:     "/data/dbfast1/seg1",
+				Dbid:        3,
+				Tablespaces: tablespaces[3],
+			},
+		).Return(&idl.RelinkTablespacesReply{}, nil)
+
+		sdw2.EXPECT().RelinkTablespacesOnSegment(
+			gomock.Any(),
+			&idl.RelinkTablespacesRequest{
+				DataDir:     "/data/dbfast2/seg2",
+				Dbid:        5,
+				Tablespaces: tablespaces[5],
+			},
+		).Return(&idl.RelinkTablespacesReply{}, nil)
+
+		// The coordinator just call relink directly
+		utils.System.ReadDirFS = func(fsys fs.FS, name string) ([]fs.DirEntry, error) {
+			return nil, nil
+		}
+		defer utils.ResetSystemFunctions()
+
+		err := hub.RelinkCoordinatorAndPrimariesTablespace(agentConns, cluster)
+		if err != nil {
+			t.Errorf("unexpected err %#v", err)
+		}
+	})
+
+	t.Run("relink errors on segments", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		sdw1 := mock_idl.NewMockAgentClient(ctrl)
+		sdw2 := mock_idl.NewMockAgentClient(ctrl)
+
+		cluster := hub.MustCreateCluster(t, greengage.SegConfigs{
+			{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir", Role: greengage.PrimaryRole},
+			{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Role: greengage.MirrorRole},
+			{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Role: greengage.PrimaryRole},
+			{DbID: 4, ContentID: 0, Hostname: "msdw1", DataDir: "/data/dbfast_mirror1/seg1", Role: greengage.MirrorRole},
+			{DbID: 5, ContentID: 2, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Role: greengage.PrimaryRole},
+			{DbID: 6, ContentID: 2, Hostname: "msdw2", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
+		})
+
+		agentConns := []*idl.Connection{
+			{AgentClient: sdw1, Hostname: "sdw1"},
+			{AgentClient: sdw2, Hostname: "sdw2"},
+		}
+		expected := errors.New("permission denied")
+
+		sdw1.EXPECT().RelinkTablespacesOnSegment(
+			gomock.Any(),
+			gomock.Any(),
+		).Return(&idl.RelinkTablespacesReply{}, expected)
+
+		sdw2.EXPECT().RelinkTablespacesOnSegment(
+			gomock.Any(),
+			&idl.RelinkTablespacesRequest{
+				DataDir: "/data/dbfast2/seg2",
+				Dbid:    5,
+			},
+		).Return(&idl.RelinkTablespacesReply{}, nil)
+
+		// The coordinator just call relink directly
+		utils.System.ReadDirFS = func(fsys fs.FS, name string) ([]fs.DirEntry, error) {
+			return nil, nil
+		}
+		defer utils.ResetSystemFunctions()
+
+		err := hub.RelinkCoordinatorAndPrimariesTablespace(agentConns, cluster)
+		if !errors.Is(err, expected) {
 			t.Errorf("unexpected err %#v", err)
 		}
 	})

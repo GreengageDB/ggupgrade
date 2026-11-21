@@ -55,7 +55,22 @@ func (s *Server) Execute(req *idl.ExecuteRequest, stream idl.CliToHub_ExecuteSer
 
 	pgUpgradeTimestamp := utils.System.Now().Format(TimeStringFormat)
 	st.Run(idl.Substep_upgrade_master, func(streams step.OutStreams) error {
-		return UpgradeCoordinator(streams, s.BackupDirs.CoordinatorBackupDir, req.GetPgUpgradeVerbose(), req.GetSkipPgUpgradeChecks(), s.PgUpgradeJobs, s.Source, s.Intermediate, idl.PgOptions_upgrade, s.Mode, pgUpgradeTimestamp)
+		err := UpgradeCoordinator(streams, s.BackupDirs.CoordinatorBackupDir, req.GetPgUpgradeVerbose(), req.GetSkipPgUpgradeChecks(), s.PgUpgradeJobs, s.Source, s.Intermediate, idl.PgOptions_upgrade, s.Mode, pgUpgradeTimestamp)
+		if err != nil {
+			return err
+		}
+
+		if s.Source.Version.Major >= 6 {
+			err = UpdateIntermediateTablespaceOids(s.Source, s.Intermediate)
+			if err != nil {
+				return err
+			}
+
+			// update intermediate cluster tablespaces in config file
+			return s.Write()
+		}
+
+		return nil
 	})
 
 	st.Run(idl.Substep_copy_master, func(streams step.OutStreams) error {
@@ -105,7 +120,13 @@ the master.`
 			return utils.NewNextActionErr(err, nextAction)
 		}
 
-		err = CopyCoordinatorTablespaces(streams, s.Source.Version, s.Source.Tablespaces, s.BackupDirs.AgentHostsToBackupDir)
+		if s.Source.Version.Major == 5 {
+			err = CopyCoordinatorTablespaces5X(streams, s.Source.Tablespaces, s.BackupDirs.AgentHostsToBackupDir)
+		} else {
+			err = CopyCoordinatorTablespaces6XAndNewer(streams, s.Target.Version, s.Intermediate.CatalogVersion,
+				s.Source.Tablespaces, s.Source.DbidToHostnames(), int32(s.Intermediate.Coordinator().DbID))
+		}
+
 		if err != nil {
 			return utils.NewNextActionErr(err, nextAction)
 		}

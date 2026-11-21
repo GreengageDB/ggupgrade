@@ -4,6 +4,7 @@
 package hub
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -88,6 +89,38 @@ PGPORT=%d`, pgUpgradeDir,
 			filepath.Join(intermediate.GPHome, "greengage_path.sh"), intermediate.CoordinatorDataDir(), intermediate.CoordinatorPort())
 
 		return utils.NewNextActionErr(xerrors.Errorf("%s master: %v", action, err), nextAction)
+	}
+
+	return nil
+}
+
+func UpdateIntermediateTablespaceOids(source *greengage.Cluster, intermediate *greengage.Cluster) (err error) {
+	err = intermediate.Start(step.DevNullStream)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = intermediate.Stop(step.DevNullStream)
+	}()
+
+	conn, err := sql.Open("pgx", intermediate.Connection())
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = conn.Close()
+	}()
+	name2OidMap, err := greengage.MapSpcname2Oid(conn)
+	if err != nil {
+		return err
+	}
+	intermediate.Tablespaces = make(greengage.Tablespaces)
+	for dbid, tablespaces := range source.Tablespaces {
+		intermediate.Tablespaces[dbid] = make(greengage.SegmentTablespaces)
+		for _, tablespace := range tablespaces {
+			newOid := name2OidMap[tablespace.Name]
+			intermediate.Tablespaces[dbid][newOid] = tablespace
+		}
 	}
 
 	return nil

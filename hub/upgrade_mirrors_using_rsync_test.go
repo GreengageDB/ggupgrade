@@ -7,6 +7,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/blang/semver/v4"
 	"github.com/golang/mock/gomock"
 
 	"github.com/GreengageDB/ggupgrade/greengage"
@@ -119,7 +120,7 @@ func TestRsyncMirrorDataDirsOnSegments(t *testing.T) {
 	})
 }
 
-func TestRsyncAndRenameMirrorTablespacesOnSegments(t *testing.T) {
+func TestRsyncAndRenameMirrorTablespacesOnSegments5X(t *testing.T) {
 	source := hub.MustCreateCluster(t, greengage.SegConfigs{
 		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg-1", Port: 15432, Role: greengage.PrimaryRole},
 		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Port: 16432, Role: greengage.MirrorRole},
@@ -128,6 +129,7 @@ func TestRsyncAndRenameMirrorTablespacesOnSegments(t *testing.T) {
 		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Port: 25435, Role: greengage.PrimaryRole},
 		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Port: 25436, Role: greengage.MirrorRole},
 	})
+	source.Version = semver.MustParse("5.0.0")
 	source.Tablespaces = testutils.CreateTablespaces()
 
 	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
@@ -215,6 +217,70 @@ func TestRsyncAndRenameMirrorTablespacesOnSegments(t *testing.T) {
 		err := hub.RsyncMirrorTablespacesOnSegments(agentConns, source, intermediate)
 		if !errors.Is(err, expected) {
 			t.Errorf("got error %#v, want %#v", err, expected)
+		}
+	})
+}
+
+func TestRsyncAndRenameMirrorTablespacesOnSegments6X(t *testing.T) {
+	source := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg-1", Port: 15432, Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby", Port: 16432, Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg1", Port: 25433, Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg1", Port: 25434, Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg2", Port: 25435, Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg2", Port: 25436, Role: greengage.MirrorRole},
+	})
+	source.Version = semver.MustParse("6.0.0")
+	source.Tablespaces = testutils.CreateTablespaces6XAndNewer()
+
+	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{DbID: 1, ContentID: -1, Hostname: "coordinator", DataDir: "/data/qddir/seg.HqtFHX54y0o.-1", Port: 50432, Role: greengage.PrimaryRole},
+		{DbID: 2, ContentID: -1, Hostname: "standby", DataDir: "/data/standby.HqtFHX54y0o", Port: 50433, Role: greengage.MirrorRole},
+		{DbID: 3, ContentID: 0, Hostname: "sdw1", DataDir: "/data/dbfast1/seg.HqtFHX54y0o.1", Port: 50434, Role: greengage.PrimaryRole},
+		{DbID: 4, ContentID: 0, Hostname: "sdw2", DataDir: "/data/dbfast_mirror1/seg.HqtFHX54y0o.1", Port: 50435, Role: greengage.MirrorRole},
+		{DbID: 5, ContentID: 1, Hostname: "sdw2", DataDir: "/data/dbfast2/seg.HqtFHX54y0o.2", Port: 50436, Role: greengage.PrimaryRole},
+		{DbID: 6, ContentID: 1, Hostname: "sdw1", DataDir: "/data/dbfast_mirror2/seg.HqtFHX54y0o.2", Port: 50437, Role: greengage.MirrorRole},
+	})
+	t.Run("succeeds", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		sdw1 := mock_idl.NewMockAgentClient(ctrl)
+		sdw1.EXPECT().RsyncTablespaceDirectories(
+			gomock.Any(),
+			&idl.RsyncRequest{
+				Options: []*idl.RsyncRequest_RsyncOptions{
+					{
+						Sources:         []string{"/tmp/ts1/3/"},
+						Destination:     "/tmp/ts1/4",
+						DestinationHost: "sdw2",
+						Options:         []string{"--archive", "--delete", "--hard-links", "--size-only", "--no-inc-recursive"},
+					}},
+			},
+		).Return(&idl.RsyncReply{}, nil)
+
+		sdw2 := mock_idl.NewMockAgentClient(ctrl)
+		sdw2.EXPECT().RsyncTablespaceDirectories(
+			gomock.Any(),
+			&idl.RsyncRequest{
+				Options: []*idl.RsyncRequest_RsyncOptions{
+					{
+						Sources:         []string{"/tmp/ts1/5/"},
+						Destination:     "/tmp/ts1/6",
+						DestinationHost: "sdw1",
+						Options:         []string{"--archive", "--delete", "--hard-links", "--size-only", "--no-inc-recursive"},
+					}},
+			},
+		).Return(&idl.RsyncReply{}, nil)
+
+		agentConns := []*idl.Connection{
+			{AgentClient: sdw1, Hostname: "sdw1"},
+			{AgentClient: sdw2, Hostname: "sdw2"},
+		}
+
+		err := hub.RsyncMirrorTablespacesOnSegments(agentConns, source, intermediate)
+		if err != nil {
+			t.Errorf("unexpected err %#v", err)
 		}
 	})
 }
