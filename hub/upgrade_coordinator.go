@@ -91,13 +91,10 @@ PGPORT=%d`, pgUpgradeDir,
 		return utils.NewNextActionErr(xerrors.Errorf("%s master: %v", action, err), nextAction)
 	}
 
-	if source.Version.Major >= 6 && action != idl.PgOptions_check {
-		return updateIntermediateTablespaceOids(source, intermediate)
-	}
 	return nil
 }
 
-func updateIntermediateTablespaceOids(source *greengage.Cluster, intermediate *greengage.Cluster) (err error) {
+func UpdateIntermediateTablespaceOids(source *greengage.Cluster, intermediate *greengage.Cluster) (err error) {
 	err = intermediate.Start(step.DevNullStream)
 	if err != nil {
 		return err

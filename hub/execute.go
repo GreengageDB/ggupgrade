@@ -60,8 +60,17 @@ func (s *Server) Execute(req *idl.ExecuteRequest, stream idl.CliToHub_ExecuteSer
 			return err
 		}
 
-		// update intermediate cluster tablespaces
-		return s.Write()
+		if s.Source.Version.Major >= 6 {
+			err = UpdateIntermediateTablespaceOids(s.Source, s.Intermediate)
+			if err != nil {
+				return err
+			}
+
+			// update intermediate cluster tablespaces in config file
+			return s.Write()
+		}
+
+		return nil
 	})
 
 	st.Run(idl.Substep_copy_master, func(streams step.OutStreams) error {
