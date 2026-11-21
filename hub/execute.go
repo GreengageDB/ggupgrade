@@ -61,7 +61,7 @@ func (s *Server) Execute(req *idl.ExecuteRequest, stream idl.CliToHub_ExecuteSer
 		}
 
 		// update intermediate cluster tablespaces
-		return s.Config.Write()
+		return s.Write()
 	})
 
 	st.Run(idl.Substep_copy_master, func(streams step.OutStreams) error {

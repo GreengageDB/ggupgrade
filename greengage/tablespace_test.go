@@ -232,12 +232,14 @@ func TestNewTablespaces(t *testing.T) {
 				1: {
 					1663: {
 						Location:    "/tmp/coordinator/gpseg-1",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 				},
 				2: {
 					1663: {
 						Location:    "/tmp/primary/gpseg-1",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 				},
@@ -287,20 +289,24 @@ func TestNewTablespaces(t *testing.T) {
 				1: {
 					1663: {
 						Location:    "/tmp/coordinator/gpseg-1",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 					1664: {
 						Location:    "/tmp/coordinator/1664",
+						Name:        "my_tablespace",
 						UserDefined: true,
 					},
 				},
 				2: {
 					1663: {
 						Location:    "/tmp/primary/gpseg0",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 					1664: {
 						Location:    "/tmp/primary/1664",
+						Name:        "my_tablespace",
 						UserDefined: true,
 					},
 				},
@@ -412,12 +418,14 @@ func TestTablespacesFromDB(t *testing.T) {
 			1: {
 				1663: {
 					Location:    "/tmp/coordinator_tablespace",
+					Name:        "pg_default",
 					UserDefined: false,
 				},
 			},
 			2: {
 				1663: {
 					Location:    "/tmp/my_tablespace",
+					Name:        "pg_default",
 					UserDefined: false,
 				},
 			},

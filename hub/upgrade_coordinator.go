@@ -110,7 +110,9 @@ func updateIntermediateTablespaceOids(source *greengage.Cluster, intermediate *g
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer func() {
+		err = conn.Close()
+	}()
 	name2OidMap, err := greengage.MapSpcname2Oid(conn)
 	if err != nil {
 		return err
