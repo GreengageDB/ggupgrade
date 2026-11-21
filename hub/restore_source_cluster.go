@@ -277,7 +277,7 @@ func RelinkCoordinatorAndPrimariesTablespace(agentConns []*idl.Connection, sourc
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		errs <- upgrade.RelinkTablespaces(strconv.Itoa(source.Coordinator().DbID), source.CoordinatorDataDir())
+		errs <- upgrade.RelinkTablespaces(strconv.Itoa(source.Coordinator().DbID), source.CoordinatorDataDir(), source.Tablespaces.GetCoordinatorTablespaces())
 	}()
 
 	errs <- RelinkTableSpacesOnSegments(agentConns, source, func(seg *greengage.SegConfig) bool {

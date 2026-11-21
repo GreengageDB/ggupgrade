@@ -614,23 +614,25 @@ func VerifyTablespaceLinks(t *testing.T, target greengage.Cluster) {
 		strconv.Itoa(target.Standby().DbID))
 }
 
-func RecreateDirectoryOnAllHosts(t *testing.T, cluster greengage.Cluster, dir string) {
+func RecreateDirectoriesOnAllHosts(t *testing.T, cluster greengage.Cluster, dirs []string) {
 	t.Helper()
 
-	// Just in case
-	if dir == "" || dir == "/" {
-		t.Fatalf("%s is root", dir)
-	}
-
-	hosts := cluster.Hosts()
-	for _, host := range hosts {
-		output, err := exec.Command("ssh", host, "rm", "-rf", dir).CombinedOutput()
-		if err != nil {
-			t.Fatalf("failed to remove directory %s on host %s: %s", dir, host, string(output))
+	for _, dir := range dirs {
+		// Just in case
+		if dir == "" || dir == "/" {
+			t.Fatalf("%s is root", dir)
 		}
-		output, err = exec.Command("ssh", host, "mkdir", "-p", dir).CombinedOutput()
-		if err != nil {
-			t.Fatalf("failed to create directory %s on host %s: %s", dir, host, string(output))
+
+		hosts := cluster.Hosts()
+		for _, host := range hosts {
+			output, err := exec.Command("ssh", host, "rm", "-rf", dir).CombinedOutput()
+			if err != nil {
+				t.Fatalf("failed to remove directory %s on host %s: %s", dir, host, string(output))
+			}
+			output, err = exec.Command("ssh", host, "mkdir", "-p", dir).CombinedOutput()
+			if err != nil {
+				t.Fatalf("failed to create directory %s on host %s: %s", dir, host, string(output))
+			}
 		}
 	}
 }

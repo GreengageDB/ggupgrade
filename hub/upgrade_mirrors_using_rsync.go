@@ -200,15 +200,16 @@ func RenameMirrorTablespacesOnSegments(agentConns []*idl.Connection, source *gre
 	return ExecuteRPC(agentConns, request)
 }
 
-func RelinkTableSpacesOnSegments(agentConns []*idl.Connection, intermediate *greengage.Cluster, segSelector func(segment *greengage.SegConfig) bool) error {
+func RelinkTableSpacesOnSegments(agentConns []*idl.Connection, cluster *greengage.Cluster, segSelector func(segment *greengage.SegConfig) bool) error {
 	request := func(conn *idl.Connection) error {
-		intermediateMirrors := intermediate.SelectSegments(func(seg *greengage.SegConfig) bool {
+		segments := cluster.SelectSegments(func(seg *greengage.SegConfig) bool {
 			return seg.IsOnHost(conn.Hostname) && segSelector(seg)
 		})
-		for _, intermediateMirror := range intermediateMirrors {
+		for _, seg := range segments {
 			_, err := conn.AgentClient.RelinkTablespacesOnSegment(context.Background(), &idl.RelinkTablespacesRequest{
-				DataDir: intermediateMirror.DataDir,
-				Dbid:    int32(intermediateMirror.DbID),
+				DataDir:     seg.DataDir,
+				Dbid:        int32(seg.DbID),
+				Tablespaces: cluster.Tablespaces[int32(cluster.Primaries[seg.ContentID].DbID)],
 			})
 			if err != nil {
 				return err

@@ -1,20 +1,46 @@
-select spcname from pg_tablespace;
- spcname         
------------------
- pg_default      
- pg_global       
- test_tablespace 
-(3 rows)
+select -1 as gp_segment_id, spcname, pg_tablespace_location(oid) as location from pg_tablespace union all select gp_segment_id, spcname, pg_tablespace_location(oid) as location from gp_dist_random('pg_tablespace');
+ gp_segment_id | spcname          | location         
+---------------+------------------+------------------
+ -1            | pg_default       |                  
+ -1            | pg_global        |                  
+ -1            | test_tablespace1 | /tmp/tablespace1 
+ -1            | test_tablespace2 | /tmp/tablespace2 
+ 1             | pg_default       |                  
+ 1             | pg_global        |                  
+ 1             | test_tablespace1 | /tmp/tablespace1 
+ 1             | test_tablespace2 | /tmp/tablespace3 
+ 2             | pg_default       |                  
+ 2             | pg_global        |                  
+ 2             | test_tablespace1 | /tmp/tablespace1 
+ 2             | test_tablespace2 | /tmp/tablespace2 
+ 0             | pg_default       |                  
+ 0             | pg_global        |                  
+ 0             | test_tablespace1 | /tmp/tablespace1 
+ 0             | test_tablespace2 | /tmp/tablespace2 
+(16 rows)
 
-select count(*) from ts_test;
+select count(*) from ts1_test;
+ count 
+-------
+ 10000 
+(1 row)
+select count(*) from ts2_test;
  count 
 -------
  10000 
 (1 row)
 
-drop table ts_test;
+drop table ts1_test;
 DROP TABLE
-drop tablespace test_tablespace;
+drop table ts2_test;
+DROP TABLE
+drop tablespace test_tablespace1;
 DROP TABLESPACE
-! rm -rf /tmp/tablespace;
+drop tablespace test_tablespace2;
+DROP TABLESPACE
+! rm -rf /tmp/tablespace1;
+
+! rm -rf /tmp/tablespace2;
+
+! rm -rf /tmp/tablespace3;
 

@@ -77,7 +77,7 @@ func upgradePrimarySegment(host string, opt *idl.PgOptions) error {
 		if targetMajorVersion.Major <= 6 {
 			err = RestoreTablespaces5Xto6X(opt.GetBackupDir(), opt.GetTablespaces(), opt.GetOldDBID(), opt.GetNewDataDir())
 		} else {
-			err = upgrade.RelinkTablespaces(opt.GetOldDBID(), opt.GetNewDataDir())
+			err = upgrade.RelinkTablespaces(opt.GetOldDBID(), opt.GetNewDataDir(), opt.GetTablespaces())
 		}
 
 		if err != nil {

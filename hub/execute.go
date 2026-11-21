@@ -55,7 +55,13 @@ func (s *Server) Execute(req *idl.ExecuteRequest, stream idl.CliToHub_ExecuteSer
 
 	pgUpgradeTimestamp := utils.System.Now().Format(TimeStringFormat)
 	st.Run(idl.Substep_upgrade_master, func(streams step.OutStreams) error {
-		return UpgradeCoordinator(streams, s.BackupDirs.CoordinatorBackupDir, req.GetPgUpgradeVerbose(), req.GetSkipPgUpgradeChecks(), s.PgUpgradeJobs, s.Source, s.Intermediate, idl.PgOptions_upgrade, s.Mode, pgUpgradeTimestamp)
+		err := UpgradeCoordinator(streams, s.BackupDirs.CoordinatorBackupDir, req.GetPgUpgradeVerbose(), req.GetSkipPgUpgradeChecks(), s.PgUpgradeJobs, s.Source, s.Intermediate, idl.PgOptions_upgrade, s.Mode, pgUpgradeTimestamp)
+		if err != nil {
+			return err
+		}
+
+		// update intermediate cluster tablespaces
+		return s.Config.Write()
 	})
 
 	st.Run(idl.Substep_copy_master, func(streams step.OutStreams) error {

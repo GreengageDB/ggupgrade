@@ -534,6 +534,32 @@ func TestRelinkCoordinatorAndPrimariesTablespace(t *testing.T) {
 			{DbID: 6, ContentID: 2, Hostname: "msdw2", DataDir: "/data/dbfast_mirror2/seg2", Role: greengage.MirrorRole},
 		})
 
+		tablespaces := greengage.Tablespaces{
+			1: {
+				16000: {
+					Location:    "/tmp/ts1",
+					Name:        "ts1",
+					UserDefined: true,
+				},
+			},
+			3: {
+				16000: {
+					Location:    "/tmp/ts1",
+					Name:        "ts1",
+					UserDefined: true,
+				},
+			},
+			5: {
+				16000: {
+					Location:    "/tmp/ts1",
+					Name:        "ts1",
+					UserDefined: true,
+				},
+			},
+		}
+
+		cluster.Tablespaces = tablespaces
+
 		agentConns := []*idl.Connection{
 			{AgentClient: sdw1, Hostname: "sdw1"},
 			{AgentClient: sdw2, Hostname: "sdw2"},
@@ -542,16 +568,18 @@ func TestRelinkCoordinatorAndPrimariesTablespace(t *testing.T) {
 		sdw1.EXPECT().RelinkTablespacesOnSegment(
 			gomock.Any(),
 			&idl.RelinkTablespacesRequest{
-				DataDir: "/data/dbfast1/seg1",
-				Dbid:    3,
+				DataDir:     "/data/dbfast1/seg1",
+				Dbid:        3,
+				Tablespaces: tablespaces[3],
 			},
 		).Return(&idl.RelinkTablespacesReply{}, nil)
 
 		sdw2.EXPECT().RelinkTablespacesOnSegment(
 			gomock.Any(),
 			&idl.RelinkTablespacesRequest{
-				DataDir: "/data/dbfast2/seg2",
-				Dbid:    5,
+				DataDir:     "/data/dbfast2/seg2",
+				Dbid:        5,
+				Tablespaces: tablespaces[5],
 			},
 		).Return(&idl.RelinkTablespacesReply{}, nil)
 

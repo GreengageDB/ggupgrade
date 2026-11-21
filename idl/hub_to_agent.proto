@@ -65,7 +65,8 @@ message PgOptions {
 
 message TablespaceInfo {
   string Location = 1;
-  bool UserDefined = 2;
+  string Name = 2;
+  bool UserDefined = 3;
 }
 
 message UpgradePrimariesRequest {
@@ -205,6 +206,7 @@ message AddReplicationEntriesReply {}
 message RelinkTablespacesRequest {
   string dataDir = 1;
   int32 dbid = 2;
+  map<int32, TablespaceInfo> Tablespaces = 3;
 }
 
 message RelinkTablespacesReply {} 

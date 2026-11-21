@@ -67,7 +67,7 @@ func testFinalize(t *testing.T, mode idl.Mode, useHbaHostnames bool) {
 	defer testutils.MustExecuteSQL(t, source.Connection(greengage.Database("postgres")), fmt.Sprintf(`DROP TABLE %s;`, table))
 
 	tablespaceDir := "/tmp/test_tablespace"
-	testutils.RecreateDirectoryOnAllHosts(t, source, tablespaceDir)
+	testutils.RecreateDirectoriesOnAllHosts(t, source, []string{tablespaceDir, tablespaceDir + "2", tablespaceDir + "3"})
 	testutils.MustAddTablespace(t, source, tablespaceDir)
 	defer testutils.MustDeleteTablespaces(t, source, acceptance.GetTempTargetCluster(t))
 
@@ -348,7 +348,7 @@ func testFinalizeInDistributedCluster(t *testing.T, mode idl.Mode) {
 	}
 
 	tablespaceDir := "/tmp/test_tablespace"
-	testutils.RecreateDirectoryOnAllHosts(t, source, tablespaceDir)
+	testutils.RecreateDirectoriesOnAllHosts(t, source, []string{tablespaceDir, tablespaceDir + "2", tablespaceDir + "3"})
 	testutils.MustAddTablespace(t, source, tablespaceDir)
 	defer testutils.MustDeleteTablespaces(t, source, source) // since we revert we need to remove tablespaces from the source cluster and not the target
 

@@ -38,12 +38,22 @@ const tablespacesQuery5X = `
 const tablespacesQuery6XAndNewer = `
 select 
     dbid,
-    pg_tablespace.oid,
+    pt.oid,
     spcname as name,
-    pg_tablespace_location(pg_tablespace.oid) as location,
+    pg_tablespace_location(pt.oid) as location,
     1 as userdefined
-    from pg_tablespace, gp_segment_configuration
-    where spcname not in ('pg_default', 'pg_global') and role = 'p';`
+    from gp_dist_random('pg_tablespace') as pt
+    join gp_segment_configuration as gsc on gsc.content = pt.gp_segment_id
+    where spcname not in ('pg_default', 'pg_global') and role = 'p'
+    union all
+    select 
+    dbid,
+    pt.oid,
+    spcname as name,
+    pg_tablespace_location(pt.oid) as location,
+    1 as userdefined from
+    pg_tablespace pt, gp_segment_configuration
+    where content = -1 and role = 'p' and spcname not in ('pg_default', 'pg_global');`
 
 // map<tablespaceOid, tablespaceInfo>
 type SegmentTablespaces map[int32]*idl.TablespaceInfo
@@ -57,7 +67,6 @@ type TablespaceTuples []Tablespace
 type Tablespace struct {
 	DbId int32
 	Oid  int32
-	Name string
 	Info *idl.TablespaceInfo
 }
 
@@ -108,7 +117,7 @@ func GetTablespaceTuples(db *sql.DB, version uint) (TablespaceTuples, error) {
 	for rows.Next() {
 		var ts Tablespace
 		ts.Info = &idl.TablespaceInfo{}
-		if err := rows.Scan(&ts.DbId, &ts.Oid, &ts.Name, &ts.Info.Location, &ts.Info.UserDefined); err != nil {
+		if err := rows.Scan(&ts.DbId, &ts.Oid, &ts.Info.Name, &ts.Info.Location, &ts.Info.UserDefined); err != nil {
 			return nil, xerrors.Errorf("scanning pg_tablespace: %w", err)
 
 		}
@@ -128,7 +137,10 @@ func GetTablespaceTuples(db *sql.DB, version uint) (TablespaceTuples, error) {
 func NewTablespaces(tuples TablespaceTuples) Tablespaces {
 	clusterTablespaceMap := make(Tablespaces)
 	for _, t := range tuples {
-		tablespaceInfo := idl.TablespaceInfo{Location: t.Info.GetLocation(), UserDefined: t.Info.GetUserDefined()}
+		tablespaceInfo := idl.TablespaceInfo{
+			Location:    t.Info.GetLocation(),
+			Name:        t.Info.Name,
+			UserDefined: t.Info.GetUserDefined()}
 		if segTablespaceMap, ok := clusterTablespaceMap[t.DbId]; ok {
 			segTablespaceMap[t.Oid] = &tablespaceInfo
 			clusterTablespaceMap[t.DbId] = segTablespaceMap
@@ -149,7 +161,7 @@ func (t TablespaceTuples) Write(w io.Writer) error {
 		line := []string{
 			strconv.Itoa(int(tablespace.DbId)),
 			strconv.Itoa(int(tablespace.Oid)),
-			tablespace.Name,
+			tablespace.Info.Name,
 			tablespace.Info.GetLocation(),
 			boolToStrInt(tablespace.Info.GetUserDefined())}
 		if err := writer.Write(line); err != nil {
@@ -203,4 +215,22 @@ func TablespacesFromDB6XAndNewer(db *sql.DB) (Tablespaces, error) {
 	}
 
 	return NewTablespaces(tablespaceTuples), nil
+}
+
+func MapSpcname2Oid(db *sql.DB) (map[string]int32, error) {
+	rows, err := db.Query("select spcname, oid from pg_tablespace where spcname not in ('pg_default', 'pg_global');")
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]int32)
+	for rows.Next() {
+		var spcname string
+		var oid int32
+		if err := rows.Scan(&spcname, &oid); err != nil {
+			return nil, xerrors.Errorf("scanning pg_tablespace: %w", err)
+		}
+		result[spcname] = oid
+	}
+	return result, nil
 }

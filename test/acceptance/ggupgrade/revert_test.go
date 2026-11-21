@@ -179,8 +179,10 @@ func testRevertAfterExecute(t *testing.T, mode idl.Mode, upgradeFailure UpgradeF
 	tempDir := testutils.GetTempDir(t, "")
 	defer testutils.MustRemoveAll(t, tempDir)
 	tablespaceDir := "/tmp/test_tablespace"
+	tablespaceDir2 := "/tmp/test_tablespace2"
+	tablespaceDir3 := "/tmp/test_tablespace3"
 
-	testutils.RecreateDirectoryOnAllHosts(t, source, tablespaceDir)
+	testutils.RecreateDirectoriesOnAllHosts(t, source, []string{tablespaceDir, tablespaceDir2, tablespaceDir3})
 	// add tablespace
 	testutils.MustAddTablespace(t, source, tablespaceDir)
 	defer testutils.MustDeleteTablespaces(t, source, source) // since we revert we need to remove tablespaces from the source cluster and not the target
