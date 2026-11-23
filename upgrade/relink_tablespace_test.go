@@ -97,7 +97,7 @@ func TestRelinkTablespace(t *testing.T) {
 		defer utils.ResetSystemFunctions()
 		err := upgrade.RelinkTablespaces("1", "/datadir", nil)
 		var expected *strconv.NumError
-		if errors.Is(err, expected) {
+		if !errors.As(err, &expected) {
 			t.Errorf("got %#v want %#v", err, expected)
 		}
 	})
@@ -121,7 +121,7 @@ func TestRelinkTablespace(t *testing.T) {
 		defer utils.ResetSystemFunctions()
 		err := upgrade.RelinkTablespaces("1", "/datadir", tablespaces)
 		expected := xerrors.Errorf("the file in the pg_tblspc is not a table space: %d", 16000)
-		if errors.Is(err, expected) {
+		if err.Error() != expected.Error() {
 			t.Errorf("got %#v want %#v", err, expected)
 		}
 	})

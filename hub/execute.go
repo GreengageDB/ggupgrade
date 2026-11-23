@@ -5,6 +5,7 @@ package hub
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/GreengageDB/ggupgrade/config/backupdir"
@@ -61,7 +62,7 @@ func (s *Server) Execute(req *idl.ExecuteRequest, stream idl.CliToHub_ExecuteSer
 		}
 
 		if s.Source.Version.Major >= 6 {
-			err = UpdateIntermediateTablespaceOids(s.Source, s.Intermediate)
+			err = UpdateIntermediateTablespaceOids(s.Source, s.Intermediate, sql.Open)
 			if err != nil {
 				return err
 			}
