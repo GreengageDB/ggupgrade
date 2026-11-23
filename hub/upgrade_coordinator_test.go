@@ -602,7 +602,9 @@ func TestUpdateIntermediateTablespaceOids(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove("/tmp/postmaster.pid")
+		defer func() {
+			_ = os.Remove("/tmp/postmaster.pid")
+		}()
 		err = fd.Close()
 		if err != nil {
 			t.Fatal(err)
@@ -648,7 +650,9 @@ func TestUpdateIntermediateTablespaceOids(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove("/tmp/postmaster.pid")
+		defer func() {
+			_ = os.Remove("/tmp/postmaster.pid")
+		}()
 		err = fd.Close()
 		if err != nil {
 			t.Fatal(err)
