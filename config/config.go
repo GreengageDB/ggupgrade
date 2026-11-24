@@ -132,7 +132,14 @@ func Create(db *sql.DB, hubPort int, agentPort int, sourceGPHome string, targetG
 	}
 
 	if config.Source.Version.Major == 5 {
-		config.Source.Tablespaces, err = greengage.TablespacesFromDB(db, utils.GetStateDirOldTablespacesFile())
+		config.Source.Tablespaces, err = greengage.TablespacesFromDB5X(db, utils.GetStateDirOldTablespacesFile())
+		if err != nil {
+			return Config{}, xerrors.Errorf("extract tablespace information: %w", err)
+		}
+	}
+
+	if config.Source.Version.Major >= 6 {
+		config.Source.Tablespaces, err = greengage.TablespacesFromDB6XAndNewer(db)
 		if err != nil {
 			return Config{}, xerrors.Errorf("extract tablespace information: %w", err)
 		}

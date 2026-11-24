@@ -4,6 +4,7 @@
 package hub_test
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
@@ -16,8 +17,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blang/semver/v4"
-
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/GreengageDB/ggupgrade/config/backupdir"
 	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/hub"
@@ -28,7 +28,10 @@ import (
 	"github.com/GreengageDB/ggupgrade/testutils/testlog"
 	"github.com/GreengageDB/ggupgrade/upgrade"
 	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/GreengageDB/ggupgrade/utils/errorlist"
 	"github.com/GreengageDB/ggupgrade/utils/rsync"
+	"github.com/blang/semver/v4"
+	"golang.org/x/xerrors"
 )
 
 const FailureStdout = `
@@ -58,6 +61,23 @@ Checking for users assigned the gphdfs role                 fatal [ 36ms ]
 
 Failure, exiting
 `
+
+func gpcommand() {
+	args := os.Args
+	fmt.Println(args)
+	if strings.Contains(args[2], "gpstop") {
+		os.Exit(1)
+	}
+}
+
+func init() {
+
+	exectest.RegisterMains(
+		exectest.Success,
+		exectest.Failure,
+		gpcommand,
+	)
+}
 
 func PgCheckFailure() {
 	_, _ = os.Stdout.WriteString(FailureStdout)
@@ -362,6 +382,330 @@ func TestRsyncCoordinatorDir(t *testing.T) {
 		stderr := stream.StderrBuf.String()
 		if stderr != hub.StreamingMainStderr {
 			t.Errorf("got stderr %q, want %q", stderr, hub.StreamingMainStderr)
+		}
+	})
+}
+
+func TestUpdateIntermediateTablespaceOids(t *testing.T) {
+	query := `select spcname, oid from pg_tablespace where spcname not in \('pg_default', 'pg_global'\);`
+
+	source := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, Port: 5432, DataDir: "/data/cdw", DbID: 1, Role: greengage.PrimaryRole},
+		{ContentID: -1, Port: 5433, DataDir: "/data/standby", DbID: 2, Role: greengage.MirrorRole},
+		{ContentID: 0, Port: 6000, DataDir: "/data/sdw1", DbID: 3, Role: greengage.PrimaryRole},
+		{ContentID: 0, Port: 6000, DataDir: "/data/mdw1", DbID: 4, Role: greengage.MirrorRole},
+		{ContentID: 1, Port: 6001, DataDir: "/data/sdw2", DbID: 5, Role: greengage.PrimaryRole},
+		{ContentID: 2, Port: 6001, DataDir: "/data/mdw2", DbID: 6, Role: greengage.MirrorRole},
+	})
+	intermediate := hub.MustCreateCluster(t, greengage.SegConfigs{
+		{ContentID: -1, Port: 5432, DataDir: "/tmp/", DbID: 1, Role: greengage.PrimaryRole},
+	})
+
+	tablespaces := greengage.Tablespaces{
+		-1: {
+			16000: {
+				Location:    "/tmp/ts1",
+				Name:        "ts1",
+				UserDefined: true,
+			},
+			17000: {
+				Location:    "/tmp/ts2",
+				Name:        "ts2",
+				UserDefined: true,
+			},
+		},
+		0: {
+			16000: {
+				Location:    "/tmp/ts1",
+				Name:        "ts1",
+				UserDefined: true,
+			},
+			17000: {
+				Location:    "/tmp/ts2",
+				Name:        "ts2",
+				UserDefined: true,
+			},
+		},
+		1: {
+			16000: {
+				Location:    "/tmp/ts3",
+				Name:        "ts1",
+				UserDefined: true,
+			},
+			17000: {
+				Location:    "/tmp/ts2",
+				Name:        "ts2",
+				UserDefined: true,
+			},
+		},
+	}
+
+	t.Run("UpdateIntermediateTablespaceOids success", func(t *testing.T) {
+		greengage.SetGreengageCommand(exectest.NewCommand(hub.Success))
+		defer greengage.ResetGreengageCommand()
+
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer testutils.FinishMock(mock, t)
+
+		rows := mock.NewRows([]string{"spcname", "oid"})
+		rows.AddRow("ts1", 26000)
+		rows.AddRow("ts2", 27000)
+		mock.ExpectQuery(query).WillReturnRows(rows)
+		mock.ExpectClose()
+
+		openDB := func(driver, dsn string) (*sql.DB, error) {
+			return db, nil
+		}
+
+		source.Tablespaces = tablespaces
+		defer func() {
+			source.Tablespaces = nil
+		}()
+		err = hub.UpdateIntermediateTablespaceOids(source, intermediate, openDB)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		tablespaces := greengage.Tablespaces{
+			-1: {
+				26000: {
+					Location:    "/tmp/ts1",
+					Name:        "ts1",
+					UserDefined: true,
+				},
+				27000: {
+					Location:    "/tmp/ts2",
+					Name:        "ts2",
+					UserDefined: true,
+				},
+			},
+			0: {
+				26000: {
+					Location:    "/tmp/ts1",
+					Name:        "ts1",
+					UserDefined: true,
+				},
+				27000: {
+					Location:    "/tmp/ts2",
+					Name:        "ts2",
+					UserDefined: true,
+				},
+			},
+			1: {
+				26000: {
+					Location:    "/tmp/ts3",
+					Name:        "ts1",
+					UserDefined: true,
+				},
+				27000: {
+					Location:    "/tmp/ts2",
+					Name:        "ts2",
+					UserDefined: true,
+				},
+			},
+		}
+		if !reflect.DeepEqual(intermediate.Tablespaces, tablespaces) {
+			t.Errorf("got tablespaces %#v, want %#v", intermediate.Tablespaces, tablespaces)
+		}
+	})
+
+	t.Run("Fail to start intermediate cluster", func(t *testing.T) {
+		greengage.SetGreengageCommand(exectest.NewCommand(hub.Failure))
+		defer greengage.ResetGreengageCommand()
+		openDB := func(driver, dsn string) (*sql.DB, error) {
+			return nil, nil
+		}
+
+		var exitErr *exec.ExitError
+		err := hub.UpdateIntermediateTablespaceOids(source, intermediate, openDB)
+		if !errors.As(err, &exitErr) {
+			t.Errorf("got %v, want %v", err, os.ErrPermission)
+		}
+	})
+
+	t.Run("opendb fails", func(t *testing.T) {
+		greengage.SetGreengageCommand(exectest.NewCommand(hub.Success))
+		defer greengage.ResetGreengageCommand()
+		expected := errors.New("opendb fails")
+		openDB := func(driver, dsn string) (*sql.DB, error) {
+			return nil, expected
+		}
+
+		err := hub.UpdateIntermediateTablespaceOids(source, intermediate, openDB)
+		if !errors.Is(err, expected) {
+			t.Errorf("got %v, want %v", err, expected)
+		}
+	})
+
+	t.Run("MapSpcname2Oid errors", func(t *testing.T) {
+		greengage.SetGreengageCommand(exectest.NewCommand(hub.Success))
+		defer greengage.ResetGreengageCommand()
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer testutils.FinishMock(mock, t)
+
+		expected := errors.New("MapSpcname2Oid fails")
+		mock.ExpectQuery(query).WillReturnError(expected)
+		mock.ExpectClose()
+
+		openDB := func(driver, dsn string) (*sql.DB, error) {
+			return db, nil
+		}
+		err = hub.UpdateIntermediateTablespaceOids(source, intermediate, openDB)
+		if !errors.Is(err, expected) {
+			t.Errorf("got %v, want %v", err, expected)
+		}
+	})
+
+	t.Run("intermediate cluster lack of the tablespace", func(t *testing.T) {
+		greengage.SetGreengageCommand(exectest.NewCommand(hub.Success))
+		defer greengage.ResetGreengageCommand()
+
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer testutils.FinishMock(mock, t)
+
+		rows := mock.NewRows([]string{"spcname", "oid"})
+		rows.AddRow("ts1", 26000)
+		mock.ExpectQuery(query).WillReturnRows(rows)
+		mock.ExpectClose()
+
+		openDB := func(driver, dsn string) (*sql.DB, error) {
+			return db, nil
+		}
+
+		source.Tablespaces = tablespaces
+		defer func() {
+			source.Tablespaces = nil
+		}()
+
+		expected := xerrors.Errorf("the intermediate cluster does not have tablespace %s, while the source cluster has it.", "ts2")
+
+		err = hub.UpdateIntermediateTablespaceOids(source, intermediate, openDB)
+		if err.Error() != expected.Error() {
+			t.Errorf("got %v, want %v", err, expected)
+		}
+	})
+
+	t.Run("Stop intermediate cluster error", func(t *testing.T) {
+		greengage.SetIsCoordinatorRunningCommand(exectest.NewCommand(exectest.Success))
+		defer greengage.ResetIsCoordinatorRunningCommand()
+
+		fd, err := os.Create("/tmp/postmaster.pid")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() {
+			_ = os.Remove("/tmp/postmaster.pid")
+		}()
+		err = fd.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		greengage.SetGreengageCommand(exectest.NewCommand(gpcommand))
+		defer greengage.ResetGreengageCommand()
+
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer testutils.FinishMock(mock, t)
+
+		rows := mock.NewRows([]string{"spcname", "oid"})
+		rows.AddRow("ts1", 26000)
+		rows.AddRow("ts2", 27000)
+		mock.ExpectQuery(query).WillReturnRows(rows)
+		mock.ExpectClose()
+
+		openDB := func(driver, dsn string) (*sql.DB, error) {
+			return db, nil
+		}
+
+		source.Tablespaces = tablespaces
+		defer func() {
+			source.Tablespaces = nil
+		}()
+
+		err = hub.UpdateIntermediateTablespaceOids(source, intermediate, openDB)
+
+		var exitErr *exec.ExitError
+		if !errors.As(err, &exitErr) {
+			t.Errorf("got %v, want %v", err, exitErr)
+		}
+	})
+
+	t.Run("multiply errors", func(t *testing.T) {
+		greengage.SetIsCoordinatorRunningCommand(exectest.NewCommand(exectest.Success))
+		defer greengage.ResetIsCoordinatorRunningCommand()
+
+		fd, err := os.Create("/tmp/postmaster.pid")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() {
+			_ = os.Remove("/tmp/postmaster.pid")
+		}()
+		err = fd.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		greengage.SetGreengageCommand(exectest.NewCommand(gpcommand))
+		defer greengage.ResetGreengageCommand()
+
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer testutils.FinishMock(mock, t)
+
+		rows := mock.NewRows([]string{"spcname", "oid"})
+		rows.AddRow("ts1", 26000)
+		mock.ExpectQuery(query).WillReturnRows(rows)
+
+		expectedCloseError := errors.New("close error")
+
+		mock.ExpectClose().WillReturnError(expectedCloseError)
+
+		openDB := func(driver, dsn string) (*sql.DB, error) {
+			return db, nil
+		}
+
+		source.Tablespaces = tablespaces
+		defer func() {
+			source.Tablespaces = nil
+		}()
+
+		err = hub.UpdateIntermediateTablespaceOids(source, intermediate, openDB)
+
+		var errList errorlist.Errors
+		if !errors.As(err, &errList) {
+			t.Errorf("got %v, want %v", err, errList)
+		}
+
+		if len(errList) != 3 {
+			t.Errorf("got %v, want %v", len(errList), 3)
+		}
+
+		expectedMissError := xerrors.Errorf("the intermediate cluster does not have tablespace %s, while the source cluster has it.", "ts2")
+
+		if errList[0].Error() != expectedMissError.Error() {
+			t.Errorf("got %v, want %v", errList[0], expectedMissError)
+		}
+		if !errors.Is(errList[1], expectedCloseError) {
+			t.Errorf("got %v, want %v", errList[1], expectedCloseError)
+		}
+		var exitErr *exec.ExitError
+		if !errors.As(errList[2], &exitErr) {
+			t.Errorf("got %v, want %v", err, exitErr)
 		}
 	})
 }

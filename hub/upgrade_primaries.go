@@ -25,6 +25,13 @@ func UpgradePrimaries(agentConns []*idl.Connection, agentHostToBackupDir backupd
 		for _, intermediatePrimary := range intermediatePrimaries {
 			sourcePrimary := source.Primaries[intermediatePrimary.ContentID]
 
+			var tablespaces map[int32]*idl.TablespaceInfo
+			if intermediate.Version.Major == 5 {
+				tablespaces = source.Tablespaces[int32(intermediatePrimary.DbID)]
+			} else {
+				tablespaces = intermediate.Tablespaces[int32(intermediatePrimary.DbID)]
+			}
+
 			opt := &idl.PgOptions{
 				BackupDir:           agentHostToBackupDir[conn.Hostname],
 				PgUpgradeVerbose:    pgUpgradeVerbose,
@@ -44,7 +51,7 @@ func UpgradePrimaries(agentConns []*idl.Connection, agentHostToBackupDir backupd
 				NewDataDir:          intermediatePrimary.DataDir,
 				NewPort:             strconv.Itoa(intermediatePrimary.Port),
 				NewDBID:             strconv.Itoa(intermediatePrimary.DbID),
-				Tablespaces:         source.Tablespaces[int32(intermediatePrimary.DbID)],
+				Tablespaces:         tablespaces,
 				PgUpgradeTimestamp:  pgUpgradeTimestamp,
 			}
 			opts = append(opts, opt)

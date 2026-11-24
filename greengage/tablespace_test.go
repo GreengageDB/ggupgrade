@@ -11,17 +11,16 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/blang/semver/v4"
-	"github.com/pkg/errors"
-
 	"github.com/GreengageDB/ggupgrade/greengage"
 	"github.com/GreengageDB/ggupgrade/idl"
 	"github.com/GreengageDB/ggupgrade/testutils"
 	"github.com/GreengageDB/ggupgrade/utils"
+	"github.com/blang/semver/v4"
+	"github.com/pkg/errors"
 )
 
 func TestGetTablespaces(t *testing.T) {
-	t.Run("retrieves tablespaces", func(t *testing.T) {
+	t.Run("retrieves tablespaces 5X", func(t *testing.T) {
 		db, mock, err := sqlmock.New()
 		if err != nil {
 			t.Fatalf("couldn't create sqlmock: %v", err)
@@ -39,7 +38,7 @@ func TestGetTablespaces(t *testing.T) {
 
 		mock.ExpectQuery("SELECT").WillReturnRows(rows)
 
-		actual, err := greengage.GetTablespaceTuples(db)
+		actual, err := greengage.GetTablespaceTuples(db, 5)
 		if err != nil {
 			t.Errorf("returned error %+v", err)
 		}
@@ -48,14 +47,89 @@ func TestGetTablespaces(t *testing.T) {
 			greengage.Tablespace{
 				DbId: 1,
 				Oid:  1234,
-				Name: "pg_default",
-				Info: &idl.TablespaceInfo{Location: "/tmp/pg_default_tablespace", UserDefined: false},
+				Info: &idl.TablespaceInfo{Location: "/tmp/pg_default_tablespace", Name: "pg_default", UserDefined: false},
 			},
 			greengage.Tablespace{
 				DbId: 2,
 				Oid:  1235,
-				Name: "my_tablespace",
-				Info: &idl.TablespaceInfo{Location: "/tmp/my_tablespace", UserDefined: true},
+				Info: &idl.TablespaceInfo{Location: "/tmp/my_tablespace", Name: "my_tablespace", UserDefined: true},
+			},
+		}
+
+		if !reflect.DeepEqual(actual, expected) {
+			t.Errorf("got configuration %+v, want %+v", actual, expected)
+		}
+	})
+
+	t.Run("retrieves tablespaces 6X", func(t *testing.T) {
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("couldn't create sqlmock: %v", err)
+		}
+		defer testutils.FinishMock(mock, t)
+		defer func() {
+			if cErr := db.Close(); cErr != nil {
+				t.Logf("error during Close: %+v", cErr)
+			}
+		}()
+
+		rows := sqlmock.NewRows([]string{"dbid", "oid", "name", "location", "userdefined"})
+		rows.AddRow(1, 16000, "ts1", "/tmp/ts1", 1)
+		rows.AddRow(2, 16000, "ts1", "/tmp/ts1", 1)
+		rows.AddRow(3, 16000, "ts1", "/tmp/ts1", 1)
+		rows.AddRow(4, 16000, "ts1", "/tmp/ts1", 1)
+		rows.AddRow(1, 17000, "ts2", "/tmp/ts2", 1)
+		rows.AddRow(2, 17000, "ts2", "/tmp/ts2", 1)
+		rows.AddRow(3, 17000, "ts2", "/tmp/ts2", 1)
+		rows.AddRow(4, 17000, "ts2", "/tmp/ts2", 1)
+
+		mock.ExpectQuery("select").WillReturnRows(rows)
+
+		actual, err := greengage.GetTablespaceTuples(db, 6)
+		if err != nil {
+			t.Errorf("returned error %+v", err)
+		}
+
+		expected := greengage.TablespaceTuples{
+			greengage.Tablespace{
+				DbId: 1,
+				Oid:  16000,
+				Info: &idl.TablespaceInfo{Location: "/tmp/ts1", Name: "ts1", UserDefined: true},
+			},
+			greengage.Tablespace{
+				DbId: 2,
+				Oid:  16000,
+				Info: &idl.TablespaceInfo{Location: "/tmp/ts1", Name: "ts1", UserDefined: true},
+			},
+			greengage.Tablespace{
+				DbId: 3,
+				Oid:  16000,
+				Info: &idl.TablespaceInfo{Location: "/tmp/ts1", Name: "ts1", UserDefined: true},
+			},
+			greengage.Tablespace{
+				DbId: 4,
+				Oid:  16000,
+				Info: &idl.TablespaceInfo{Location: "/tmp/ts1", Name: "ts1", UserDefined: true},
+			},
+			greengage.Tablespace{
+				DbId: 1,
+				Oid:  17000,
+				Info: &idl.TablespaceInfo{Location: "/tmp/ts2", Name: "ts2", UserDefined: true},
+			},
+			greengage.Tablespace{
+				DbId: 2,
+				Oid:  17000,
+				Info: &idl.TablespaceInfo{Location: "/tmp/ts2", Name: "ts2", UserDefined: true},
+			},
+			greengage.Tablespace{
+				DbId: 3,
+				Oid:  17000,
+				Info: &idl.TablespaceInfo{Location: "/tmp/ts2", Name: "ts2", UserDefined: true},
+			},
+			greengage.Tablespace{
+				DbId: 4,
+				Oid:  17000,
+				Info: &idl.TablespaceInfo{Location: "/tmp/ts2", Name: "ts2", UserDefined: true},
 			},
 		}
 
@@ -71,16 +145,31 @@ func TestGetTablespaces(t *testing.T) {
 		name    string
 		version semver.Version
 		error   error
+		query   string
 	}{
+		{
+			name:    " query execution failed",
+			version: semver.MustParse("5.0.0"),
+			error:   expectedErr,
+			query:   "SELECT",
+		},
+		{
+			name:    "tablespace query execution failed",
+			version: semver.MustParse("5.0.0"),
+			error:   expectedErr,
+			query:   "SELECT",
+		},
 		{
 			name:    " query execution failed",
 			version: semver.MustParse("6.0.0"),
 			error:   expectedErr,
+			query:   "select",
 		},
 		{
 			name:    "tablespace query execution failed",
 			version: semver.MustParse("6.0.0"),
 			error:   expectedErr,
+			query:   "select",
 		},
 	}
 
@@ -97,9 +186,9 @@ func TestGetTablespaces(t *testing.T) {
 				}
 			}()
 
-			mock.ExpectQuery("SELECT").WillReturnError(c.error)
+			mock.ExpectQuery(c.query).WillReturnError(c.error)
 
-			tuples, err := greengage.GetTablespaceTuples(db)
+			tuples, err := greengage.GetTablespaceTuples(db, uint(c.version.Major))
 			if !errors.Is(err, c.error) {
 				t.Errorf("returned %#v want %#v", err, c.error)
 			}
@@ -123,18 +212,18 @@ func TestNewTablespaces(t *testing.T) {
 				{
 					DbId: 1,
 					Oid:  1663,
-					Name: "pg_default",
 					Info: &idl.TablespaceInfo{
 						Location:    "/tmp/coordinator/gpseg-1",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 				},
 				{
 					DbId: 2,
 					Oid:  1663,
-					Name: "pg_default",
 					Info: &idl.TablespaceInfo{
 						Location:    "/tmp/primary/gpseg-1",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 				},
@@ -143,12 +232,14 @@ func TestNewTablespaces(t *testing.T) {
 				1: {
 					1663: {
 						Location:    "/tmp/coordinator/gpseg-1",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 				},
 				2: {
 					1663: {
 						Location:    "/tmp/primary/gpseg-1",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 				},
@@ -160,36 +251,36 @@ func TestNewTablespaces(t *testing.T) {
 				{
 					DbId: 1,
 					Oid:  1663,
-					Name: "pg_default",
 					Info: &idl.TablespaceInfo{
 						Location:    "/tmp/coordinator/gpseg-1",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 				},
 				{
 					DbId: 1,
 					Oid:  1664,
-					Name: "my_tablespace",
 					Info: &idl.TablespaceInfo{
 						Location:    "/tmp/coordinator/1664",
+						Name:        "my_tablespace",
 						UserDefined: true,
 					},
 				},
 				{
 					DbId: 2,
 					Oid:  1663,
-					Name: "pg_default",
 					Info: &idl.TablespaceInfo{
 						Location:    "/tmp/primary/gpseg0",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 				},
 				{
 					DbId: 2,
 					Oid:  1664,
-					Name: "my_tablespace",
 					Info: &idl.TablespaceInfo{
 						Location:    "/tmp/primary/1664",
+						Name:        "my_tablespace",
 						UserDefined: true,
 					},
 				},
@@ -198,20 +289,24 @@ func TestNewTablespaces(t *testing.T) {
 				1: {
 					1663: {
 						Location:    "/tmp/coordinator/gpseg-1",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 					1664: {
 						Location:    "/tmp/coordinator/1664",
+						Name:        "my_tablespace",
 						UserDefined: true,
 					},
 				},
 				2: {
 					1663: {
 						Location:    "/tmp/primary/gpseg0",
+						Name:        "pg_default",
 						UserDefined: false,
 					},
 					1664: {
 						Location:    "/tmp/primary/1664",
+						Name:        "my_tablespace",
 						UserDefined: true,
 					},
 				},
@@ -248,7 +343,7 @@ func TestTablespacesFromDB(t *testing.T) {
 		expected := errors.New("connection failed")
 		mock.ExpectQuery("SELECT").WillReturnError(expected)
 
-		tablespaces, err := greengage.TablespacesFromDB(db, "")
+		tablespaces, err := greengage.TablespacesFromDB5X(db, "")
 		if !errors.Is(err, expected) {
 			t.Errorf("got %#v want %#v", err, expected)
 		}
@@ -268,7 +363,7 @@ func TestTablespacesFromDB(t *testing.T) {
 		expected := errors.New("failed to get tablespace information")
 		mock.ExpectQuery("SELECT .* upgrade_tablespace").WillReturnError(expected)
 
-		tablespaces, err := greengage.TablespacesFromDB(db, "")
+		tablespaces, err := greengage.TablespacesFromDB5X(db, "")
 
 		if err == nil {
 			t.Errorf("Expected an error, but got nil")
@@ -305,7 +400,7 @@ func TestTablespacesFromDB(t *testing.T) {
 		}()
 
 		expectedFileName := "/tmp/mappingFile.txt"
-		tablespaces, err := greengage.TablespacesFromDB(db, expectedFileName)
+		tablespaces, err := greengage.TablespacesFromDB5X(db, expectedFileName)
 
 		if err != nil {
 			t.Errorf("got unexpected error: %+v", err)
@@ -323,12 +418,14 @@ func TestTablespacesFromDB(t *testing.T) {
 			1: {
 				1663: {
 					Location:    "/tmp/coordinator_tablespace",
+					Name:        "pg_default",
 					UserDefined: false,
 				},
 			},
 			2: {
 				1663: {
 					Location:    "/tmp/my_tablespace",
+					Name:        "pg_default",
 					UserDefined: false,
 				},
 			},
@@ -358,7 +455,7 @@ func TestTablespacesFromDB(t *testing.T) {
 			createCalled = true
 			return nil, expectedError
 		}
-		_, err = greengage.TablespacesFromDB(db, expectedFileName)
+		_, err = greengage.TablespacesFromDB5X(db, expectedFileName)
 
 		if err == nil {
 			t.Errorf("expected error: %+v", expectedError)
@@ -382,18 +479,18 @@ func TestWrite(t *testing.T) {
 				greengage.Tablespace{
 					DbId: 1,
 					Oid:  1663,
-					Name: "default",
 					Info: &idl.TablespaceInfo{
 						Location:    "/tmp/coordinator/gpseg-1",
+						Name:        "default",
 						UserDefined: false,
 					},
 				},
 				greengage.Tablespace{
 					DbId: 2,
 					Oid:  1664,
-					Name: "my_tablespace",
 					Info: &idl.TablespaceInfo{
 						Location:    "/tmp/coordinator/gpseg-1",
+						Name:        "my_tablespace",
 						UserDefined: true,
 					},
 				},
@@ -413,4 +510,64 @@ func TestWrite(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMapSpcname2Oid(t *testing.T) {
+
+	query := `select spcname, oid from pg_tablespace where spcname not in \('pg_default', 'pg_global'\);`
+
+	t.Run("successfully create a map", func(t *testing.T) {
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("couldn't create sqlmock: %v", err)
+		}
+		defer testutils.FinishMock(mock, t)
+		defer func() {
+			if cErr := db.Close(); cErr != nil {
+				t.Logf("error during Close: %+v", cErr)
+			}
+		}()
+
+		rows := sqlmock.NewRows([]string{"spcname", "oid"})
+		rows.AddRow("ts1", 17000)
+		rows.AddRow("ts2", 18000)
+
+		mock.ExpectQuery(query).WillReturnRows(rows)
+
+		expected := map[string]int32{
+			"ts1": 17000,
+			"ts2": 18000,
+		}
+
+		result, err := greengage.MapSpcname2Oid(db)
+		if err != nil {
+			t.Fatalf("got unexpected error: %+v", err)
+		}
+		if !reflect.DeepEqual(result, expected) {
+			t.Errorf("expected: %#v got: %#v", expected, result)
+		}
+	})
+
+	t.Run("Error on query", func(t *testing.T) {
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("couldn't create sqlmock: %v", err)
+		}
+		defer testutils.FinishMock(mock, t)
+		defer func() {
+			if cErr := db.Close(); cErr != nil {
+				t.Logf("error during Close: %+v", cErr)
+			}
+		}()
+		expected := errors.New("query error")
+		mock.ExpectQuery(query).WillReturnError(expected)
+
+		result, err := greengage.MapSpcname2Oid(db)
+		if result != nil {
+			t.Errorf("expected: %#v got: %#v", nil, result)
+		}
+		if !errors.Is(err, expected) {
+			t.Errorf("expected: %#v got: %#v", expected, err)
+		}
+	})
 }

@@ -83,7 +83,14 @@ func checkDiskSpaceOnStandbyAndSegments(agentConns []*idl.Connection, errs chan<
 		var dirs []string
 		for _, seg := range segmentsExcludingCoordinator {
 			dirs = append(dirs, seg.DataDir)
-			dirs = append(dirs, sourceTablespaces[int32(seg.DbID)].UserDefinedTablespacesLocations()...)
+			if source.Version.Major < 6 {
+				dirs = append(dirs, sourceTablespaces[int32(seg.DbID)].UserDefinedTablespacesLocations()...)
+			}
+		}
+
+		// On 6X and newer tablespace location is the same on all hosts
+		if source.Version.Major >= 6 {
+			dirs = append(dirs, sourceTablespaces[int32(source.Coordinator().DbID)].UserDefinedTablespacesLocations()...)
 		}
 
 		wg.Add(1)

@@ -40,6 +40,14 @@ func TestFinalize(t *testing.T) {
 	t.Run("in link mode ggupgrade finalize should also delete mirror directories and honors --use-hba-hostnames", func(t *testing.T) {
 		testFinalize(t, idl.Mode_link, true)
 	})
+
+	t.Run("Upgrade cluster with user tablespaces in copy mode", func(t *testing.T) {
+		testFinalizeInDistributedCluster(t, idl.Mode_copy)
+	})
+
+	t.Run("Upgrade cluster with user tablespaces in link mode", func(t *testing.T) {
+		testFinalizeInDistributedCluster(t, idl.Mode_link)
+	})
 }
 
 func testFinalize(t *testing.T, mode idl.Mode, useHbaHostnames bool) {
@@ -58,9 +66,8 @@ func testFinalize(t *testing.T, mode idl.Mode, useHbaHostnames bool) {
 	testutils.MustExecuteSQL(t, source.Connection(greengage.Database("postgres")), fmt.Sprintf(`CREATE TABLE %s (a int); INSERT INTO %s VALUES (1), (2), (3);`, table, table))
 	defer testutils.MustExecuteSQL(t, source.Connection(greengage.Database("postgres")), fmt.Sprintf(`DROP TABLE %s;`, table))
 
-	tablespaceDir := testutils.GetTempDir(t, "")
-	defer testutils.MustRemoveAll(t, tablespaceDir)
-
+	tablespaceDir := "/tmp/test_tablespace"
+	testutils.RecreateDirectoriesOnAllHosts(t, source, []string{tablespaceDir, tablespaceDir + "2", tablespaceDir + "3"})
 	testutils.MustAddTablespace(t, source, tablespaceDir)
 	defer testutils.MustDeleteTablespaces(t, source, acceptance.GetTempTargetCluster(t))
 
@@ -100,6 +107,8 @@ func testFinalize(t *testing.T, mode idl.Mode, useHbaHostnames bool) {
 	if rows != expectedRows {
 		t.Fatalf("got %d want %d rows", rows, expectedRows)
 	}
+
+	testutils.VerifyTablespaceLinks(t, acceptance.GetTargetCluster(t))
 
 	testutils.VerifyTablespaceData(t, *conf.Target)
 
@@ -326,4 +335,27 @@ func parsePgHbaConfForHosts(t *testing.T, path string) []string {
 	sort.Strings(hosts)
 
 	return hosts
+}
+
+func testFinalizeInDistributedCluster(t *testing.T, mode idl.Mode) {
+	source := acceptance.GetSourceCluster(t)
+
+	// Run this test only on distributed cluster
+	if len(source.Hosts()) == 1 {
+		return
+	}
+
+	tablespaceDir := "/tmp/test_tablespace"
+	testutils.RecreateDirectoriesOnAllHosts(t, source, []string{tablespaceDir, tablespaceDir + "2", tablespaceDir + "3"})
+	testutils.MustAddTablespace(t, source, tablespaceDir)
+	defer testutils.MustDeleteTablespaces(t, source, source)
+
+	acceptance.Initialize(t, mode)
+	acceptance.Execute(t)
+	acceptance.Finalize(t)
+	target := acceptance.GetTargetCluster(t)
+
+	testutils.VerifyTablespaceLinks(t, target)
+
+	testutils.VerifyTablespaceData(t, target)
 }

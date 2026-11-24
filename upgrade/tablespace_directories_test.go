@@ -264,7 +264,7 @@ func TestVerifyTablespaceDirectories(t *testing.T) {
 
 	t.Run("succeeds with multiple non-legacy tablespace locations", func(t *testing.T) {
 		ts := fstest.MapFS{
-			filepath.Join("1", "GPDB_6_301908232"): {Mode: os.ModeDir},
+			filepath.Join("GPDB_6_301908232"): {Mode: os.ModeDir},
 		}
 
 		paths := []string{"/filespace/demoDataDir0/12812", "/filespace/demoDataDir0/12094"}
@@ -278,9 +278,9 @@ func TestVerifyTablespaceDirectories(t *testing.T) {
 
 	t.Run("does not error when tablespace directory contains additional files", func(t *testing.T) {
 		ts := fstest.MapFS{
-			"foo":                                  {},
-			filepath.Join("1", "bar"):              {},
-			filepath.Join("1", "GPDB_6_301908232"): {Mode: os.ModeDir},
+			"foo":                             {},
+			filepath.Join("bar"):              {},
+			filepath.Join("GPDB_6_301908232"): {Mode: os.ModeDir},
 		}
 
 		err := upgrade.VerifyTablespaceLocation(ts, "/filespace/demoDataDir0/16386")
@@ -340,11 +340,11 @@ func TestVerifyTablespaceDirectories(t *testing.T) {
 
 	t.Run("errors when failing to verify non-legacy tablespace directory", func(t *testing.T) {
 		ts := fstest.MapFS{
-			filepath.Join("1", "non_tablespace_directory"): {Mode: os.ModeDir},
+			filepath.Join("non_tablespace_directory"): {Mode: os.ModeDir},
 		}
 
 		err := upgrade.VerifyTablespaceLocation(ts, "/filespace/demoDataDir0/16386")
-		expected := xerrors.Errorf(`Invalid tablespace directory. Expected "1/non_tablespace_directory" to start with "GPDB_".`)
+		expected := xerrors.Errorf(`Invalid tablespace directory. Expected "non_tablespace_directory" to start with "GPDB_".`)
 		if err.Error() != expected.Error() {
 			t.Errorf("got error %#v want %#v", err, expected)
 		}
@@ -356,7 +356,7 @@ func TestVerifyTablespaceDirectories(t *testing.T) {
 		}
 
 		err := upgrade.VerifyTablespaceLocation(ts, "/filespace/demoDataDir0/16386")
-		expected := xerrors.Errorf(`invalid tablespace directory "/filespace/demoDataDir0/16386/1"`)
+		expected := xerrors.Errorf(`Invalid tablespace directory. Expected "1" to start with "GPDB_".`)
 		if err.Error() != expected.Error() {
 			t.Errorf("got error %#v want %#v", err, expected)
 		}
@@ -429,7 +429,7 @@ func TestVerifyLegacyTablespaceDirectory(t *testing.T) {
 func TestVerifyTablespaceDirectory(t *testing.T) {
 	t.Run("succeeds for tablespace directories", func(t *testing.T) {
 		ts := fstest.MapFS{
-			filepath.Join("1", "GPDB_6_301908232"): {Mode: os.ModeDir},
+			"GPDB_6_301908232": {Mode: os.ModeDir},
 		}
 
 		exists, err := upgrade.VerifyTablespaceDbIDDirectory(ts, "1")
@@ -449,7 +449,7 @@ func TestVerifyTablespaceDirectory(t *testing.T) {
 		}
 
 		exists, err := upgrade.VerifyTablespaceDbIDDirectory(ts, "12094")
-		if err != nil {
+		if err.Error() != "Invalid tablespace directory. Expected \"12094\" to start with \"GPDB_\"." {
 			t.Errorf("unexpected error %+v", err)
 		}
 
@@ -464,7 +464,7 @@ func TestVerifyTablespaceDirectory(t *testing.T) {
 		}
 
 		exists, err := upgrade.VerifyTablespaceDbIDDirectory(ts, "1")
-		expected := `Invalid tablespace directory. Expected "1/non_tablespace_directory" to start with "GPDB_".`
+		expected := `Invalid tablespace directory. Expected "1" to start with "GPDB_".`
 		if err.Error() != expected {
 			t.Errorf("got error %#v want %#v", err, expected)
 		}
@@ -476,8 +476,8 @@ func TestVerifyTablespaceDirectory(t *testing.T) {
 
 	t.Run("errors when failing to read directory", func(t *testing.T) {
 		exists, err := upgrade.VerifyTablespaceDbIDDirectory(fstest.MapFS{}, "1")
-		if !errors.Is(err, os.ErrNotExist) {
-			t.Errorf("got error %#v want %#v", err, os.ErrNotExist)
+		if err != nil {
+			t.Errorf("unexpected error %+v", err)
 		}
 
 		if exists {

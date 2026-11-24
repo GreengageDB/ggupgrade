@@ -4,6 +4,7 @@
 package hub
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -88,6 +89,42 @@ PGPORT=%d`, pgUpgradeDir,
 			filepath.Join(intermediate.GPHome, "greengage_path.sh"), intermediate.CoordinatorDataDir(), intermediate.CoordinatorPort())
 
 		return utils.NewNextActionErr(xerrors.Errorf("%s master: %v", action, err), nextAction)
+	}
+
+	return nil
+}
+
+func UpdateIntermediateTablespaceOids(source *greengage.Cluster, intermediate *greengage.Cluster, openDB func(string, string) (*sql.DB, error)) (err error) {
+	err = intermediate.Start(step.DevNullStream)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = errorlist.Append(err, intermediate.Stop(step.DevNullStream))
+	}()
+
+	conn, err := openDB("pgx", intermediate.Connection())
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = errorlist.Append(err, conn.Close())
+	}()
+	name2OidMap, err := greengage.MapSpcname2Oid(conn)
+	if err != nil {
+		return err
+	}
+	intermediate.Tablespaces = make(greengage.Tablespaces)
+	for dbid, tablespaces := range source.Tablespaces {
+		intermediate.Tablespaces[dbid] = make(greengage.SegmentTablespaces)
+		for _, tablespace := range tablespaces {
+			newOid, ok := name2OidMap[tablespace.Name]
+			if !ok {
+				err = xerrors.Errorf("the intermediate cluster does not have tablespace %s, while the source cluster has it.", tablespace.Name)
+				return
+			}
+			intermediate.Tablespaces[dbid][newOid] = tablespace
+		}
 	}
 
 	return nil
